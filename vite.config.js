@@ -14,6 +14,8 @@ export default defineConfig({
     allowedHosts: [
       'aebrahm-ramos-portfolio-bns27.ondigitalocean.app',
       '.ondigitalocean.app', // Allow all DigitalOcean app domains
+      'aebrahmramos.dev',
+      'www.aebrahmramos.dev',
     ],
   },
 })
