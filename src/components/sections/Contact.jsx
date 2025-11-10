@@ -9,8 +9,11 @@ import {
   Card,
   CardContent,
   IconButton,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 import { FiMail, FiSend, FiLinkedin, FiGithub } from 'react-icons/fi';
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +23,8 @@ const Contact = () => {
     subject: '',
     message: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success' or 'error'
 
   const handleChange = (e) => {
     setFormData({
@@ -28,9 +33,42 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      // EmailJS configuration from environment variables
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+      const templateParams = {
+        from_name: `${formData.firstName} ${formData.lastName}`,
+        from_email: formData.email,
+        subject: formData.subject || 'Portfolio Contact Form',
+        message: formData.message,
+        to_name: 'Aebrahm Ramos',
+      };
+
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+
+      setSubmitStatus('success');
+      // Reset form
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        subject: '',
+        message: '',
+      });
+    } catch (error) {
+      console.error('Email send failed:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isFormValid = formData.firstName && formData.lastName && formData.email && formData.message;
@@ -118,6 +156,18 @@ const Contact = () => {
                 </Typography>
 
                 <Box component="form" onSubmit={handleSubmit}>
+                  {/* Status Messages */}
+                  {submitStatus === 'success' && (
+                    <Alert severity="success" sx={{ mb: 3 }}>
+                      Message sent successfully! I'll get back to you soon.
+                    </Alert>
+                  )}
+                  {submitStatus === 'error' && (
+                    <Alert severity="error" sx={{ mb: 3 }}>
+                      Failed to send message. Please try again or contact me directly.
+                    </Alert>
+                  )}
+
                   <Grid container spacing={{ xs: 2, sm: 2.5 }}>
                     {/* First Name */}
                     <Grid size={{ xs: 12, sm: 6 }}>
@@ -213,11 +263,11 @@ const Contact = () => {
                         type="submit"
                         variant="contained"
                         fullWidth
-                        disabled={!isFormValid}
-                        startIcon={<FiSend />}
+                        disabled={!isFormValid || isSubmitting}
+                        startIcon={isSubmitting ? <CircularProgress size={20} /> : <FiSend />}
                         sx={{ minHeight: 52, fontSize: '1rem', py: 1.5 }}
                       >
-                        Send Message
+                        {isSubmitting ? 'Sending...' : 'Send Message'}
                       </Button>
                     </Grid>
                   </Grid>

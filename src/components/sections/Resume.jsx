@@ -73,7 +73,7 @@ const Resume = () => {
               variant="contained"
               size="large"
               startIcon={<FiDownload />}
-              href="/resume-aebrahm-ramos.pdf"
+              href="/resume/resume-aebrahm-ramos.pdf"
               download
               sx={{
                 backgroundColor: 'white',
@@ -93,7 +93,9 @@ const Resume = () => {
               variant="outlined"
               size="large"
               startIcon={<FiExternalLink />}
-              href="#"
+              href="/resume/resume-aebrahm-ramos.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
               sx={{
                 borderColor: 'white',
                 color: 'white',
