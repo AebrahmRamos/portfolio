@@ -42,7 +42,7 @@ const ScrollToTopButton = () => {
         aria-label="Scroll back to top"
         sx={{
           position: 'fixed',
-          bottom: { xs: 20, sm: 32 },
+          bottom: { xs: 80, sm: 90 }, // Increased to avoid reCAPTCHA badge
           right: { xs: 20, sm: 32 },
           zIndex: 1000,
           width: { xs: 48, sm: 56 },

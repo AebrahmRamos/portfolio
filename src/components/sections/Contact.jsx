@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import {
   Box,
   Container,
@@ -16,6 +17,7 @@ import { FiMail, FiSend, FiLinkedin, FiGithub } from 'react-icons/fi';
 import emailjs from '@emailjs/browser';
 
 const Contact = () => {
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -39,6 +41,16 @@ const Contact = () => {
     setSubmitStatus(null);
 
     try {
+      // Verify reCAPTCHA
+      if (!executeRecaptcha) {
+        console.error('reCAPTCHA not ready');
+        setSubmitStatus('error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      const recaptchaToken = await executeRecaptcha('contact_form');
+
       // EmailJS configuration from environment variables
       const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
       const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -50,6 +62,7 @@ const Contact = () => {
         subject: formData.subject || 'Portfolio Contact Form',
         message: formData.message,
         to_name: 'Aebrahm Ramos',
+        'g-recaptcha-response': recaptchaToken, // Include reCAPTCHA token
       };
 
       await emailjs.send(serviceId, templateId, templateParams, publicKey);

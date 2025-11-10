@@ -185,3 +185,11 @@ button {
     display: none !important;
   }
 }
+
+/* reCAPTCHA Badge Positioning */
+.grecaptcha-badge {
+  right: 4px !important;
+  bottom: 4px !important;
+  z-index: 999 !important;
+}
+
