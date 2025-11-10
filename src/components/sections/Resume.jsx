@@ -1,8 +1,13 @@
-import React from 'react';
-import { Box, Container, Typography, Button, Grid, Paper } from '@mui/material';
-import { FiDownload, FiExternalLink, FiFileText } from 'react-icons/fi';
+import React, { useState } from 'react';
+import { Box, Container, Typography, Button, Grid, Paper, Modal, IconButton } from '@mui/material';
+import { FiDownload, FiExternalLink, FiFileText, FiX } from 'react-icons/fi';
 
 const Resume = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleOpenModal = () => setModalOpen(true);
+  const handleCloseModal = () => setModalOpen(false);
+
   const resumeFeatures = [
     {
       col1: ['Education & Academic Background', 'Technical Skills & Expertise'],
@@ -73,7 +78,7 @@ const Resume = () => {
               variant="contained"
               size="large"
               startIcon={<FiDownload />}
-              href="/resume-aebrahm-ramos.pdf"
+              href="/resume/resume-aebrahm-ramos.pdf"
               download
               sx={{
                 backgroundColor: 'white',
@@ -93,7 +98,7 @@ const Resume = () => {
               variant="outlined"
               size="large"
               startIcon={<FiExternalLink />}
-              href="#"
+              onClick={handleOpenModal}
               sx={{
                 borderColor: 'white',
                 color: 'white',
@@ -216,10 +221,103 @@ const Resume = () => {
               opacity: 0.7,
             }}
           >
-            Last updated: May 2025 • Available in PDF format
+            Last updated: November 10, 2025 • Available in PDF format
           </Typography>
         </Box>
       </Container>
+
+      {/* PDF Viewer Modal */}
+      <Modal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        aria-labelledby="resume-modal-title"
+        aria-describedby="resume-modal-description"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Box
+          sx={{
+            position: 'relative',
+            width: '90vw',
+            height: '90vh',
+            backgroundColor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            overflow: 'hidden',
+          }}
+        >
+          {/* Modal Header */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              p: 2,
+              borderBottom: 1,
+              borderColor: 'divider',
+            }}
+          >
+            <Typography variant="h6" id="resume-modal-title">
+              Resume - Aebrahm Ramos
+            </Typography>
+            <IconButton
+              onClick={handleCloseModal}
+              aria-label="Close resume viewer"
+              sx={{
+                color: 'text.secondary',
+                '&:hover': {
+                  backgroundColor: 'action.hover',
+                },
+              }}
+            >
+              <FiX size={24} />
+            </IconButton>
+          </Box>
+
+          {/* PDF Viewer */}
+          <Box
+            sx={{
+              width: '100%',
+              height: 'calc(100% - 64px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <object
+              data="/resume/resume-aebrahm-ramos.pdf#toolbar=1&navpanes=0&scrollbar=1"
+              type="application/pdf"
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+              }}
+            >
+              <Box
+                sx={{
+                  p: 4,
+                  textAlign: 'center',
+                }}
+              >
+                <Typography variant="body1" sx={{ mb: 2 }}>
+                  Your browser doesn't support embedded PDFs.
+                </Typography>
+                <Button
+                  variant="contained"
+                  href="/resume/resume-aebrahm-ramos.pdf"
+                  download
+                  startIcon={<FiDownload />}
+                >
+                  Download PDF Instead
+                </Button>
+              </Box>
+            </object>
+          </Box>
+        </Box>
+      </Modal>
     </Box>
   );
 };

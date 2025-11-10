@@ -1,4 +1,5 @@
 import React, { Suspense, lazy } from 'react';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/layout/Layout';
 import Hero from './components/sections/Hero';
@@ -16,23 +17,27 @@ const Resume = lazy(() => import('./components/sections/Resume'));
 const Footer = lazy(() => import('./components/sections/Footer'));
 
 function App() {
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
   return (
-    <ThemeProvider>
-      <Layout>
-        <Hero />
-        <About />
-        <Education />
-        <Skills />
-        <Suspense fallback={<Loading />}>
-          <Projects />
-          <Experience />
-          <Organizations />
-          <Contact />
-          <Resume />
-          <Footer />
-        </Suspense>
-      </Layout>
-    </ThemeProvider>
+    <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
+      <ThemeProvider>
+        <Layout>
+          <Hero />
+          <About />
+          <Education />
+          <Skills />
+          <Suspense fallback={<Loading />}>
+            <Projects />
+            <Experience />
+            <Organizations />
+            <Contact />
+            <Resume />
+            <Footer />
+          </Suspense>
+        </Layout>
+      </ThemeProvider>
+    </GoogleReCaptchaProvider>
   );
 }
 
