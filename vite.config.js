@@ -11,5 +11,9 @@ export default defineConfig({
   preview: {
     host: '0.0.0.0',
     port: 5173,
+    allowedHosts: [
+      'aebrahm-ramos-portfolio-bns27.ondigitalocean.app',
+      '.ondigitalocean.app', // Allow all DigitalOcean app domains
+    ],
   },
 })
