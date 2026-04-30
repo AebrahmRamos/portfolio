@@ -1,47 +1,53 @@
-/**
- * Education data for portfolio
- * Contains all academic background information with degrees, institutions, dates, and skills
- */
-
 export const education = [
   {
     id: 1,
-    degree: 'Bachelor of Science - BS, Computer Science',
-    major: 'Major in Computer and Systems Engineering',
+    degree: 'Bachelor of Science in Computer Science',
+    major: 'Major in Computer Systems Engineering',
     institution: 'De La Salle University',
     date: 'Aug 2023 - Aug 2027',
-    status: null,
-    statusColor: 'primary', // Blue
-    activities: null,
-    skills: null,
-    additionalSkills: 0,
     current: true,
+    tracks: [
+      {
+        label: 'Computer Science',
+        courses: [
+          'Data Structures & Algorithms',
+          'Object-Oriented Programming',
+          'Software Engineering',
+          'Secure Web Development',
+          'Computer Architecture',
+          'Operating Systems',
+        ],
+      },
+      {
+        label: 'Computer Systems Engineering',
+        courses: [
+          'Digital Signal Processing',
+          'Electrical Circuits',
+          'Microprocessor Systems',
+          'Embedded Hardware Design',
+          'Assembly Language Programming',
+          'Parallel Computing',
+        ],
+      },
+    ],
+  },
+  {
+    id: 2,
+    degree: 'Senior High School — General Academic Strand',
+    major: null,
+    institution: 'OB Montessori Center Inc.',
+    date: null,
+    current: false,
+    tracks: null,
   },
   {
     id: 3,
-    degree: 'Senior High School, General Academic Strand',
+    degree: 'Junior High School',
     major: null,
-    institution: 'OB Montessori Center Inc. - Fairview',
+    institution: 'OB Montessori Center Inc.',
     date: null,
-    status: null,
-    statusColor: 'secondary', // Yellow
-    activities: null,
-    skills: null,
-    additionalSkills: 0,
     current: false,
-  },
-  {
-    id: 4,
-    degree: 'High School Diploma, General Academic Strand',
-    major: null,
-    institution: 'OB Montessori Center Inc. - Fairview',
-    date: null,
-    status: null,
-    statusColor: 'secondary', // Yellow
-    activities: null,
-    skills: null,
-    additionalSkills: 0,
-    current: false,
+    tracks: null,
   },
 ];
 

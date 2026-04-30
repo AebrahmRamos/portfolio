@@ -242,6 +242,32 @@ export const projects = [
   },
   {
     id: 9,
+    title: 'M68HC11 EPROM Programmer',
+    description:
+      'Hardware EPROM programmer implementing the fast programming algorithm to interface a Motorola M68HC11 with a 2764 UVEPROM chip.',
+    fullDescription:
+      'Implemented a read and write programming protocol for the Motorola M68HC11 microcontroller to be externally interfaced with a 2764 UVEPROM. The programming protocol follows the fast programming algorithm specified in the 2764 UVEPROM\'s datasheet. The project encompasses a Python bootloader for host-side communication, M68HC11 assembly code for the microcontroller firmware, hardware connection design and interfacing, and custom PCB fabrication.',
+    image: 'https://api.builder.io/api/v1/image/assets/TEMP/b2c10a7f62f84dd4920fc0a6c929f1b5d8d067e7?width=760',
+    features: [
+      'Read and write programming protocol for 2764 UVEPROM',
+      'Fast programming algorithm per datasheet specification',
+      'Python bootloader for host-side communication via PySerial',
+      'M68HC11 assembly firmware',
+      'Hardware interfacing and connection design',
+      'Custom PCB fabrication',
+    ],
+    technologies: [
+      'M68HC11 Assembly',
+      'Python',
+      'PySerial',
+    ],
+    liveDemo: null,
+    github: null,
+    featured: false,
+    category: ['Assembly', 'Embedded Systems'],
+  },
+  {
+    id: 10,
     title: 'RGB to Grayscale Converter',
     description:
       'RGB to Grayscale converter linking C and Assembly with optimized conversion function.',

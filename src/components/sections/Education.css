@@ -1,66 +1,132 @@
 .education {
-  background-color: var(--md-sys-color-surface);
-  padding: 80px 0;
+  background-color: var(--md-sys-color-surface-container-low);
+  padding: 64px 0 80px;
 }
 
-@media (min-width: 900px) { .education { padding: 96px 0; } }
+@media (min-width: 900px) { .education { padding: 80px 0 96px; } }
 
-.education__grid {
-  display: grid;
-  gap: 24px;
-  max-width: 960px;
+.education__title {
+  background: linear-gradient(135deg, var(--md-sys-color-tertiary) 0%, var(--md-sys-color-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.edu-timeline {
+  position: relative;
+  padding-left: 48px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
-@media (min-width: 600px) {
-  .education__grid { grid-template-columns: 1fr 1fr; }
+@media (min-width: 900px) { .edu-timeline { padding-left: 64px; } }
+
+.edu-timeline__line {
+  position: absolute;
+  left: 12px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--md-sys-color-tertiary) 0%,
+    color-mix(in srgb, var(--md-sys-color-tertiary) 20%, transparent) 100%
+  );
 }
 
-.education__card--current {
-  box-shadow: inset 0 0 0 2px var(--md-sys-color-primary) !important;
+@media (min-width: 900px) { .edu-timeline__line { left: 20px; } }
+
+.edu-timeline__entry {
+  position: relative;
+  margin-bottom: 28px;
 }
 
-.education__card-header {
+.edu-timeline__node {
+  position: absolute;
+  left: -44px;
+  top: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-surface-container-low);
+  border: 2px solid var(--md-sys-color-outline-variant);
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.education__degree {
-  color: var(--md-sys-color-on-surface);
-  margin-bottom: 4px;
-}
-
-.education__major {
+  align-items: center;
+  justify-content: center;
   color: var(--md-sys-color-on-surface-variant);
+  z-index: 2;
 }
 
-.education__institution {
-  color: var(--md-sys-color-primary);
-  margin-bottom: 4px;
+@media (min-width: 900px) {
+  .edu-timeline__node { left: -60px; width: 48px; height: 48px; }
 }
 
-.education__date {
-  color: var(--md-sys-color-on-surface-variant);
-  margin-bottom: 12px;
+.edu-timeline__node--current {
+  border-color: var(--md-sys-color-tertiary);
+  color: var(--md-sys-color-tertiary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--md-sys-color-tertiary) 12%, transparent);
 }
 
-.education__status { margin-bottom: 16px; }
+.edu-timeline__card--current {
+  box-shadow: inset 0 0 0 1.5px var(--md-sys-color-tertiary) !important;
+}
 
-.education__section { margin-bottom: 12px; }
-.education__section .m3-label-large {
-  color: var(--md-sys-color-on-surface);
+.edu-timeline__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 6px;
 }
 
-.education__muted {
-  color: var(--md-sys-color-on-surface-variant);
+@media (min-width: 600px) {
+  .edu-timeline__header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
 }
 
-.education__chips {
+.edu-timeline__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.edu-timeline__degree {
+  color: var(--md-sys-color-on-surface);
+}
+
+.edu-timeline__date {
+  color: var(--md-sys-color-on-surface-variant);
+  white-space: nowrap;
+}
+
+.edu-timeline__major {
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 6px;
+}
+
+.edu-timeline__institution {
+  color: var(--md-sys-color-tertiary);
+  margin-bottom: 16px;
+}
+
+.edu-timeline__tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 4px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.edu-timeline__track-label {
+  color: var(--md-sys-color-on-surface);
+  margin-bottom: 8px;
+}
+
+.edu-timeline__track-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 6px;
 }
