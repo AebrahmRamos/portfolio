@@ -1,0 +1,18 @@
+.m3-progress {
+  display: inline-block;
+  position: relative;
+}
+
+.m3-progress__spinner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--md-sys-color-surface-container-highest);
+  border-top-color: var(--md-sys-color-primary);
+  border-radius: 50%;
+  animation: m3-spin 0.9s linear infinite;
+}
+
+@keyframes m3-spin {
+  to { transform: rotate(360deg); }
+}

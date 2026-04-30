@@ -1,0 +1,22 @@
+.scroll-to-top {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8) translateY(8px);
+  transition:
+    opacity var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized),
+    transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized);
+}
+
+.scroll-to-top--visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1) translateY(0);
+}
+
+@media (min-width: 600px) {
+  .scroll-to-top { right: 32px; bottom: 90px; }
+}

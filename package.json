@@ -14,10 +14,7 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^7.3.5",
-    "@mui/material": "^7.3.5",
+    "@material/material-color-utilities": "^0.4.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-google-recaptcha-v3": "^1.11.0",

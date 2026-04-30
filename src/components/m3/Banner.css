@@ -1,0 +1,27 @@
+.m3-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--md-sys-shape-corner-sm);
+  font-family: var(--md-sys-typescale-font);
+  font-size: var(--md-sys-typescale-body-medium-size);
+  line-height: var(--md-sys-typescale-body-medium-line);
+}
+
+.m3-banner--success {
+  background: color-mix(in srgb, var(--md-sys-color-tertiary-container) 100%, transparent);
+  color: var(--md-sys-color-on-tertiary-container);
+}
+.m3-banner--error {
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+}
+.m3-banner--info {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.m3-banner--warning {
+  background: color-mix(in srgb, var(--md-sys-color-tertiary-container) 100%, transparent);
+  color: var(--md-sys-color-on-tertiary-container);
+}

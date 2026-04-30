@@ -1,31 +1,12 @@
 import React from 'react';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Progress } from '../m3';
+import './Loading.css';
 
-const Loading = () => {
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: 'background.default',
-        gap: 3,
-      }}
-    >
-      <CircularProgress size={60} thickness={4} />
-      <Typography
-        variant="h6"
-        sx={{
-          color: 'text.secondary',
-          fontWeight: 500,
-        }}
-      >
-        Loading Portfolio...
-      </Typography>
-    </Box>
-  );
-};
+const Loading = () => (
+  <div className="loading">
+    <Progress size={60} />
+    <p className="m3-title-medium loading__text">Loading Portfolio...</p>
+  </div>
+);
 
 export default Loading;

@@ -1,0 +1,112 @@
+.projects {
+  background: var(--md-sys-color-surface);
+  padding: 80px 0;
+}
+
+@media (min-width: 900px) { .projects { padding: 96px 0; } }
+
+.projects__title {
+  background: linear-gradient(135deg, var(--md-sys-color-primary) 0%, var(--md-sys-color-tertiary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.projects__grid {
+  display: grid;
+  gap: 20px;
+}
+
+@media (min-width: 600px) { .projects__grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 900px) { .projects__grid { grid-template-columns: repeat(3, 1fr); } }
+
+.projects__card { height: 100%; }
+
+.projects__card-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  z-index: 1;
+  position: relative;
+}
+
+.projects__card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.projects__card-title {
+  color: var(--md-sys-color-on-surface);
+  flex: 1;
+}
+
+.projects__card-desc {
+  color: var(--md-sys-color-on-surface-variant);
+  flex: 1;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.projects__card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+/* Modal */
+.projects__modal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.projects__modal-image {
+  margin-bottom: 20px;
+  border-radius: var(--md-sys-shape-corner-md);
+  overflow: hidden;
+}
+
+.projects__modal-image img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  display: block;
+}
+
+.projects__modal-desc {
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 20px;
+}
+
+.projects__modal-section { margin-bottom: 20px; }
+
+.projects__modal-section-title {
+  color: var(--md-sys-color-on-surface);
+  margin-bottom: 12px;
+}
+
+.projects__modal-list {
+  padding-left: 20px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.projects__modal-list li { margin-bottom: 6px; }
+
+.projects__modal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.projects__modal-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}

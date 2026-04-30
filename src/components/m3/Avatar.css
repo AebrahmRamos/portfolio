@@ -1,0 +1,14 @@
+.m3-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--md-sys-shape-corner-full);
+  overflow: hidden;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  font-family: var(--md-sys-typescale-font);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.m3-avatar--img { object-fit: cover; }

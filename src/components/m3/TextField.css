@@ -1,0 +1,84 @@
+.m3-tf { display: inline-block; }
+.m3-tf--full { display: block; width: 100%; }
+
+.m3-tf__field {
+  position: relative;
+  background: var(--md-sys-color-surface-container-lowest);
+  border-radius: var(--md-sys-shape-corner-xs);
+}
+
+.m3-tf__input {
+  display: block;
+  width: 100%;
+  padding: 24px 16px 8px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-xs);
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-sys-typescale-font);
+  font-size: var(--md-sys-typescale-body-large-size);
+  line-height: var(--md-sys-typescale-body-large-line);
+  transition: border-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+  outline: none;
+  min-height: 56px;
+  box-sizing: border-box;
+}
+
+.m3-tf--multiline .m3-tf__input {
+  min-height: auto;
+  padding-top: 26px;
+  resize: vertical;
+  font-family: var(--md-sys-typescale-font);
+}
+
+.m3-tf__input:hover { border-color: var(--md-sys-color-on-surface); }
+
+.m3-tf--focused .m3-tf__input,
+.m3-tf__input:focus {
+  border-color: var(--md-sys-color-primary);
+  border-width: 2px;
+  padding: 23px 15px 7px;
+}
+
+.m3-tf--multiline.m3-tf--focused .m3-tf__input {
+  padding-top: 25px;
+}
+
+.m3-tf--error .m3-tf__input {
+  border-color: var(--md-sys-color-error);
+}
+
+.m3-tf__label {
+  position: absolute;
+  left: 16px;
+  top: 18px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-family: var(--md-sys-typescale-font);
+  font-size: var(--md-sys-typescale-body-large-size);
+  line-height: 1;
+  pointer-events: none;
+  transition:
+    transform var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
+    color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+  background: transparent;
+  padding: 0 4px;
+}
+
+.m3-tf--filled .m3-tf__label,
+.m3-tf--focused .m3-tf__label {
+  transform: translateY(-14px) scale(0.75);
+  color: var(--md-sys-color-on-surface-variant);
+  background: var(--md-sys-color-surface-container-lowest);
+}
+
+.m3-tf--focused .m3-tf__label { color: var(--md-sys-color-primary); }
+.m3-tf--error .m3-tf__label { color: var(--md-sys-color-error); }
+
+.m3-tf__helper {
+  display: block;
+  margin-top: 4px;
+  padding: 0 16px;
+  font-size: var(--md-sys-typescale-body-small-size);
+  color: var(--md-sys-color-on-surface-variant);
+}
+.m3-tf--error .m3-tf__helper { color: var(--md-sys-color-error); }
