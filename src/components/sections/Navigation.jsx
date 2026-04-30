@@ -7,10 +7,10 @@ import './Navigation.css';
 
 const navItems = [
   { label: 'About', id: 'about' },
-  { label: 'Education', id: 'education' },
-  { label: 'Skills', id: 'skills' },
-  { label: 'Projects', id: 'projects' },
   { label: 'Experience', id: 'experience' },
+  { label: 'Projects', id: 'projects' },
+  { label: 'Skills', id: 'skills' },
+  { label: 'Education', id: 'education' },
   { label: 'Organizations', id: 'organizations' },
   { label: 'Contact', id: 'contact' },
 ];

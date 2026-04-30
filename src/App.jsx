@@ -4,13 +4,13 @@ import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/layout/Layout';
 import Hero from './components/sections/Hero';
 import About from './components/sections/About';
-import Education from './components/sections/Education';
-import Skills from './components/sections/Skills';
 import Loading from './components/common/Loading';
 
 // Lazy-load below-the-fold sections for better initial bundle size
-const Projects = lazy(() => import('./components/sections/Projects'));
 const Experience = lazy(() => import('./components/sections/Experience'));
+const Projects = lazy(() => import('./components/sections/Projects'));
+const Skills = lazy(() => import('./components/sections/Skills'));
+const Education = lazy(() => import('./components/sections/Education'));
 const Organizations = lazy(() => import('./components/sections/Organizations'));
 const Contact = lazy(() => import('./components/sections/Contact'));
 const Resume = lazy(() => import('./components/sections/Resume'));
@@ -25,11 +25,11 @@ function App() {
         <Layout>
           <Hero />
           <About />
-          <Education />
-          <Skills />
           <Suspense fallback={<Loading />}>
-            <Projects />
             <Experience />
+            <Projects />
+            <Skills />
+            <Education />
             <Organizations />
             <Contact />
             <Resume />

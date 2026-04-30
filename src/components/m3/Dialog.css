@@ -9,6 +9,12 @@
   max-height: 90vh;
   width: min(800px, 90vw);
   overflow: hidden;
+  /* Force centering — overrides browser UA left:0/right:0 without top/bottom */
+  inset: 0;
+  margin: auto;
+}
+
+.m3-dialog[open] {
   display: flex;
   flex-direction: column;
   animation: m3-dialog-in var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate);

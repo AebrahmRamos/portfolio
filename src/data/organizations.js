@@ -23,6 +23,7 @@ export const organizations = [
       {
         id: '1-2',
         title: 'Chief Developer (Executive)',
+
         date: 'Oct 2024 - Aug 2025',
         type: 'Leadership',
         description:
@@ -48,7 +49,7 @@ export const organizations = [
           'Collaborated closely with partnership coordinators and team members for logistical needs',
           'Effectively troubleshoots technical difficulties before and during events',
         ],
-        current: true,
+        current: false,
       },
     ],
     iconColor: 'primary',
