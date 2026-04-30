@@ -30,7 +30,7 @@ const Resume = () => {
             variant="elevated"
             size="large"
             startIcon={<FiDownload />}
-            href="/resume/resume-aebrahm-ramos.pdf"
+            href="/resume/ramos-aebrahm-resume.pdf"
             download
             className="resume__btn-download"
           >
@@ -60,7 +60,7 @@ const Resume = () => {
         </div>
 
         <p className="m3-body-small resume__updated">
-          Last updated: November 10, 2025 • Available in PDF format
+          Last updated: April 30, 2026 • Available in PDF format
         </p>
       </div>
 
@@ -73,13 +73,13 @@ const Resume = () => {
         </div>
         <div className="resume__modal-body">
           <object
-            data="/resume/resume-aebrahm-ramos.pdf#toolbar=1&navpanes=0&scrollbar=1"
+            data="/resume/ramos-aebrahm-resume.pdf#toolbar=1&navpanes=0&scrollbar=1"
             type="application/pdf"
             className="resume__pdf"
           >
             <div className="resume__pdf-fallback">
               <p className="m3-body-large">Your browser doesn't support embedded PDFs.</p>
-              <Button variant="filled" href="/resume/resume-aebrahm-ramos.pdf" download startIcon={<FiDownload />}>
+              <Button variant="filled" href="/resume/ramos-aebrahm-resume.pdf" download startIcon={<FiDownload />}>
                 Download PDF Instead
               </Button>
             </div>

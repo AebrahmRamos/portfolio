@@ -75,7 +75,7 @@ const Navigation = () => {
               <Button
                 variant="outlined"
                 startIcon={<FiDownload />}
-                href="/resume-aebrahm-ramos.pdf"
+                href="/resume/ramos-aebrahm-resume.pdf"
                 download
               >
                 Resume
@@ -122,7 +122,7 @@ const Navigation = () => {
             <Button
               variant="outlined"
               startIcon={<FiDownload />}
-              href="/resume-aebrahm-ramos.pdf"
+              href="/resume/ramos-aebrahm-resume.pdf"
               download
               fullWidth
             >

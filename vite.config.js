@@ -8,5 +8,19 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
+    allowedHosts: [
+      'aebrahmramos.dev',
+      'www.aebrahmramos.dev',
+    ],
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 5173,
+    allowedHosts: [
+      'aebrahm-ramos-portfolio-bns27.ondigitalocean.app',
+      '.ondigitalocean.app',
+      'aebrahmramos.dev',
+      'www.aebrahmramos.dev',
+    ],
   },
 })
