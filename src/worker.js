@@ -65,6 +65,7 @@ function jsonResponse(data, status = 200) {
 function injectLinkHeader(response) {
   const headers = new Headers(response.headers);
   headers.set('Link', LINK_HEADER);
+  headers.set('Vary', 'Accept');
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
@@ -89,6 +90,7 @@ export default {
         headers: {
           'Content-Type': 'text/markdown; charset=utf-8',
           'Cache-Control': 'public, max-age=3600',
+          'Vary': 'Accept',
           Link: LINK_HEADER,
         },
       });
