@@ -12,5 +12,15 @@
   },
   "compatibility_flags": [
     "nodejs_compat"
-  ]
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "portfolio-blog",
+      "database_id": "da664f90-3880-4e3b-934a-dbbd4cb802b8"
+    }
+  ],
+  "vars": {
+    "ADMIN_TOKEN": "dev-change-me-in-production"
+  }
 }
