@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { FiMenu, FiX, FiSun, FiMoon, FiDownload } from 'react-icons/fi';
 import { useThemeContext } from '../../context/ThemeContext';
 import { scrollToSection } from '../../utils/helpers';
@@ -17,6 +18,8 @@ const navItems = [
 
 const Navigation = () => {
   const { darkMode, toggleDarkMode } = useThemeContext();
+  const location = useLocation();
+  const isBlogPage = location.pathname.startsWith('/blog') || location.pathname.startsWith('/admin');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
@@ -60,7 +63,7 @@ const Navigation = () => {
 
           {!isMobile && (
             <div className="nav__desktop">
-              {navItems.map((item) => (
+              {!isBlogPage && navItems.map((item) => (
                 <button
                   key={item.id}
                   className={`nav__link ${activeSection === item.id ? 'nav__link--active' : ''}`}
@@ -69,6 +72,13 @@ const Navigation = () => {
                   {item.label}
                 </button>
               ))}
+              <Link
+                to="/blog"
+                className={`nav__link ${isBlogPage ? 'nav__link--active' : ''}`}
+                style={{ textDecoration: 'none' }}
+              >
+                Blog
+              </Link>
               <IconButton onClick={toggleDarkMode} aria-label="Toggle dark mode">
                 {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
               </IconButton>
@@ -117,6 +127,14 @@ const Navigation = () => {
                 {item.label}
               </button>
             ))}
+            <Link
+              to="/blog"
+              className={`drawer__item ${isBlogPage ? 'drawer__item--active' : ''}`}
+              style={{ textDecoration: 'none' }}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Blog
+            </Link>
           </nav>
           <div className="drawer__footer">
             <Button
