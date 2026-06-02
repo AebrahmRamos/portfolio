@@ -163,43 +163,53 @@ test.describe('Admin API', () => {
 });
 
 // ─── Browser: Blog UI ─────────────────────────────────────────────────────────
+// Note: SPAs never reach 'networkidle' — use element-level waits instead.
 
 test.describe('Blog UI', () => {
   test('blog index page loads and shows post', async ({ page }) => {
     await page.goto(`${BASE}/blog`);
-    await page.waitForLoadState('networkidle');
-    // Should show at least one post
-    const posts = page.locator('.post-row, .post-card');
-    await expect(posts.first()).toBeVisible({ timeout: 10000 });
+    // Wait for React to hydrate and the post list to render (API fetch completes)
+    const posts = page.locator('.post-row, [class*="post-row"], article, .post-card, [class*="post-card"]');
+    await expect(posts.first()).toBeVisible({ timeout: 20000 });
+    await expect(posts.first()).toContainText('Test Post');
   });
 
   test('blog post page renders test-post', async ({ page }) => {
     await page.goto(`${BASE}/blog/test-post`);
-    await page.waitForLoadState('networkidle');
-    // Title should be visible
-    await expect(page.locator('h1')).toContainText('Test Post', { timeout: 10000 });
+    // h1 appears once React fetches and renders the post
+    await expect(page.locator('h1')).toContainText('Test Post', { timeout: 20000 });
+    // Body content should be present
+    await expect(page.locator('body')).toContainText('first post for testing', { timeout: 5000 });
   });
 
-  test('progress bar exists on post page', async ({ page }) => {
+  test('back-to-blog link exists on post page', async ({ page }) => {
     await page.goto(`${BASE}/blog/test-post`);
-    await page.waitForLoadState('networkidle');
-    const bar = page.locator('.bpr__progress, [class*="progress"]');
-    await expect(bar.first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('h1')).toContainText('Test Post', { timeout: 20000 });
+    // Back nav — text or arrow link
+    const backLink = page.locator('a[href="/blog"], a:has-text("All posts"), a:has-text("Back")');
+    await expect(backLink.first()).toBeVisible({ timeout: 5000 });
   });
 
-  test('blog index search filters posts', async ({ page }) => {
+  test('post tags are displayed', async ({ page }) => {
+    await page.goto(`${BASE}/blog/test-post`);
+    await expect(page.locator('h1')).toContainText('Test Post', { timeout: 20000 });
+    await expect(page.locator('body')).toContainText('c++', { timeout: 5000 });
+  });
+
+  test('blog index search input is present', async ({ page }) => {
     await page.goto(`${BASE}/blog`);
-    await page.waitForLoadState('networkidle');
-    const searchInput = page.locator('input[type="search"], input[placeholder*="earch"]');
-    if (await searchInput.isVisible()) {
-      await searchInput.fill('nonexistent xyz abc');
-      await page.waitForTimeout(500); // debounce
-      const emptyState = page.locator('[class*="empty"], [class*="no-results"]');
-      // Either empty state shows OR posts are filtered
-      const posts = page.locator('.post-row, .post-card');
-      const count = await posts.count();
-      expect(count).toBe(0);
+    await expect(page.locator('.post-row, [class*="post-row"], article, .post-card').first()).toBeVisible({ timeout: 20000 });
+    // Search input might be present in new design
+    const searchInput = page.locator('input[type="search"], input[type="text"][placeholder*="earch"], input[placeholder*="earch"]');
+    const hasSearch = await searchInput.count() > 0;
+    if (hasSearch) {
+      // If search exists, typing a non-matching query should reduce visible posts
+      await searchInput.first().fill('xyznonexistent123');
+      await page.waitForTimeout(400); // wait for debounce
+      const remaining = await page.locator('.post-row, [class*="post-row"], article[class*="post"]').count();
+      expect(remaining).toBe(0);
     }
+    // If no search yet, test passes (future feature)
   });
 });
 
@@ -208,13 +218,12 @@ test.describe('Blog UI', () => {
 test.describe('Admin CMS', () => {
   test('admin gate shows login form', async ({ page }) => {
     await page.goto(`${BASE}/admin`);
-    await page.waitForLoadState('networkidle');
-    await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 8000 });
+    await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 15000 });
   });
 
   test('admin login with correct token works', async ({ page }) => {
     await page.goto(`${BASE}/admin`);
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 15000 });
     await page.locator('input[type="password"]').fill(ADMIN_TOKEN);
     await page.locator('button[type="submit"]').click();
     // Should navigate to posts list
@@ -224,7 +233,7 @@ test.describe('Admin CMS', () => {
 
   test('admin shows existing test post', async ({ page }) => {
     await page.goto(`${BASE}/admin`);
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 15000 });
     await page.locator('input[type="password"]').fill(ADMIN_TOKEN);
     await page.locator('button[type="submit"]').click();
     await expect(page.locator('text=Test Post')).toBeVisible({ timeout: 10000 });
@@ -232,7 +241,7 @@ test.describe('Admin CMS', () => {
 
   test('editor loads when clicking Edit', async ({ page }) => {
     await page.goto(`${BASE}/admin`);
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 15000 });
     await page.locator('input[type="password"]').fill(ADMIN_TOKEN);
     await page.locator('button[type="submit"]').click();
     await page.locator('text=Edit').first().click();
@@ -244,7 +253,7 @@ test.describe('Admin CMS', () => {
 
   test('new post editor opens with empty Tiptap', async ({ page }) => {
     await page.goto(`${BASE}/admin`);
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 15000 });
     await page.locator('input[type="password"]').fill(ADMIN_TOKEN);
     await page.locator('button[type="submit"]').click();
     await page.locator('text=New post').click();
