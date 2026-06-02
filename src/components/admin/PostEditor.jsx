@@ -44,8 +44,26 @@ function Toolbar({ editor }) {
   );
 
   const addImage = () => {
-    const url = prompt('Image URL:');
-    if (url) editor.chain().focus().setImage({ src: url }).run();
+    // Offer both URL and file upload
+    const choice = confirm('Upload a file? Click OK for file picker, Cancel to enter URL.');
+    if (choice) {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = async () => {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          editor.chain().focus().setImage({ src: reader.result }).run();
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    } else {
+      const url = prompt('Image URL:');
+      if (url) editor.chain().focus().setImage({ src: url }).run();
+    }
   };
 
   const addLink = () => {
@@ -97,16 +115,62 @@ export default function PostEditor({ token }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(isEdit);
 
+  // Convert a File/Blob to a base64 data URL for embedding images without R2
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ codeBlock: false }),
       CodeBlockLowlight.configure({ lowlight }),
-      Image.configure({ inline: false }),
+      Image.configure({ inline: false, allowBase64: true }),
       LinkExtension.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: 'Start writing…' }),
     ],
     editorProps: {
       attributes: { 'aria-label': 'Post body', role: 'textbox' },
+      // Handle image paste and drag-drop — convert to base64 and insert
+      handlePaste(view, event) {
+        const items = Array.from(event.clipboardData?.items ?? []);
+        const imageItem = items.find(item => item.type.startsWith('image/'));
+        if (!imageItem) return false; // let Tiptap handle non-image pastes normally
+
+        event.preventDefault();
+        const file = imageItem.getAsFile();
+        if (!file) return false;
+
+        fileToBase64(file).then(dataUrl => {
+          view.dispatch(
+            view.state.tr.replaceSelectionWith(
+              view.state.schema.nodes.image.create({ src: dataUrl })
+            )
+          );
+        }).catch(() => {});
+        return true;
+      },
+      handleDrop(view, event, _slice, moved) {
+        if (moved) return false;
+        const files = Array.from(event.dataTransfer?.files ?? []);
+        const imageFile = files.find(f => f.type.startsWith('image/'));
+        if (!imageFile) return false;
+
+        event.preventDefault();
+        const coords = view.posAtCoords({ left: event.clientX, top: event.clientY });
+        if (!coords) return false;
+
+        fileToBase64(imageFile).then(dataUrl => {
+          const node = view.state.schema.nodes.image.create({ src: dataUrl });
+          const transaction = view.state.tr.insert(coords.pos, node);
+          view.dispatch(transaction);
+        }).catch(() => {});
+        return true;
+      },
     },
   });
 

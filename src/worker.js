@@ -126,7 +126,7 @@ function parseTags(raw) {
 async function handleGetPosts(request, env) {
   const url = new URL(request.url);
   const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10));
-  const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get('limit') ?? '10', 10)));
+  const limit = Math.min(200, Math.max(1, parseInt(url.searchParams.get('limit') ?? '10', 10)));
   const offset = (page - 1) * limit;
 
   const [rowsResult, countResult] = await Promise.all([
@@ -139,10 +139,16 @@ async function handleGetPosts(request, env) {
   ]);
 
   const total = countResult?.total ?? 0;
-  return jsonResponse({
+  // Short TTL for the list — stale-while-revalidate so CDN stays fast but refreshes quickly
+  return new Response(JSON.stringify({
     posts: rowsResult.results.map(p => ({ ...p, tags: parseTags(p.tags) })),
     total, page, limit,
     hasMore: offset + limit < total,
+  }, null, 2), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, max-age=0, s-maxage=60, stale-while-revalidate=300',
+    },
   });
 }
 

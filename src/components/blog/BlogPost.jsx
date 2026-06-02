@@ -1,43 +1,209 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import { Chip } from '../m3';
 import './blog.css';
 
 function formatDate(ts) {
   if (!ts) return '';
-  return new Date(ts * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  return new Date(ts * 1000).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 }
+
+// Strip HTML tags and count words to get an estimated reading time.
+// Average adult reading speed is ~238 wpm (per Nielsen Norman Group research).
+function calcReadingTime(html) {
+  if (!html) return null;
+  const text = html.replace(/<[^>]+>/g, ' ');
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  const minutes = Math.ceil(words / 238);
+  return minutes < 1 ? '< 1 min read' : `${minutes} min read`;
+}
+
+// ── Skeleton ──────────────────────────────────────────────────────────────────
 
 function SkeletonPost() {
   return (
-    <div className="blog-post__container">
-      <div style={{ marginBottom: 32 }}>
-        <div className="skeleton" style={{ width: 80, height: 14, borderRadius: 4 }} />
+    <div className="bpr__container">
+      {/* Back link skeleton */}
+      <div className="skeleton" style={{ width: 72, height: 13, borderRadius: 4, marginBottom: 40 }} />
+
+      {/* Series label skeleton */}
+      <div className="skeleton" style={{ width: 120, height: 11, borderRadius: 4, marginBottom: 16 }} />
+
+      {/* Title */}
+      <div className="skeleton" style={{ width: '85%', height: 44, borderRadius: 6, marginBottom: 12 }} />
+      <div className="skeleton" style={{ width: '60%', height: 44, borderRadius: 6, marginBottom: 28 }} />
+
+      {/* Meta row */}
+      <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
+        <div className="skeleton" style={{ width: 120, height: 13, borderRadius: 4 }} />
+        <div className="skeleton" style={{ width: 80, height: 13, borderRadius: 4 }} />
       </div>
-      <div className="skeleton" style={{ width: '40%', height: 14, marginBottom: 16 }} />
-      <div className="skeleton" style={{ width: '80%', height: 40, marginBottom: 16 }} />
-      <div className="skeleton" style={{ width: '60%', height: 14, marginBottom: 32 }} />
-      {[100, 90, 95, 85, 100, 70].map((w, i) => (
-        <div key={i} className="skeleton" style={{ width: `${w}%`, height: 14, marginBottom: 12 }} />
+
+      {/* Divider */}
+      <div style={{ height: 1, background: 'var(--md-sys-color-outline-variant)', marginBottom: 40 }} />
+
+      {/* Body lines */}
+      {[100, 97, 93, 100, 88, 100, 95, 72].map((w, i) => (
+        <div
+          key={i}
+          className="skeleton"
+          style={{ width: `${w}%`, height: 18, borderRadius: 4, marginBottom: 14 }}
+        />
       ))}
     </div>
   );
 }
 
+// ── Reading progress bar ───────────────────────────────────────────────────────
+
+function ReadingProgressBar() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const doc = document.documentElement;
+      const scrollTop = doc.scrollTop || document.body.scrollTop;
+      const scrollHeight = doc.scrollHeight - doc.clientHeight;
+      setProgress(scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  return (
+    <div className="bpr__progress-track" aria-hidden="true">
+      <div className="bpr__progress-fill" style={{ width: `${progress}%` }} />
+    </div>
+  );
+}
+
+// ── Floating side actions (desktop only) ───────────────────────────────────────
+
+function FloatingActions() {
+  const [copied, setCopied] = useState(false);
+
+  const copyLink = useCallback(() => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, []);
+
+  return (
+    <aside className="bpr__float-actions" aria-label="Article actions">
+      <Link to="/blog" className="bpr__float-btn" aria-label="Back to blog">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+        <span className="bpr__float-btn-label">Blog</span>
+      </Link>
+
+      <button
+        className="bpr__float-btn"
+        onClick={copyLink}
+        aria-label={copied ? 'Link copied' : 'Copy link'}
+      >
+        {copied ? (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        ) : (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+        )}
+        <span className="bpr__float-btn-label">{copied ? 'Copied!' : 'Copy'}</span>
+      </button>
+    </aside>
+  );
+}
+
+// ── Series prev/next navigation ────────────────────────────────────────────────
+
+function SeriesNav({ seriesPosts, currentSlug, seriesTitle }) {
+  const currentIdx = seriesPosts.findIndex(p => p.slug === currentSlug);
+  const prev = currentIdx > 0 ? seriesPosts[currentIdx - 1] : null;
+  const next = currentIdx < seriesPosts.length - 1 ? seriesPosts[currentIdx + 1] : null;
+
+  if (!prev && !next) return null;
+
+  return (
+    <nav className="bpr__series-nav" aria-label="Series navigation">
+      <p className="bpr__series-nav-label">
+        Part {currentIdx + 1} of {seriesPosts.length} in
+        <span className="bpr__series-nav-title"> {seriesTitle}</span>
+      </p>
+      <div className="bpr__series-nav-cards">
+        {prev ? (
+          <Link to={`/blog/${prev.slug}`} className="bpr__series-card bpr__series-card--prev">
+            <span className="bpr__series-card-direction">← Previous</span>
+            <span className="bpr__series-card-post-title">{prev.title}</span>
+          </Link>
+        ) : (
+          // Empty placeholder keeps the next card right-aligned when there's no prev
+          <div />
+        )}
+
+        {next && (
+          <Link to={`/blog/${next.slug}`} className="bpr__series-card bpr__series-card--next">
+            <span className="bpr__series-card-direction">Next →</span>
+            <span className="bpr__series-card-post-title">{next.title}</span>
+          </Link>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+// ── Tag pills at the bottom ────────────────────────────────────────────────────
+
+function TagFooter({ tags }) {
+  if (!tags || tags.length === 0) return null;
+
+  return (
+    <div className="bpr__tag-footer">
+      <span className="bpr__tag-footer-label">Tagged under</span>
+      <div className="bpr__tag-footer-pills">
+        {tags.map(tag => (
+          <Link
+            key={tag}
+            to={`/blog?tag=${encodeURIComponent(tag)}`}
+            className="bpr__tag-pill"
+          >
+            {tag}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Main component ─────────────────────────────────────────────────────────────
+
 export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
-  const [seriesPosts, setSeriesPosts] = useState([]);
+  const [seriesData, setSeriesData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const bodyRef = useRef(null);
 
-  // Check if author is authenticated (for draft preview)
+  // Draft preview support — admin token grants access to unpublished posts
   const adminToken = sessionStorage.getItem('adminToken');
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
+    setPost(null);
+    setSeriesData(null);
+
     const headers = {};
     if (adminToken) headers['Authorization'] = `Bearer ${adminToken}`;
 
@@ -49,22 +215,28 @@ export default function BlogPost() {
       })
       .then(async data => {
         setPost(data);
-        // Load series posts if this post is in a series
+
         if (data.series_slug) {
           const sr = await fetch(`/api/blog/series/${data.series_slug}`);
-          const sd = await sr.json();
-          setSeriesPosts(sd.posts ?? []);
+          if (sr.ok) {
+            const sd = await sr.json();
+            setSeriesData(sd);
+          }
         }
+
         setLoading(false);
       })
       .catch(err => {
-        if (err.message === 'not_found') navigate('/blog', { replace: true });
-        else setError('Failed to load post.');
+        if (err.message === 'not_found') {
+          navigate('/blog', { replace: true });
+        } else {
+          setError('Failed to load this post. Please try again.');
+        }
         setLoading(false);
       });
   }, [slug, adminToken, navigate]);
 
-  // Sanitize and inject HTML safely
+  // Sanitize and inject body HTML — DOMPurify ensures no XSS from Tiptap output
   useEffect(() => {
     if (post?.body_html && bodyRef.current) {
       const clean = DOMPurify.sanitize(post.body_html, {
@@ -76,21 +248,26 @@ export default function BlogPost() {
     }
   }, [post]);
 
-  // Set page title
   useEffect(() => {
     if (post) document.title = `${post.title} — Aebrahm Ramos`;
     return () => { document.title = 'Aebrahm Ramos'; };
   }, [post]);
 
   if (loading) {
-    return <section className="blog-post"><SkeletonPost /></section>;
+    return (
+      <section className="bpr">
+        <ReadingProgressBar />
+        <SkeletonPost />
+      </section>
+    );
   }
 
   if (error) {
     return (
-      <section className="blog-post">
-        <div className="blog-post__container">
-          <p className="blog__error">{error}</p>
+      <section className="bpr">
+        <div className="bpr__container">
+          <Link to="/blog" className="bpr__back">← Back</Link>
+          <p className="bpr__error">{error}</p>
         </div>
       </section>
     );
@@ -99,56 +276,82 @@ export default function BlogPost() {
   if (!post) return null;
 
   const tags = Array.isArray(post.tags) ? post.tags : [];
+  const readingTime = calcReadingTime(post.body_html);
+  const seriesPosts = seriesData?.posts ?? [];
+  const seriesTitle = seriesData?.series?.title ?? post.series_slug;
 
   return (
-    <section className="blog-post">
-      <div className="blog-post__container">
-        <Link to="/blog" className="blog-post__back">
-          ← All posts
-        </Link>
+    <section className="bpr">
+      <ReadingProgressBar />
+      <FloatingActions />
 
-        {post.series_slug && (
-          <Link to={`/blog/series/${post.series_slug}`} className="blog-post__series-label">
-            {post.series_slug}
-          </Link>
-        )}
+      <div className="bpr__container">
+        {/* Top navigation */}
+        <Link to="/blog" className="bpr__back">← Back</Link>
 
-        <h1 className="m3-display-small blog-post__title">{post.title}</h1>
-
-        <div className="blog-post__meta">
-          <span>{formatDate(post.published_at)}</span>
-          {post.status === 'draft' && (
-            <span style={{ color: 'var(--md-sys-color-tertiary)', fontWeight: 600 }}>DRAFT</span>
+        {/* Article header */}
+        <header className="bpr__header">
+          {post.series_slug && (
+            <Link
+              to={`/blog/series/${post.series_slug}`}
+              className="bpr__series-eyebrow"
+            >
+              {seriesTitle}
+            </Link>
           )}
-        </div>
 
-        {tags.length > 0 && (
-          <div className="blog-post__tags">
-            {tags.map(tag => <Chip key={tag} label={tag} variant="assist" />)}
+          <h1 className="bpr__title">{post.title}</h1>
+
+          <div className="bpr__meta">
+            <time dateTime={new Date(post.published_at * 1000).toISOString()}>
+              {formatDate(post.published_at)}
+            </time>
+
+            {readingTime && (
+              <>
+                <span className="bpr__meta-dot" aria-hidden="true">·</span>
+                <span>{readingTime}</span>
+              </>
+            )}
+
+            {post.status === 'draft' && (
+              <>
+                <span className="bpr__meta-dot" aria-hidden="true">·</span>
+                <span className="bpr__draft-badge">Draft</span>
+              </>
+            )}
           </div>
-        )}
 
-        {/* Post body — DOMPurify-sanitized HTML */}
-        <div ref={bodyRef} className="blog-post__body" />
-
-        {/* Series navigation */}
-        {post.series_slug && seriesPosts.length > 1 && (
-          <nav className="blog-post__series-nav" aria-label="Series navigation">
-            <p className="blog-post__series-nav-title">More in this series</p>
-            <ol className="series-nav__list">
-              {seriesPosts.map(p => (
-                <li key={p.slug}>
-                  <Link
-                    to={`/blog/${p.slug}`}
-                    className={p.slug === slug ? 'current' : ''}
-                  >
-                    {p.title}
-                  </Link>
-                </li>
+          {tags.length > 0 && (
+            <div className="bpr__header-tags">
+              {tags.map(tag => (
+                <Link
+                  key={tag}
+                  to={`/blog?tag=${encodeURIComponent(tag)}`}
+                  className="bpr__tag-pill bpr__tag-pill--header"
+                >
+                  {tag}
+                </Link>
               ))}
-            </ol>
-          </nav>
-        )}
+            </div>
+          )}
+        </header>
+
+        {/* Post body — DOMPurify-sanitized Tiptap HTML */}
+        <div ref={bodyRef} className="bpr__body" />
+
+        {/* Footer section */}
+        <footer className="bpr__footer">
+          <TagFooter tags={tags} />
+
+          {post.series_slug && seriesPosts.length > 1 && (
+            <SeriesNav
+              seriesPosts={seriesPosts}
+              currentSlug={slug}
+              seriesTitle={seriesTitle}
+            />
+          )}
+        </footer>
       </div>
     </section>
   );
