@@ -1,15 +1,35 @@
-import {
-  portfolioMarkdown,
-  aboutData,
-  experienceData,
-  projectsData,
-  contactData,
-} from './agent/portfolio-content.js';
+import { portfolioMarkdown } from './agent/portfolio-content.js';
+import { sanitizeBodyHtml } from './sanitize.js';
 
 const LINK_HEADER = [
   '</.well-known/agent-skills/index.json>; rel="service-desc"',
   '</.well-known/mcp/server-card.json>; rel="service-doc"',
 ].join(', ');
+
+// CSP ships as Report-Only first: the app uses inline JSON-LD, Google Fonts,
+// reCAPTCHA, EmailJS, and data/blob images, so enforce only after the report
+// stream confirms the allowlist is complete. The rest enforce immediately.
+const CSP_REPORT_ONLY = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https:",
+  "connect-src 'self' https://api.emailjs.com https://www.google.com",
+  "frame-src https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'self'",
+].join('; ');
+
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'SAMEORIGIN',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+  'Content-Security-Policy-Report-Only': CSP_REPORT_ONLY,
+};
 
 const MCP_SERVER_CARD = {
   schemaVersion: '1.0',
@@ -78,14 +98,14 @@ const AGENT_SKILLS_INDEX = {
 function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
     status,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' },
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600', 'X-Content-Type-Options': 'nosniff' },
   });
 }
 
 function adminJson(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
     status,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' },
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' },
   });
 }
 
@@ -93,6 +113,16 @@ function injectLinkHeader(response) {
   const headers = new Headers(response.headers);
   headers.set('Link', LINK_HEADER);
   headers.set('Vary', 'Accept');
+  for (const [k, v] of Object.entries(SECURITY_HEADERS)) headers.set(k, v);
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+// Static assets (JS/CSS/fonts) bypass injectLinkHeader; give them at least
+// nosniff + HSTS (CSP/frame-options are only meaningful on the HTML document).
+function withAssetHeaders(response) {
+  const headers = new Headers(response.headers);
+  headers.set('X-Content-Type-Options', 'nosniff');
+  headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
@@ -104,7 +134,7 @@ function safeEqual(a, b) {
   return diff === 0;
 }
 
-function deriveSlug(title) {
+export function deriveSlug(title) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
@@ -119,6 +149,37 @@ function requireAuth(request, env) {
 
 function parseTags(raw) {
   try { return JSON.parse(raw ?? '[]'); } catch { return []; }
+}
+
+// Pure: merge a PATCH body over the existing row into the next field set.
+// Exported for unit tests. Uses `'key' in body` so an explicit null/empty value
+// can CLEAR summary/tags/series_slug (the old `??`/truthy checks made them
+// un-clearable once set), and handles both publish and unpublish timestamps.
+export function computePostUpdate(body, existing, now) {
+  const isPublishing = body.status === 'published' && existing.status === 'draft';
+  const isUnpublishing = body.status === 'draft' && existing.status === 'published';
+  return {
+    title: body.title ?? existing.title,
+    body_json: body.body_json != null
+      ? (typeof body.body_json === 'string' ? body.body_json : JSON.stringify(body.body_json))
+      : existing.body_json,
+    body_html: body.body_html ?? existing.body_html,
+    body_md: body.body_md ?? existing.body_md,
+    summary: 'summary' in body ? body.summary : existing.summary,
+    series_slug: 'series_slug' in body ? body.series_slug : existing.series_slug,
+    tags: 'tags' in body ? JSON.stringify(Array.isArray(body.tags) ? body.tags : []) : existing.tags,
+    status: body.status ?? existing.status,
+    published_at: isPublishing ? now : isUnpublishing ? null : existing.published_at,
+    updated_at: now,
+  };
+}
+
+// D1 doesn't reliably enforce the series FK without a per-connection PRAGMA, so
+// validate in app code. A null/empty series_slug (no series) is always allowed.
+async function seriesExists(env, slug) {
+  if (!slug) return true;
+  const row = await env.DB.prepare('SELECT 1 FROM series WHERE slug = ?').bind(slug).first();
+  return !!row;
 }
 
 // ─── Public Blog API ──────────────────────────────────────────────────────────
@@ -164,13 +225,22 @@ async function handleGetPost(slug, request, env) {
 
   if (!row || (row.status !== 'published' && !isAdmin)) return jsonResponse({ error: 'not_found' }, 404);
 
+  // Never let a CDN/proxy publicly cache an admin-viewed draft; Vary on
+  // Authorization so authed and anonymous responses don't share a cache entry.
+  const cacheControl = (isAdmin && row.status !== 'published')
+    ? 'private, no-store'
+    : 'public, max-age=0, s-maxage=300, stale-while-revalidate=600';
+  const vary = 'Accept, Authorization';
+
   const accept = request.headers.get('Accept') ?? '';
   if (accept.includes('text/markdown')) {
     return new Response(row.body_md ?? '', {
-      headers: { 'Content-Type': 'text/markdown; charset=utf-8', 'Cache-Control': 'public, max-age=3600', 'Vary': 'Accept' },
+      headers: { 'Content-Type': 'text/markdown; charset=utf-8', 'Cache-Control': cacheControl, Vary: vary, 'X-Content-Type-Options': 'nosniff' },
     });
   }
-  return jsonResponse({ ...row, tags: parseTags(row.tags) });
+  return new Response(JSON.stringify({ ...row, tags: parseTags(row.tags) }, null, 2), {
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': cacheControl, Vary: vary, 'X-Content-Type-Options': 'nosniff' },
+  });
 }
 
 async function handleGetSeriesList(env) {
@@ -293,9 +363,15 @@ async function handleAdminCreatePost(request, env) {
   const { title, body_json, body_html, body_md, summary, series_slug, tags, status } = body;
   if (!title || !body_json) return adminJson({ error: 'missing_fields', required: ['title', 'body_json'] }, 400);
 
-  const slug = body.slug || deriveSlug(title);
+  // Normalize any client-supplied slug to [a-z0-9-] so it can't break routing
+  // or produce invalid sitemap/RSS XML.
+  const slug = deriveSlug(body.slug || title);
   const existing = await env.DB.prepare(`SELECT id FROM posts WHERE slug = ?`).bind(slug).first();
   if (existing) return adminJson({ error: 'slug_conflict', suggested: `${slug}-2` }, 409);
+
+  if (!(await seriesExists(env, series_slug ?? null))) {
+    return adminJson({ error: 'invalid_series_slug', series_slug }, 400);
+  }
 
   const now = Math.floor(Date.now() / 1000);
   const isPublished = status === 'published';
@@ -306,7 +382,7 @@ async function handleAdminCreatePost(request, env) {
     `INSERT INTO posts (slug, title, body_json, body_html, body_md, summary, series_slug, tags, status, created_at, published_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
-    slug, title, bodyJsonStr, body_html ?? '', body_md ?? '',
+    slug, title, bodyJsonStr, sanitizeBodyHtml(body_html), body_md ?? '',
     summary ?? null, series_slug ?? null, tagsJson,
     isPublished ? 'published' : 'draft',
     now, isPublished ? now : null, now
@@ -325,22 +401,29 @@ async function handleAdminUpdatePost(id, request, env) {
   const existing = await env.DB.prepare(`SELECT * FROM posts WHERE id = ?`).bind(id).first();
   if (!existing) return adminJson({ error: 'not_found' }, 404);
 
+  // Reject unknown status at the boundary — otherwise it hits the DB CHECK and 500s.
+  if (body.status != null && body.status !== 'draft' && body.status !== 'published') {
+    return adminJson({ error: 'invalid_status', status: body.status }, 400);
+  }
+
+  // Sanitize incoming HTML server-side before it is merged/stored (defense in
+  // depth on top of client render-time DOMPurify).
+  if (typeof body.body_html === 'string') body.body_html = sanitizeBodyHtml(body.body_html);
+
   const now = Math.floor(Date.now() / 1000);
-  const isPublishing = body.status === 'published' && existing.status === 'draft';
-  const publishedAt = isPublishing ? now : existing.published_at;
-  const bodyJsonStr = body.body_json
-    ? (typeof body.body_json === 'string' ? body.body_json : JSON.stringify(body.body_json))
-    : existing.body_json;
-  const tagsJson = body.tags ? JSON.stringify(Array.isArray(body.tags) ? body.tags : []) : existing.tags;
+  const fields = computePostUpdate(body, existing, now);
+
+  // Only validate the series when it actually changed (it was valid when last written).
+  if (fields.series_slug !== existing.series_slug && !(await seriesExists(env, fields.series_slug))) {
+    return adminJson({ error: 'invalid_series_slug', series_slug: fields.series_slug }, 400);
+  }
 
   await env.DB.prepare(
     `UPDATE posts SET title=?, body_json=?, body_html=?, body_md=?, summary=?, series_slug=?, tags=?, status=?, published_at=?, updated_at=? WHERE id=?`
   ).bind(
-    body.title ?? existing.title, bodyJsonStr,
-    body.body_html ?? existing.body_html, body.body_md ?? existing.body_md,
-    body.summary ?? existing.summary, 'series_slug' in body ? body.series_slug : existing.series_slug,
-    tagsJson, body.status ?? existing.status,
-    publishedAt, now, id
+    fields.title, fields.body_json, fields.body_html, fields.body_md,
+    fields.summary, fields.series_slug, fields.tags, fields.status,
+    fields.published_at, fields.updated_at, id
   ).run();
 
   return adminJson({ id: Number(id), slug: existing.slug });
@@ -380,6 +463,195 @@ async function handleAdminListSeries(request, env) {
   return adminJson({ series: rows.results });
 }
 
+// ─── SEO / GEO: server-side <head> for blog routes (SSR-lite) ───────────────────
+// Crawlers and social/AI scrapers don't run JS, so the SPA shell is contentless
+// to them. For blog routes we fetch index.html and inject per-route title, meta,
+// canonical, OG/Twitter, and JSON-LD from D1 before serving.
+
+const SITE = 'https://aebrahmramos.dev';
+const OG_IMAGE = 'https://wcnushafgkumpgjy.public.blob.vercel-storage.com/og-image.png';
+
+function escAttr(s) {
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function escText(s) {
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+export function applyMeta(html, { title, description, url, image, ogType }) {
+  const setMeta = (h, attr, name, value) => {
+    const re = new RegExp(`(<meta\\s+${attr}=["']${name}["']\\s+content=)["'][^"']*["']`, 'i');
+    return re.test(h) ? h.replace(re, `$1"${escAttr(value)}"`) : h;
+  };
+  html = html.replace(/<title>[^<]*<\/title>/i, `<title>${escText(title)}</title>`);
+  html = setMeta(html, 'name', 'description', description);
+  html = setMeta(html, 'property', 'og:title', title);
+  html = setMeta(html, 'property', 'og:description', description);
+  html = setMeta(html, 'property', 'og:url', url);
+  html = setMeta(html, 'property', 'og:image', image);
+  html = setMeta(html, 'property', 'twitter:title', title);
+  html = setMeta(html, 'property', 'twitter:description', description);
+  html = setMeta(html, 'property', 'twitter:url', url);
+  html = setMeta(html, 'property', 'twitter:image', image);
+  if (ogType) html = setMeta(html, 'property', 'og:type', ogType);
+  const canonical = `<link rel="canonical" href="${escAttr(url)}" />`;
+  html = /<link\s+rel=["']canonical["']/i.test(html)
+    ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonical)
+    : html.replace('</head>', `  ${canonical}\n</head>`);
+  return html;
+}
+
+export function injectJsonLd(html, ...objs) {
+  // Escape `<` so a post title/summary containing </script> can't break out.
+  const scripts = objs.map(o =>
+    `  <script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`
+  ).join('\n');
+  return html.replace('</head>', `${scripts}\n</head>`);
+}
+
+export function blogPostingJsonLd(row, url) {
+  const keywords = parseTags(row.tags).join(', ');
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: row.title,
+    ...(row.summary ? { description: row.summary } : {}),
+    ...(row.published_at ? { datePublished: new Date(row.published_at * 1000).toISOString() } : {}),
+    ...(row.updated_at ? { dateModified: new Date(row.updated_at * 1000).toISOString() } : {}),
+    author: { '@type': 'Person', name: 'Aebrahm Ramos', url: SITE },
+    image: OG_IMAGE,
+    url,
+    mainEntityOfPage: url,
+    ...(keywords ? { keywords } : {}),
+  };
+}
+
+export function breadcrumbJsonLd(items) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, item: it.url })),
+  };
+}
+
+function htmlResponse(html, status = 200) {
+  return new Response(html, {
+    status,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'public, max-age=0, s-maxage=300, stale-while-revalidate=600',
+      Link: LINK_HEADER,
+      Vary: 'Accept',
+      ...SECURITY_HEADERS,
+    },
+  });
+}
+
+async function handleBlogHtml(pathname, request, env) {
+  const shell = await env.ASSETS.fetch(new URL('/index.html', request.url));
+  const baseHtml = await shell.text();
+
+  const postMatch = pathname.match(/^\/blog\/([^/]+)$/);
+  const seriesMatch = pathname.match(/^\/blog\/series\/([^/]+)$/);
+
+  if (postMatch && postMatch[1] !== 'series') {
+    const slug = decodeURIComponent(postMatch[1]);
+    const row = await env.DB.prepare(
+      `SELECT slug, title, summary, series_slug, tags, published_at, updated_at
+       FROM posts WHERE slug = ? AND status = 'published'`
+    ).bind(slug).first();
+    if (!row) return htmlResponse(baseHtml, 404); // real 404, not a soft-404
+    const url = `${SITE}/blog/${row.slug}`;
+    const title = `${row.title} — Aebrahm Ramos`;
+    const description = row.summary || `${row.title} — writing by Aebrahm Ramos.`;
+    let html = applyMeta(baseHtml, { title, description, url, image: OG_IMAGE, ogType: 'article' });
+    html = injectJsonLd(html,
+      blogPostingJsonLd(row, url),
+      breadcrumbJsonLd([
+        { name: 'Home', url: SITE },
+        { name: 'Blog', url: `${SITE}/blog` },
+        { name: row.title, url },
+      ]),
+    );
+    return htmlResponse(html);
+  }
+
+  if (seriesMatch) {
+    const slug = decodeURIComponent(seriesMatch[1]);
+    const series = await env.DB.prepare(`SELECT slug, title, description FROM series WHERE slug = ?`).bind(slug).first();
+    if (!series) return htmlResponse(baseHtml, 404);
+    const url = `${SITE}/blog/series/${series.slug}`;
+    const title = `${series.title} — Series — Aebrahm Ramos`;
+    const description = series.description || `Posts in the ${series.title} series by Aebrahm Ramos.`;
+    let html = applyMeta(baseHtml, { title, description, url, image: OG_IMAGE });
+    html = injectJsonLd(html, breadcrumbJsonLd([
+      { name: 'Home', url: SITE },
+      { name: 'Blog', url: `${SITE}/blog` },
+      { name: series.title, url },
+    ]));
+    return htmlResponse(html);
+  }
+
+  // /blog index
+  const url = `${SITE}/blog`;
+  const title = 'Writing — Aebrahm Ramos';
+  const description = 'Technical writing on systems programming, embedded systems, and software engineering by Aebrahm Ramos.';
+  let html = applyMeta(baseHtml, { title, description, url, image: OG_IMAGE });
+  html = injectJsonLd(html, breadcrumbJsonLd([
+    { name: 'Home', url: SITE },
+    { name: 'Blog', url },
+  ]));
+  return htmlResponse(html);
+}
+
+async function handleSitemap(env) {
+  const [posts, series] = await Promise.all([
+    env.DB.prepare(`SELECT slug, updated_at FROM posts WHERE status = 'published' ORDER BY published_at DESC`).all(),
+    env.DB.prepare(`SELECT slug FROM series`).all(),
+  ]);
+  const day = ts => new Date((ts || 0) * 1000).toISOString().slice(0, 10);
+  const urls = [
+    { loc: `${SITE}/`, changefreq: 'monthly', priority: '1.0' },
+    { loc: `${SITE}/blog`, changefreq: 'weekly', priority: '0.9' },
+    ...posts.results.map(p => ({ loc: `${SITE}/blog/${p.slug}`, lastmod: day(p.updated_at), changefreq: 'monthly', priority: '0.8' })),
+    ...series.results.map(s => ({ loc: `${SITE}/blog/series/${s.slug}`, changefreq: 'monthly', priority: '0.6' })),
+  ];
+  const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls.map(u =>
+      `  <url><loc>${escText(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}` +
+      `<changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`
+    ).join('\n') +
+    `\n</urlset>\n`;
+  return new Response(body, {
+    headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=0, s-maxage=3600' },
+  });
+}
+
+async function handleRssFeed(env) {
+  const rows = await env.DB.prepare(
+    `SELECT slug, title, summary, published_at FROM posts WHERE status = 'published' ORDER BY published_at DESC LIMIT 50`
+  ).all();
+  const items = rows.results.map(p =>
+    `    <item>\n` +
+    `      <title>${escText(p.title)}</title>\n` +
+    `      <link>${escText(`${SITE}/blog/${p.slug}`)}</link>\n` +
+    `      <guid>${escText(`${SITE}/blog/${p.slug}`)}</guid>\n` +
+    (p.summary ? `      <description>${escText(p.summary)}</description>\n` : '') +
+    (p.published_at ? `      <pubDate>${new Date(p.published_at * 1000).toUTCString()}</pubDate>\n` : '') +
+    `    </item>`
+  ).join('\n');
+  const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<rss version="2.0">\n  <channel>\n` +
+    `    <title>Aebrahm Ramos — Blog</title>\n` +
+    `    <link>${SITE}/blog</link>\n` +
+    `    <description>Technical writing on systems programming, embedded systems, and software engineering.</description>\n` +
+    `${items}\n  </channel>\n</rss>\n`;
+  return new Response(body, {
+    headers: { 'Content-Type': 'application/rss+xml; charset=utf-8', 'Cache-Control': 'public, max-age=0, s-maxage=3600' },
+  });
+}
+
 // ─── Main fetch handler ────────────────────────────────────────────────────────
 
 export default {
@@ -396,6 +668,8 @@ export default {
 
     // AI SEO
     if (pathname === '/llms.txt') return handleLlmsTxt(env);
+    if (pathname === '/sitemap.xml') return handleSitemap(env);
+    if (pathname === '/feed.xml') return handleRssFeed(env);
 
     // Blog read API
     if (pathname === '/api/blog/feed.json') return handleFeed(env);
@@ -421,6 +695,21 @@ export default {
       if (method === 'DELETE') return handleAdminDeletePost(adminPostMatch[1], request, env);
     }
 
+    // Unmatched API paths get a clean JSON 404 instead of falling through to the
+    // SPA shell (which would return index.html with a 200 and break r.json()).
+    if (pathname.startsWith('/api/')) {
+      return new Response(JSON.stringify({ error: 'not_found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+      });
+    }
+
+    // SEO/GEO: server-render the <head> for blog page routes so crawlers and
+    // social/AI scrapers (which don't run JS) get real per-route metadata.
+    if (method === 'GET' && (pathname === '/blog' || /^\/blog\/[^/]+$/.test(pathname) || /^\/blog\/series\/[^/]+$/.test(pathname))) {
+      return handleBlogHtml(pathname, request, env);
+    }
+
     // Markdown content negotiation — only for portfolio root, not blog/api paths
     const accept = request.headers.get('Accept') ?? '';
     if (accept.includes('text/markdown') && !pathname.startsWith('/api/') && !pathname.startsWith('/blog/')) {
@@ -430,6 +719,7 @@ export default {
           'Cache-Control': 'public, max-age=3600',
           'Vary': 'Accept',
           Link: LINK_HEADER,
+          ...SECURITY_HEADERS,
         },
       });
     }
@@ -438,6 +728,6 @@ export default {
     const response = await env.ASSETS.fetch(request);
     const contentType = response.headers.get('Content-Type') ?? '';
     if (contentType.includes('text/html')) return injectLinkHeader(response);
-    return response;
+    return withAssetHeaders(response);
   },
 };
