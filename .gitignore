@@ -41,3 +41,6 @@ dist-ssr
 !.env.example
 AGENTS.md
 GEMINI.md
+
+# Playwright run artifacts
+test-results/
