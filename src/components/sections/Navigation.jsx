@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { FiMenu, FiX, FiSun, FiMoon, FiDownload } from 'react-icons/fi';
 import { useThemeContext } from '../../context/ThemeContext';
 import { scrollToSection } from '../../utils/helpers';
@@ -62,7 +62,7 @@ const Navigation = () => {
           </button>
 
           {!isMobile && (
-            <div className="nav__desktop">
+            <nav className="nav__desktop" aria-label="Primary">
               {!isBlogPage && navItems.map((item) => (
                 <button
                   key={item.id}
@@ -72,13 +72,6 @@ const Navigation = () => {
                   {item.label}
                 </button>
               ))}
-              <Link
-                to="/blog"
-                className={`nav__link ${isBlogPage ? 'nav__link--active' : ''}`}
-                style={{ textDecoration: 'none' }}
-              >
-                Blog
-              </Link>
               <IconButton onClick={toggleDarkMode} aria-label="Toggle dark mode">
                 {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
               </IconButton>
@@ -90,7 +83,7 @@ const Navigation = () => {
               >
                 Resume
               </Button>
-            </div>
+            </nav>
           )}
 
           {isMobile && (
@@ -127,14 +120,6 @@ const Navigation = () => {
                 {item.label}
               </button>
             ))}
-            <Link
-              to="/blog"
-              className={`drawer__item ${isBlogPage ? 'drawer__item--active' : ''}`}
-              style={{ textDecoration: 'none' }}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Blog
-            </Link>
           </nav>
           <div className="drawer__footer">
             <Button
