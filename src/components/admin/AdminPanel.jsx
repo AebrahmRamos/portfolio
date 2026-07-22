@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import { Card } from '../m3';
 import PostEditor from './PostEditor';
 import './admin.css';
@@ -64,10 +64,9 @@ function AuthGate({ onAuth }) {
 
 // ─── Post List ────────────────────────────────────────────────────────────────
 
-function PostList({ token }) {
+function PostList({ token, onLogout }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   const load = useCallback(() => {
     fetch('/api/admin/posts', { headers: { Authorization: `Bearer ${token}` } })
@@ -110,6 +109,7 @@ function PostList({ token }) {
           <div className="admin-actions">
             <Link to="/admin/new" className="btn btn--primary">+ New post</Link>
             <Link to="/blog" className="btn btn--outlined">View blog</Link>
+            <button type="button" onClick={onLogout} className="btn btn--outlined">Sign out</button>
           </div>
         </div>
 
@@ -169,7 +169,7 @@ export default function AdminPanel() {
 
   return (
     <Routes>
-      <Route index element={<PostList token={token} />} />
+      <Route index element={<PostList token={token} onLogout={handleLogout} />} />
       <Route path="new" element={<PostEditor token={token} />} />
       <Route path="edit/:id" element={<PostEditor token={token} />} />
     </Routes>

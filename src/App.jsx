@@ -6,6 +6,7 @@ import Layout from './components/layout/Layout';
 import Hero from './components/sections/Hero';
 import About from './components/sections/About';
 import Loading from './components/common/Loading';
+import Reveal from './components/common/Reveal';
 
 // Lazy-load below-the-fold portfolio sections
 const Experience = lazy(() => import('./components/sections/Experience'));
@@ -28,15 +29,15 @@ function PortfolioPage() {
   return (
     <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
       <Hero />
-      <About />
+      <Reveal><About /></Reveal>
       <Suspense fallback={<Loading />}>
-        <Experience />
-        <Projects />
-        <Skills />
-        <Education />
-        <Organizations />
-        <Contact />
-        <Resume />
+        <Reveal><Experience /></Reveal>
+        <Reveal><Projects /></Reveal>
+        <Reveal><Skills /></Reveal>
+        <Reveal><Education /></Reveal>
+        <Reveal><Organizations /></Reveal>
+        <Reveal><Contact /></Reveal>
+        <Reveal><Resume /></Reveal>
         <Footer />
       </Suspense>
     </GoogleReCaptchaProvider>

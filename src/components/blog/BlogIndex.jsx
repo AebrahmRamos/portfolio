@@ -1,66 +1,34 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { Chip, TextField } from '../m3';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { formatPostDate } from './format';
 import './blog.css';
 
-// Assumes average silent reading speed.
-const WORDS_PER_MINUTE = 200;
-
-function estimateReadingTime(text) {
-  if (!text) return null;
-  const wordCount = text.trim().split(/\s+/).length;
-  const minutes = Math.ceil(wordCount / WORDS_PER_MINUTE);
-  return minutes;
+function readingTime(summary) {
+  if (!summary) return null;
+  const words = summary.split(/\s+/).length;
+  return `${Math.max(1, Math.ceil(words / 200))} min read`;
 }
 
-function formatDate(ts) {
-  if (!ts) return '';
-  return new Date(ts * 1000).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
-// Staggered fade-in via CSS animation-delay keyed by index.
-function PostRow({ post, index, onTagClick, activeTagSet }) {
-  const readingTime = estimateReadingTime(post.summary);
-
+function PostRow({ post, onTagClick, index, seriesTitle }) {
+  const rt = readingTime(post.summary);
+  // Stretched-link pattern: the row is a non-interactive <article>, the title
+  // holds the link (covers the row via ::after), and tag buttons sit above it.
+  // Avoids the invalid <button> inside <a> nesting the old markup had.
   return (
-    <article
-      className="post-row"
-      style={{ animationDelay: `${index * 60}ms` }}
-    >
-      <div className="post-row__meta-top">
-        {post.series_slug && (
-          <span className="post-row__series">{post.series_slug}</span>
-        )}
-        <span className="post-row__date">{formatDate(post.published_at)}</span>
-        {readingTime && (
-          <>
-            <span className="post-row__meta-dot" aria-hidden="true">·</span>
-            <span className="post-row__reading-time">{readingTime} min read</span>
-          </>
-        )}
+    <article className="blog-post-row" style={{ animationDelay: `${index * 40}ms` }}>
+      <div className="blog-post-row__header">
+        <span className="blog-post-row__date">{formatPostDate(post.published_at)}</span>
+        {post.series_slug && <span className="blog-post-row__series">{seriesTitle ?? post.series_slug}</span>}
+        {rt && <span className="blog-post-row__read">{rt}</span>}
       </div>
-
-      <Link to={`/blog/${post.slug}`} className="post-row__title-link">
-        <h2 className="post-row__title">{post.title}</h2>
-      </Link>
-
-      {post.summary && (
-        <p className="post-row__summary">{post.summary}</p>
-      )}
-
+      <h2 className="blog-post-row__title">
+        <Link to={`/blog/${post.slug}`} className="blog-post-row__link">{post.title}</Link>
+      </h2>
+      {post.summary && <p className="blog-post-row__summary">{post.summary}</p>}
       {post.tags?.length > 0 && (
-        <div className="post-row__tags">
+        <div className="blog-post-row__tags">
           {post.tags.slice(0, 5).map(tag => (
-            <button
-              key={tag}
-              className={`post-row__tag-pill${activeTagSet.has(tag) ? ' post-row__tag-pill--active' : ''}`}
-              onClick={() => onTagClick(tag)}
-              aria-pressed={activeTagSet.has(tag)}
-            >
+            <button key={tag} className="blog-tag" onClick={() => onTagClick(tag)}>
               {tag}
             </button>
           ))}
@@ -70,64 +38,22 @@ function PostRow({ post, index, onTagClick, activeTagSet }) {
   );
 }
 
-// Skeleton rows mirror the editorial list layout — no card boxes.
 function SkeletonRows() {
   return (
-    <div className="blog-skeleton-list" aria-busy="true" aria-label="Loading posts">
-      {[0, 1, 2, 3].map(i => (
-        <div
-          key={i}
-          className="blog-skeleton-row"
-          style={{ animationDelay: `${i * 80}ms` }}
-        >
-          <div className="skeleton" style={{ width: '22%', height: 12, marginBottom: 14 }} />
-          <div className="skeleton" style={{ width: '72%', height: 26, marginBottom: 10 }} />
-          <div className="skeleton" style={{ width: '100%', height: 14, marginBottom: 6 }} />
-          <div className="skeleton" style={{ width: '85%', height: 14, marginBottom: 16 }} />
+    <>
+      {[80, 60, 90, 70].map((w, i) => (
+        <div key={i} className="blog-skeleton-row">
+          <div className="skeleton" style={{ width: 120, height: 10, marginBottom: 12 }} />
+          <div className="skeleton" style={{ width: `${w}%`, height: 22, marginBottom: 10 }} />
+          <div className="skeleton" style={{ width: '100%', height: 12, marginBottom: 6 }} />
+          <div className="skeleton" style={{ width: '85%', height: 12, marginBottom: 12 }} />
           <div style={{ display: 'flex', gap: 6 }}>
-            <div className="skeleton" style={{ width: 56, height: 22, borderRadius: 99 }} />
-            <div className="skeleton" style={{ width: 72, height: 22, borderRadius: 99 }} />
+            <div className="skeleton" style={{ width: 60, height: 20, borderRadius: 100 }} />
+            <div className="skeleton" style={{ width: 50, height: 20, borderRadius: 100 }} />
           </div>
         </div>
       ))}
-    </div>
-  );
-}
-
-function EmptyState({ hasFilters, onClearFilters }) {
-  return (
-    <div className="blog-empty-state">
-      {hasFilters ? (
-        <>
-          <p className="blog-empty-state__message">No posts matching your filters.</p>
-          <button className="blog-empty-state__clear" onClick={onClearFilters}>
-            Clear all filters
-          </button>
-        </>
-      ) : (
-        <p className="blog-empty-state__message">No posts yet. Check back soon.</p>
-      )}
-    </div>
-  );
-}
-
-// Collapsible section used for the mobile series panel.
-function CollapsibleSection({ title, children, defaultOpen = false }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="collapsible">
-      <button
-        className="collapsible__trigger"
-        onClick={() => setOpen(v => !v)}
-        aria-expanded={open}
-      >
-        <span>{title}</span>
-        <span className={`collapsible__arrow${open ? ' collapsible__arrow--open' : ''}`} aria-hidden="true">
-          ▾
-        </span>
-      </button>
-      {open && <div className="collapsible__body">{children}</div>}
-    </div>
+    </>
   );
 }
 
@@ -136,286 +62,208 @@ export default function BlogIndex() {
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Filter state
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const [rawQuery, setRawQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [activeTags, setActiveTags] = useState(new Set());
-  const [activeSeriesSlug, setActiveSeriesSlug] = useState(null);
-  const [sortOrder, setSortOrder] = useState('newest');
+  // Seed filters from ?tag=… so tag links from posts actually filter the index.
+  const [activeTags, setActiveTags] = useState(() => {
+    const t = searchParams.get('tag');
+    return new Set(t ? [t] : []);
+  });
+  const [sort, setSort] = useState('newest');
+  const debounceRef = useRef(null);
 
-  const debounceTimer = useRef(null);
-
-  // Load all posts upfront — client-side filtering only.
-  // If the post count grows substantially, paginate on the backend and disable client filtering.
   useEffect(() => {
+    const asJson = r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    };
     Promise.all([
-      fetch('/api/blog?page=1&limit=200').then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      }),
-      fetch('/api/blog/series').then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      }),
+      fetch('/api/blog?limit=200').then(asJson),
+      fetch('/api/blog/series').then(asJson),
     ])
-      .then(([postsData, seriesData]) => {
-        setAllPosts(postsData.posts ?? []);
-        setSeries(seriesData.series ?? []);
+      .then(([pd, sd]) => {
+        setAllPosts(pd.posts ?? []);
+        setSeries(sd.series ?? []);
         setLoading(false);
       })
-      .catch(() => {
-        setError('Failed to load posts. Please try again.');
-        setLoading(false);
-      });
+      .catch(() => { setError('Failed to load posts.'); setLoading(false); });
   }, []);
 
-  const handleSearchChange = useCallback((e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => setDebouncedQuery(value), 300);
+  const handleSearch = useCallback(val => {
+    setRawQuery(val);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setDebouncedQuery(val), 300);
   }, []);
 
-  const handleTagClick = useCallback((tag) => {
+  const toggleTag = useCallback(tag => {
     setActiveTags(prev => {
       const next = new Set(prev);
-      if (next.has(tag)) {
-        next.delete(tag);
-      } else {
-        next.add(tag);
-      }
+      if (next.has(tag)) next.delete(tag);
+      else next.add(tag);
       return next;
     });
   }, []);
 
-  const handleSeriesClick = useCallback((slug) => {
-    setActiveSeriesSlug(prev => (prev === slug ? null : slug));
-  }, []);
+  // Clear any pending debounce timer on unmount to avoid a state update after unmount.
+  useEffect(() => () => clearTimeout(debounceRef.current), []);
 
-  const clearAllFilters = useCallback(() => {
-    setSearchQuery('');
-    setDebouncedQuery('');
-    setActiveTags(new Set());
-    setActiveSeriesSlug(null);
-    setSortOrder('newest');
-  }, []);
+  // Re-seed the active tag when the ?tag= param changes (e.g. clicking a tag link
+  // from a post while the index is already mounted, or back/forward navigation).
+  useEffect(() => {
+    const t = searchParams.get('tag');
+    setActiveTags(t ? new Set([t]) : new Set());
+  }, [searchParams]);
 
-  // Derive unique tags from all loaded posts.
+  const seriesTitleBySlug = useMemo(
+    () => Object.fromEntries(series.map(s => [s.slug, s.title])),
+    [series]
+  );
+
   const allTags = useMemo(() => {
-    const tagSet = new Set();
-    allPosts.forEach(post => post.tags?.forEach(t => tagSet.add(t)));
-    return Array.from(tagSet).sort();
+    const map = new Map();
+    allPosts.forEach(p => (p.tags ?? []).forEach(t => map.set(t, (map.get(t) ?? 0) + 1)));
+    return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20).map(([t]) => t);
   }, [allPosts]);
 
-  const filteredAndSortedPosts = useMemo(() => {
-    let results = allPosts;
+  // Always surface active tags as toggles, even if they fall outside the top-20
+  // (e.g. a ?tag=rare deep-link), so the user can always deselect them.
+  const visibleTags = useMemo(() => {
+    const extra = [...activeTags].filter(t => !allTags.includes(t));
+    return [...allTags, ...extra];
+  }, [allTags, activeTags]);
 
+  const filtered = useMemo(() => {
+    let posts = allPosts;
     if (debouncedQuery.trim()) {
-      const lower = debouncedQuery.toLowerCase();
-      results = results.filter(post =>
-        post.title?.toLowerCase().includes(lower) ||
-        post.summary?.toLowerCase().includes(lower) ||
-        post.tags?.some(t => t.toLowerCase().includes(lower))
+      const q = debouncedQuery.toLowerCase();
+      posts = posts.filter(p =>
+        p.title.toLowerCase().includes(q) ||
+        (p.summary ?? '').toLowerCase().includes(q) ||
+        (p.tags ?? []).some(t => t.toLowerCase().includes(q))
       );
     }
-
-    if (activeTags.size > 0) {
-      results = results.filter(post =>
-        post.tags?.some(t => activeTags.has(t))
-      );
+    if (activeTags.size) {
+      // OR semantics: a post matches if it carries any selected tag.
+      posts = posts.filter(p => (p.tags ?? []).some(t => activeTags.has(t)));
     }
+    return sort === 'oldest'
+      ? [...posts].sort((a, b) => a.published_at - b.published_at)
+      : posts;
+  }, [allPosts, debouncedQuery, activeTags, sort]);
 
-    if (activeSeriesSlug) {
-      results = results.filter(post => post.series_slug === activeSeriesSlug);
-    }
-
-    results = [...results].sort((a, b) => {
-      const diff = (b.published_at ?? 0) - (a.published_at ?? 0);
-      return sortOrder === 'newest' ? diff : -diff;
-    });
-
-    return results;
-  }, [allPosts, debouncedQuery, activeTags, activeSeriesSlug, sortOrder]);
-
-  const hasActiveFilters =
-    debouncedQuery.trim().length > 0 ||
-    activeTags.size > 0 ||
-    activeSeriesSlug !== null;
-
-  const activeTagList = Array.from(activeTags);
+  const isFiltered = debouncedQuery.trim() || activeTags.size > 0;
 
   return (
-    <section className="blog">
-      <div className="blog__container">
-
-        {/* ── Hero header ─────────────────────────────────────────────────── */}
-        <header className="blog-hero">
-          <h1 className="blog-hero__title">Writing</h1>
-          <p className="blog-hero__subtitle">
+    <div className="blog-index">
+      <div className="blog-hero">
+        <div className="blog-hero__inner">
+          <p className="blog-hero__eyebrow">Writing</p>
+          <h1 className="blog-hero__title">The Stack</h1>
+          <p className="blog-hero__sub">
             Things I've figured out — systems programming, embedded systems, and software engineering.
           </p>
-        </header>
-
-        {/* ── Search + sort controls ───────────────────────────────────────── */}
-        <div className="blog-controls">
-          <div className="blog-controls__search">
-            <TextField
-              label="Search posts"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              aria-label="Search posts by title, summary, or tag"
-            />
-          </div>
-          <div className="blog-controls__sort">
-            <label htmlFor="blog-sort" className="blog-controls__sort-label">Sort</label>
-            <select
-              id="blog-sort"
-              className="blog-controls__sort-select"
-              value={sortOrder}
-              onChange={e => setSortOrder(e.target.value)}
-            >
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-            </select>
-          </div>
-        </div>
-
-        {/* ── Active tag pills (when tags are selected) ─────────────────── */}
-        {activeTagList.length > 0 && (
-          <div className="blog-active-filters">
-            <span className="blog-active-filters__label">Filtered by:</span>
-            {activeTagList.map(tag => (
-              <Chip
-                key={tag}
-                label={tag}
-                variant="filter"
-                selected
-                onDelete={() => handleTagClick(tag)}
-              />
-            ))}
-            <button className="blog-active-filters__clear" onClick={clearAllFilters}>
-              Clear all
-            </button>
-          </div>
-        )}
-
-        {/* ── Two-column layout: posts + sidebar ──────────────────────────── */}
-        <div className="blog__layout">
-
-          {/* ── Post list ─────────────────────────────────────────────────── */}
-          <main className="blog__main">
-            {loading ? (
-              <SkeletonRows />
-            ) : error ? (
-              <p className="blog__error">{error}</p>
-            ) : filteredAndSortedPosts.length === 0 ? (
-              <EmptyState
-                hasFilters={hasActiveFilters}
-                onClearFilters={clearAllFilters}
-              />
-            ) : (
-              <div className="blog-post-list">
-                {filteredAndSortedPosts.map((post, i) => (
-                  <PostRow
-                    key={post.id}
-                    post={post}
-                    index={i}
-                    onTagClick={handleTagClick}
-                    activeTagSet={activeTags}
-                  />
-                ))}
-              </div>
-            )}
-          </main>
-
-          {/* ── Sidebar (desktop sticky, mobile collapsible) ─────────────── */}
-          <aside className="blog-sidebar">
-
-            {/* Series filter — desktop always visible */}
-            {series.length > 0 && (
-              <div className="blog-sidebar__section blog-sidebar__section--desktop">
-                <p className="blog-sidebar__heading">Series</p>
-                <ul className="sidebar-series-list">
-                  {series.map(s => (
-                    <li key={s.slug}>
-                      <button
-                        className={`sidebar-series-list__item${activeSeriesSlug === s.slug ? ' sidebar-series-list__item--active' : ''}`}
-                        onClick={() => handleSeriesClick(s.slug)}
-                        aria-pressed={activeSeriesSlug === s.slug}
-                      >
-                        <span className="sidebar-series-list__name">{s.title}</span>
-                        <span className="sidebar-series-list__count">{s.post_count}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Tag filter — desktop always visible */}
-            {allTags.length > 0 && (
-              <div className="blog-sidebar__section blog-sidebar__section--desktop">
-                <p className="blog-sidebar__heading">Tags</p>
-                <div className="sidebar-tag-list">
-                  {allTags.map(tag => (
-                    <button
-                      key={tag}
-                      className={`sidebar-tag-list__tag${activeTags.has(tag) ? ' sidebar-tag-list__tag--active' : ''}`}
-                      onClick={() => handleTagClick(tag)}
-                      aria-pressed={activeTags.has(tag)}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Mobile: collapsible versions */}
-            {series.length > 0 && (
-              <div className="blog-sidebar__section blog-sidebar__section--mobile">
-                <CollapsibleSection title="Series">
-                  <ul className="sidebar-series-list">
-                    {series.map(s => (
-                      <li key={s.slug}>
-                        <button
-                          className={`sidebar-series-list__item${activeSeriesSlug === s.slug ? ' sidebar-series-list__item--active' : ''}`}
-                          onClick={() => handleSeriesClick(s.slug)}
-                          aria-pressed={activeSeriesSlug === s.slug}
-                        >
-                          <span className="sidebar-series-list__name">{s.title}</span>
-                          <span className="sidebar-series-list__count">{s.post_count}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </CollapsibleSection>
-              </div>
-            )}
-
-            {allTags.length > 0 && (
-              <div className="blog-sidebar__section blog-sidebar__section--mobile">
-                <CollapsibleSection title="Tags">
-                  <div className="sidebar-tag-list">
-                    {allTags.map(tag => (
-                      <button
-                        key={tag}
-                        className={`sidebar-tag-list__tag${activeTags.has(tag) ? ' sidebar-tag-list__tag--active' : ''}`}
-                        onClick={() => handleTagClick(tag)}
-                        aria-pressed={activeTags.has(tag)}
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                  </div>
-                </CollapsibleSection>
-              </div>
-            )}
-
-          </aside>
         </div>
       </div>
-    </section>
+
+      {series.length > 0 && (
+        <div className="blog-series-chips">
+          {series.map(s => (
+            <Link key={s.slug} to={`/blog/series/${s.slug}`} style={{ textDecoration: 'none' }}>
+              <span className="blog-tag">{s.title} ({s.post_count})</span>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <div className="blog-body">
+        <div>
+          <div className="blog-controls">
+            <div className="blog-search">
+              <span className="blog-search__icon">⌕</span>
+              <input
+                type="search"
+                className="blog-search__input"
+                placeholder="Search posts…"
+                aria-label="Search posts"
+                value={rawQuery}
+                onChange={e => handleSearch(e.target.value)}
+              />
+            </div>
+            <select className="blog-sort" value={sort} onChange={e => setSort(e.target.value)}>
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+            </select>
+          </div>
+
+          {visibleTags.length > 0 && (
+            <div className="blog-tags">
+              {activeTags.size > 0 && (
+                <button className="blog-tag blog-tag--clear" onClick={() => setActiveTags(new Set())}>
+                  ✕ Clear
+                </button>
+              )}
+              {visibleTags.map(tag => (
+                <button key={tag}
+                  className={`blog-tag ${activeTags.has(tag) ? 'blog-tag--active' : ''}`}
+                  aria-pressed={activeTags.has(tag)}
+                  onClick={() => toggleTag(tag)}>
+                  {tag}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {loading ? <SkeletonRows /> : error ? (
+            <div className="blog-empty">
+              <p className="blog-empty__sub" style={{ color: 'var(--md-sys-color-error)' }}>{error}</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="blog-empty">
+              <div style={{ fontSize: '2rem', marginBottom: 16, opacity: 0.45 }}>◈</div>
+              <p className="blog-empty__title">{isFiltered ? 'No posts match your filters' : 'Nothing here yet'}</p>
+              <p className="blog-empty__sub">{isFiltered ? 'Try adjusting your search or clearing filters.' : 'First post coming soon.'}</p>
+              {isFiltered && (
+                <button className="blog-empty__action"
+                  onClick={() => { setRawQuery(''); setDebouncedQuery(''); setActiveTags(new Set()); }}>
+                  Clear filters
+                </button>
+              )}
+            </div>
+          ) : (
+            <div>{filtered.map((post, i) => <PostRow key={post.id} post={post} onTagClick={toggleTag} index={i} seriesTitle={seriesTitleBySlug[post.series_slug]} />)}</div>
+          )}
+        </div>
+
+        <aside className="blog-sidebar">
+          {series.length > 0 && (
+            <div className="blog-sidebar__section">
+              <p className="blog-sidebar__label">Series</p>
+              {series.map(s => (
+                <Link key={s.slug} to={`/blog/series/${s.slug}`} className="blog-sidebar__series-item">
+                  <span>{s.title}</span>
+                  <span className="blog-sidebar__series-count">{s.post_count}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+          {allTags.length > 0 && (
+            <div className="blog-sidebar__section">
+              <p className="blog-sidebar__label">Topics</p>
+              <div className="blog-sidebar__tag-cloud">
+                {allTags.slice(0, 12).map(tag => (
+                  <button key={tag}
+                    className={`blog-tag ${activeTags.has(tag) ? 'blog-tag--active' : ''}`}
+                    aria-pressed={activeTags.has(tag)}
+                    onClick={() => toggleTag(tag)}>
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </aside>
+      </div>
+    </div>
   );
 }

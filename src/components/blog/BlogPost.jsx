@@ -1,16 +1,29 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
+import { formatPostDate } from './format';
 import './blog.css';
 
-function formatDate(ts) {
-  if (!ts) return '';
-  return new Date(ts * 1000).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
+// DOMPurify is configured to allow <iframe> for embeds, so constrain them to a
+// trusted-host allowlist and force a restrictive sandbox — otherwise admin-authored
+// (or compromised-token) HTML could embed any third-party frame (clickjacking/drive-by).
+const ALLOWED_IFRAME_HOSTS = new Set([
+  'www.youtube.com', 'youtube.com', 'www.youtube-nocookie.com', 'player.vimeo.com',
+]);
+
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+  if (node.tagName !== 'IFRAME') return;
+  let host = '';
+  try { host = new URL(node.getAttribute('src') || '', window.location.origin).hostname; } catch { host = ''; }
+  if (!ALLOWED_IFRAME_HOSTS.has(host)) {
+    node.remove();
+    return;
+  }
+  // Omit allow-same-origin — the dangerous combo with allow-scripts — since
+  // cross-origin YouTube/Vimeo embeds play fine without it.
+  node.setAttribute('sandbox', 'allow-scripts allow-presentation allow-popups allow-fullscreen');
+  node.setAttribute('loading', 'lazy');
+});
 
 // Strip HTML tags and count words to get an estimated reading time.
 // Average adult reading speed is ~238 wpm (per Nielsen Norman Group research).
@@ -76,7 +89,7 @@ function ReadingProgressBar() {
   }, []);
 
   return (
-    <div className="bpr__progress-track" aria-hidden="true">
+    <div className="bpr__progress" aria-hidden="true">
       <div className="bpr__progress-fill" style={{ width: `${progress}%` }} />
     </div>
   );
@@ -95,7 +108,7 @@ function FloatingActions() {
   }, []);
 
   return (
-    <aside className="bpr__float-actions" aria-label="Article actions">
+    <aside className="bpr__float" aria-label="Article actions">
       <Link to="/blog" className="bpr__float-btn" aria-label="Back to blog">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <polyline points="15 18 9 12 15 6" />
@@ -135,15 +148,15 @@ function SeriesNav({ seriesPosts, currentSlug, seriesTitle }) {
 
   return (
     <nav className="bpr__series-nav" aria-label="Series navigation">
-      <p className="bpr__series-nav-label">
+      <p className="bpr__series-nav-header">
         Part {currentIdx + 1} of {seriesPosts.length} in
         <span className="bpr__series-nav-title"> {seriesTitle}</span>
       </p>
-      <div className="bpr__series-nav-cards">
+      <div className="bpr__series-grid">
         {prev ? (
           <Link to={`/blog/${prev.slug}`} className="bpr__series-card bpr__series-card--prev">
-            <span className="bpr__series-card-direction">← Previous</span>
-            <span className="bpr__series-card-post-title">{prev.title}</span>
+            <span className="bpr__series-card-dir">← Previous</span>
+            <span className="bpr__series-card-title">{prev.title}</span>
           </Link>
         ) : (
           // Empty placeholder keeps the next card right-aligned when there's no prev
@@ -152,8 +165,8 @@ function SeriesNav({ seriesPosts, currentSlug, seriesTitle }) {
 
         {next && (
           <Link to={`/blog/${next.slug}`} className="bpr__series-card bpr__series-card--next">
-            <span className="bpr__series-card-direction">Next →</span>
-            <span className="bpr__series-card-post-title">{next.title}</span>
+            <span className="bpr__series-card-dir">Next →</span>
+            <span className="bpr__series-card-title">{next.title}</span>
           </Link>
         )}
       </div>
@@ -167,9 +180,9 @@ function TagFooter({ tags }) {
   if (!tags || tags.length === 0) return null;
 
   return (
-    <div className="bpr__tag-footer">
-      <span className="bpr__tag-footer-label">Tagged under</span>
-      <div className="bpr__tag-footer-pills">
+    <div className="bpr__footer-tags">
+      <span className="bpr__footer-tags-label">Tagged under</span>
+      <div className="bpr__footer-tags-pills">
         {tags.map(tag => (
           <Link
             key={tag}
@@ -188,7 +201,6 @@ function TagFooter({ tags }) {
 
 export default function BlogPost() {
   const { slug } = useParams();
-  const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [seriesData, setSeriesData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -227,14 +239,12 @@ export default function BlogPost() {
         setLoading(false);
       })
       .catch(err => {
-        if (err.message === 'not_found') {
-          navigate('/blog', { replace: true });
-        } else {
-          setError('Failed to load this post. Please try again.');
-        }
+        setError(err.message === 'not_found'
+          ? 'This post doesn’t exist or has been unpublished.'
+          : 'Failed to load this post. Please try again.');
         setLoading(false);
       });
-  }, [slug, adminToken, navigate]);
+  }, [slug, adminToken]);
 
   // Sanitize and inject body HTML — DOMPurify ensures no XSS from Tiptap output
   useEffect(() => {
@@ -294,7 +304,7 @@ export default function BlogPost() {
           {post.series_slug && (
             <Link
               to={`/blog/series/${post.series_slug}`}
-              className="bpr__series-eyebrow"
+              className="bpr__series-label"
             >
               {seriesTitle}
             </Link>
@@ -303,20 +313,23 @@ export default function BlogPost() {
           <h1 className="bpr__title">{post.title}</h1>
 
           <div className="bpr__meta">
-            <time dateTime={new Date(post.published_at * 1000).toISOString()}>
-              {formatDate(post.published_at)}
-            </time>
+            {/* Drafts have a null published_at — don't emit a 1970 dateTime */}
+            {post.published_at && (
+              <time dateTime={new Date(post.published_at * 1000).toISOString()}>
+                {formatPostDate(post.published_at)}
+              </time>
+            )}
 
             {readingTime && (
               <>
-                <span className="bpr__meta-dot" aria-hidden="true">·</span>
+                {post.published_at && <span className="bpr__meta-dot" aria-hidden="true">·</span>}
                 <span>{readingTime}</span>
               </>
             )}
 
             {post.status === 'draft' && (
               <>
-                <span className="bpr__meta-dot" aria-hidden="true">·</span>
+                {(post.published_at || readingTime) && <span className="bpr__meta-dot" aria-hidden="true">·</span>}
                 <span className="bpr__draft-badge">Draft</span>
               </>
             )}
