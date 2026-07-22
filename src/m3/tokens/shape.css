@@ -1,12 +1,14 @@
-/* M3 Shape Scale — expressive Material You (organic, generous rounding) */
+/* M3 Shape Scale — matches the real Material 3 spec (6 named tiers + pill),
+   verified against material-components/material-web's generated tokens
+   (tokens/versions/v0_192/_md-sys-shape.scss). The previous scale invented
+   3 extra tiers beyond spec (24/36/48px) which made every surface using
+   them noticeably rounder than real M3. */
 :root {
   --md-sys-shape-corner-none: 0;
-  --md-sys-shape-corner-xs: 8px;
-  --md-sys-shape-corner-sm: 12px;
-  --md-sys-shape-corner-md: 16px;
-  --md-sys-shape-corner-lg: 24px;
+  --md-sys-shape-corner-xs: 4px;
+  --md-sys-shape-corner-sm: 8px;
+  --md-sys-shape-corner-md: 12px;
+  --md-sys-shape-corner-lg: 16px;
   --md-sys-shape-corner-xl: 28px;
-  --md-sys-shape-corner-2xl: 36px;
-  --md-sys-shape-corner-3xl: 48px;
   --md-sys-shape-corner-full: 9999px;
 }

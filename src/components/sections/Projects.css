@@ -31,7 +31,7 @@
 .projects__card {
   position: relative;
   height: 100%;
-  border-radius: var(--md-sys-shape-corner-lg);
+  border-radius: var(--md-sys-shape-corner-md);
   background: var(--md-sys-color-surface-container);
   box-shadow: var(--md-sys-elevation-1);
   overflow: hidden;
@@ -85,7 +85,9 @@
   height: 100%;
   z-index: 1;
   position: relative;
-  padding: 20px;
+  /* padding comes from the shared .m3-card__content (Card.css) — this used
+     to set its own 20px, winning over Card.css's 24px only by accident of
+     CSS import order, not deliberate design. */
 }
 
 .projects__card-header {
@@ -221,5 +223,4 @@
 @media (max-width: 600px) {
   .projects { padding-block: var(--md-sys-spacing-section-y-sm); }
   .projects__grid { gap: 16px; }
-  .projects__card-content { padding: 16px; }
 }

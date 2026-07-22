@@ -130,11 +130,6 @@
   align-items: center;
   gap: 4px;
 }
-/* Keep drawer trigger + actions at a comfortable 44px tap target */
-.nav__mobile-actions > * {
-  min-width: 44px;
-  min-height: 44px;
-}
 
 /* Drawer */
 .drawer__inner {
@@ -149,10 +144,6 @@
   display: flex;
   justify-content: flex-end;
   margin-bottom: 16px;
-}
-.drawer__header > * {
-  min-width: 44px;
-  min-height: 44px;
 }
 
 .drawer__nav {

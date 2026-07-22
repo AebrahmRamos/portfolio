@@ -68,7 +68,7 @@
   margin: 0 0 8px;
   background: var(--md-sys-color-surface-container-low);
   border-bottom: 1px solid var(--blog-rule);
-  border-radius: 0 0 var(--md-sys-shape-corner-3xl, 48px) var(--md-sys-shape-corner-3xl, 48px);
+  border-radius: 0 0 var(--md-sys-shape-corner-xl, 28px) var(--md-sys-shape-corner-xl, 28px);
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -1026,7 +1026,7 @@
 @media (max-width: 900px) {
   .blog-hero {
     padding: 56px 0 44px;
-    border-radius: 0 0 var(--md-sys-shape-corner-2xl, 36px) var(--md-sys-shape-corner-2xl, 36px);
+    border-radius: 0 0 var(--md-sys-shape-corner-xl, 28px) var(--md-sys-shape-corner-xl, 28px);
   }
 }
 

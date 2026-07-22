@@ -24,8 +24,10 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 28px 24px !important;
-  border-radius: var(--md-sys-shape-corner-lg);
+  /* padding comes from the shared .m3-card__content (Card.css) — this used
+     to override it to 28px/24px, one of three different values across the
+     app for the same conceptual "card content padding". */
+  border-radius: var(--md-sys-shape-corner-md);
   background: var(--md-sys-color-surface-container);
   box-shadow: var(--md-sys-elevation-1);
   transition:
@@ -116,7 +118,7 @@
   position: relative;
   overflow: hidden;
   padding: 40px 32px;
-  border-radius: var(--md-sys-shape-corner-2xl);
+  border-radius: var(--md-sys-shape-corner-xl);
   background: var(--md-sys-color-surface-container-high);
   border: 1px solid var(--md-sys-color-outline-variant);
   box-shadow: var(--md-sys-elevation-2);
@@ -179,6 +181,5 @@
 @media (max-width: 600px) {
   .skills { padding-block: var(--md-sys-spacing-section-y-sm); }
   .skills__grid { gap: 18px; margin-bottom: 32px; }
-  .skills__card-content { padding: 24px 20px !important; }
   .skills__mern { border-radius: var(--md-sys-shape-corner-lg); padding: 28px 20px; }
 }

@@ -23,7 +23,7 @@
 }
 
 .contact__form-card {
-  border-radius: var(--md-sys-shape-corner-2xl);
+  border-radius: var(--md-sys-shape-corner-xl);
   background: var(--md-sys-color-surface-container-high);
   border: 1px solid color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
   box-shadow: var(--md-sys-elevation-2);
@@ -77,7 +77,7 @@
 
 .contact__link-card {
   text-decoration: none;
-  border-radius: var(--md-sys-shape-corner-lg);
+  border-radius: var(--md-sys-shape-corner-md);
 }
 
 .contact__link-content {

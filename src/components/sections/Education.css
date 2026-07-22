@@ -95,9 +95,9 @@
     var(--md-sys-elevation-3);
 }
 
-/* Timeline card: expressive lg radius, tonal surface, tactile hover lift. */
+/* Timeline card: tonal surface, tactile hover lift. */
 .edu-timeline__card {
-  border-radius: var(--md-sys-shape-corner-lg);
+  border-radius: var(--md-sys-shape-corner-md);
   background: var(--md-sys-color-surface-container);
   transition:
     transform 300ms var(--md-sys-motion-easing-standard),

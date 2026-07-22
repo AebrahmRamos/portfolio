@@ -1,7 +1,9 @@
 .m3-card {
   position: relative;
   display: block;
-  border-radius: var(--md-sys-shape-corner-lg);
+  /* Real M3's elevated/filled/outlined card spec calls for corner-medium,
+     not corner-large — verified against material-web's generated tokens. */
+  border-radius: var(--md-sys-shape-corner-md);
   overflow: hidden;
   transition:
     box-shadow var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-standard),

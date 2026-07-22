@@ -30,7 +30,7 @@ const Organizations = () => (
               {getIcon(org.organization)}
             </div>
 
-            <Card variant="elevated" className="timeline__card">
+            <Card variant="elevated" interactive className="timeline__card">
               <div className="m3-card__content">
                 <p className="m3-title-large timeline__org">{org.organization}</p>
 

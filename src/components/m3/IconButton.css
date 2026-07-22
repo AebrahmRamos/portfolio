@@ -3,9 +3,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* 44px minimum touch target */
-  width: 44px;
-  height: 44px;
+  /* 40px matches the real M3 icon-button state-layer spec. The visible
+     circle stays compact; ::after below expands the actual clickable
+     region to the WCAG 44px minimum without inflating what's drawn. */
+  width: 40px;
+  height: 40px;
   border: none;
   background: transparent;
   color: var(--md-sys-color-on-surface);
@@ -17,6 +19,14 @@
 }
 
 .m3-icon-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+
+/* Invisible hit-slop: expands the clickable box to 44px without touching
+   the visible 40px circle (2px inset each side = 4px added). */
+.m3-icon-btn::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+}
 
 /* Press scale for tactile feedback */
 .m3-icon-btn:active:not(:disabled) { transform: scale(0.92); }

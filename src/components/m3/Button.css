@@ -15,7 +15,11 @@
   text-decoration: none;
   border-radius: var(--md-sys-shape-corner-full);
   padding: 0 24px;
-  min-height: 44px;
+  /* 40px matches the real M3 filled-button container-height spec. The
+     visible pill stays compact; ::after below expands the actual
+     clickable region to the WCAG 44px minimum without inflating what's
+     drawn on screen (the same "hit-slop" pattern Material apps use). */
+  min-height: 40px;
   transition:
     background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
     box-shadow var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
@@ -31,6 +35,14 @@
   cursor: not-allowed;
   opacity: 0.38;
   pointer-events: none;
+}
+
+/* Invisible hit-slop: expands the clickable box to 44px without touching
+   the visible 40px pill (2px inset each side = 4px added height). */
+.m3-btn::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
 }
 
 .m3-btn__state {
@@ -61,7 +73,7 @@
 
 .m3-btn--full { width: 100%; }
 .m3-btn--large { min-height: 48px; padding: 0 28px; font-size: 1rem; }
-.m3-btn--small { min-height: 44px; padding: 0 16px; font-size: 0.8125rem; }
+.m3-btn--small { min-height: 40px; padding: 0 16px; font-size: 0.8125rem; }
 
 /* Filled */
 .m3-btn--filled {

@@ -1,5 +1,6 @@
 /* Organizations — Material You section.
-   Tonal surface, lift+scale cards, pill role badges. */
+   Tonal surface, lift+scale cards (styling lives on the shared .m3-card
+   component — this file only owns section-level layout). */
 
 .organizations {
   position: relative;
@@ -16,68 +17,7 @@
   color: var(--md-sys-color-on-surface);
 }
 
-/* Bespoke org card — matches the shared .m3-card lift+scale energy. */
-.organizations__card,
-.organization-card,
-.organizations__item {
-  position: relative;
-  overflow: hidden;
-  background-color: var(--md-sys-color-surface-container);
-  color: var(--md-sys-color-on-surface);
-  border-radius: var(--md-sys-shape-corner-lg);
-  box-shadow: var(--md-sys-elevation-1);
-  transition:
-    transform 300ms var(--md-sys-motion-easing-standard),
-    box-shadow 300ms var(--md-sys-motion-easing-standard),
-    background-color 300ms var(--md-sys-motion-easing-standard);
-}
-
-.organizations__card:hover,
-.organization-card:hover,
-.organizations__item:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: var(--md-sys-elevation-3);
-  background-color: var(--md-sys-color-surface-container-high);
-}
-
-.organizations__card:active,
-.organization-card:active,
-.organizations__item:active {
-  transform: scale(0.96);
-  box-shadow: var(--md-sys-elevation-1);
-}
-
-.organizations__card:focus-visible,
-.organization-card:focus-visible,
-.organizations__item:focus-visible {
-  outline: 3px solid var(--md-sys-color-primary);
-  outline-offset: 2px;
-}
-
-/* Role badge — full pill, tonal secondary container. */
-.organizations__role,
-.organization-card__role,
-.organizations__badge {
-  display: inline-flex;
-  align-items: center;
-  background-color: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
-  border-radius: var(--md-sys-shape-corner-full);
-  padding: 6px 14px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
 /* Mobile: tighten section padding. */
 @media (max-width: 600px) {
   .organizations { padding-block: var(--md-sys-spacing-section-y-sm); }
-
-  .organizations__card,
-  .organization-card,
-  .organizations__item {
-    border-radius: var(--md-sys-shape-corner-md);
-  }
 }

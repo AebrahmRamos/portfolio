@@ -35,13 +35,13 @@
   max-width: 65ch;
 }
 
-/* Warm, personal facts card: tonal surface-container with a large 2xl radius */
+/* Warm, personal facts card: tonal surface-container with an extra-large radius */
 .about__facts-card {
   align-self: start;
   background-color: var(--md-sys-color-surface-container);
   color: var(--md-sys-color-on-surface);
   padding: 40px;
-  border-radius: var(--md-sys-shape-corner-2xl);
+  border-radius: var(--md-sys-shape-corner-xl);
   border: 1px solid var(--md-sys-color-outline-variant);
   box-shadow: var(--md-sys-elevation-1);
   transition:
