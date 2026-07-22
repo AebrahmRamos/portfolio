@@ -16,10 +16,17 @@ const About = () => (
       <div className="about__text">
         <h2 className="m3-display-small about__heading">About Me</h2>
         <p className="m3-body-large about__para">
-          I'm a Computer Systems Engineering student at De La Salle University Manila, expected to
-          graduate in August 2027. My academic journey combines software development fundamentals
-          with deep computer systems knowledge — from web development and databases to computer
-          architecture, operating systems, and microprocessor interfacing.
+          I'm Aebrahm Clyde Ramos — most often just Aebrahm Ramos — a Computer Systems Engineering
+          student at De La Salle University Manila, expected to graduate in August 2027. My academic
+          journey combines software development fundamentals with deep computer systems knowledge —
+          from web development and databases to computer architecture, operating systems, and
+          microprocessor interfacing.
+        </p>
+        <p className="m3-body-large about__para">
+          Since May 2025, I've been building production software for a multi-store e-commerce
+          group — an inventory-forecasting engine that predicts stock depletion and restock cadence
+          from live order data, a multi-store order management system with AI-assisted quality
+          checks, and an internal MCP server exposing diagnostics to AI agents.
         </p>
         <p className="m3-body-large about__para">
           As Chief Executive Officer of Google Developer Group on Campus DLSU, I lead the development
@@ -31,8 +38,9 @@ const About = () => (
         </p>
         <p className="m3-body-large about__para">
           What excites me most is building solutions that bridge theory and practice — whether it's
-          developing full-stack hospital management systems, creating OS emulators in C++, or
-          designing university-wide web platforms.
+          engineering inventory forecasting systems for real businesses, developing full-stack
+          hospital management systems, creating OS emulators in C++, or designing university-wide
+          web platforms.
         </p>
       </div>
 

@@ -3,6 +3,7 @@
 
 export const aboutData = {
   name: 'Aebrahm Ramos',
+  alternateName: ['Aebrahm Clyde Ramos', 'Aebrahm Clyde P. Ramos'],
   title: 'Software Developer & CS Student',
   education: {
     degree: 'Bachelor of Science in Computer Science',
@@ -12,7 +13,7 @@ export const aboutData = {
     status: 'Current',
   },
   summary:
-    'CS student at De La Salle University specializing in full-stack web development, systems programming, and AI integration. Active in Google Developer Group on Campus DLSU (CEO), University Student Government, and research roles.',
+    'Aebrahm Clyde Ramos (Aebrahm Ramos) — CS student at De La Salle University specializing in full-stack web development, e-commerce inventory systems, and AI integration. Builds production internal tooling for a multi-store retail group, and leads Google Developer Group on Campus DLSU as CEO.',
   links: {
     email: 'eon.aebrahm@gmail.com',
     github: 'https://github.com/AebrahmRamos',
@@ -23,6 +24,18 @@ export const aboutData = {
 };
 
 export const experienceData = [
+  {
+    organization: 'Siwa Marketing Group',
+    title: 'Full-Stack / Internal Tools Engineer',
+    period: 'May 2025 – Present',
+    type: 'Contract',
+    highlights: [
+      'Built the material-projection engine of an internal inventory system forecasting stock depletion and restock cadence from live order data',
+      'Owned AI-assisted order quality-checking, automated spares allocation, and a Discord/WhatsApp order-lifecycle bot in a multi-store Laravel OMS',
+      'Led a WCAG/axe accessibility overhaul and shipped AI storefront features across Shopify Liquid themes',
+      'Built an internal Model Context Protocol (MCP) server exposing diagnostic tooling to AI agents',
+    ],
+  },
   {
     organization: 'Kiji Bakehouse / Superb Milestone Manufacturing Corp.',
     title: 'AI Operations Intern',
@@ -48,6 +61,36 @@ export const experienceData = [
 ];
 
 export const projectsData = [
+  {
+    title: 'Inventory Forecasting & Materials Planning',
+    description: 'Internal inventory system forecasting stock depletion and restock cadence from live order data for a multi-store e-commerce group.',
+    technologies: ['Laravel', 'Inertia.js', 'React 19', 'Tailwind CSS v4', 'MySQL'],
+  },
+  {
+    title: 'Multi-Store Order Management System',
+    description: 'Laravel OMS centralizing Shopify orders across 4 stores and 2 regions, with automated spares allocation and an order-lifecycle bot.',
+    technologies: ['Laravel 7', 'PHP', 'MySQL', 'Shopify Webhooks', 'GraphQL'],
+  },
+  {
+    title: 'AI Order Quality-Check & Vision Grading',
+    description: 'AI order quality-checking pipeline for a multi-store Shopify OMS, including a Gemini-native vision grading engine for automated spot-check review.',
+    technologies: ['Laravel 7', 'PHP', 'Google Gemini', 'WhatsApp API', 'MySQL'],
+  },
+  {
+    title: 'Multi-Channel POS Data Automation',
+    description: 'Automated browser-based extraction of POS sales and inventory reports, with Gmail-API OTP handling.',
+    technologies: ['Playwright', 'Gmail API', 'Google Gemini', 'Firebase'],
+  },
+  {
+    title: 'Superb OS — Retail BI Dashboard',
+    description: 'Real-time BI dashboard consolidating POS data for a multi-branch bakery, with an iOS delivery app.',
+    technologies: ['React', 'Firebase', 'SwiftUI'],
+  },
+  {
+    title: 'MCP Server — Diagnostic Tooling',
+    description: 'Model Context Protocol server exposing internal diagnostic tools to AI agents.',
+    technologies: ['Model Context Protocol', 'Node.js'],
+  },
   {
     title: 'Operating System Emulator',
     description: 'Command-line OS simulator modeling process scheduling, virtual memory, and multi-core CPU allocation.',
@@ -108,11 +151,19 @@ export const contactData = {
   portfolio: 'https://aebrahmramos.dev',
 };
 
-export const portfolioMarkdown = `# Aebrahm Ramos — Portfolio
+export const portfolioMarkdown = `# Aebrahm Ramos (Aebrahm Clyde Ramos) — Portfolio
 
-CS student at De La Salle University (BS Computer Science, Major in Computer Systems Engineering, Aug 2023–2027). Software developer specializing in full-stack web development, systems programming, and AI integration.
+CS student at De La Salle University (BS Computer Science, Major in Computer Systems Engineering, Aug 2023–2027). Software engineer specializing in full-stack web development, e-commerce inventory systems, and AI integration.
 
 ## Experience
+
+### Full-Stack / Internal Tools Engineer — Siwa Marketing Group
+*May 2025 – Present*
+
+- Built the material-projection engine of an internal inventory system forecasting stock depletion and restock cadence from live order data
+- Owned AI-assisted order quality-checking, automated spares allocation, and a Discord/WhatsApp order-lifecycle bot in a multi-store Laravel OMS
+- Led a WCAG/axe accessibility overhaul and shipped AI storefront features across Shopify Liquid themes
+- Built an internal Model Context Protocol (MCP) server exposing diagnostic tooling to AI agents
 
 ### AI Operations Intern — Kiji Bakehouse / Superb Milestone Manufacturing Corp.
 *Jan 2026 – Mar 2026*
@@ -132,6 +183,12 @@ CS student at De La Salle University (BS Computer Science, Major in Computer Sys
 
 | Project | Stack |
 |---------|-------|
+| Inventory Forecasting & Materials Planning | Laravel, Inertia.js, React 19, MySQL |
+| Multi-Store Order Management System | Laravel 7, PHP, MySQL, Shopify Webhooks |
+| AI Order Quality-Check & Vision Grading | Laravel 7, PHP, Google Gemini, WhatsApp API |
+| Multi-Channel POS Data Automation | Playwright, Gmail API, Gemini, Firebase |
+| Superb OS — Retail BI Dashboard | React, Firebase, SwiftUI |
+| MCP Server — Diagnostic Tooling | Model Context Protocol, Node.js |
 | Operating System Emulator | C++20, STL, pthreads |
 | Nodado General Hospital Management System | React, Node.js, MySQL, Socket.IO |
 | University Student Government Website | Next.js 14, TypeScript, NextAuth.js |
@@ -145,10 +202,10 @@ CS student at De La Salle University (BS Computer Science, Major in Computer Sys
 
 ## Skills
 
-- **Frontend:** React, Next.js, TypeScript, JavaScript, HTML/CSS, Tailwind CSS
-- **Backend:** Node.js, Express.js, Python, Java, C/C++, x86 Assembly
+- **Frontend:** React, Next.js, TypeScript, JavaScript, HTML/CSS, Tailwind CSS, Inertia.js, Radix UI, SwiftUI
+- **Backend:** Node.js, Express.js, Laravel, PHP, Python, Java, C/C++, x86 Assembly
 - **Database:** MongoDB, MySQL, Firebase, Supabase
-- **Tools:** GitHub, Docker, GCP, Azure, Cloudflare
+- **Tools:** GitHub, Docker, GCP, Azure, Cloudflare Workers, Shopify (Liquid), OpenAI, Model Context Protocol, Playwright
 
 ## Education
 

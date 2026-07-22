@@ -1,6 +1,134 @@
 export const projects = [
   {
     id: 1,
+    title: 'Inventory Forecasting & Materials Planning',
+    description:
+      'Internal inventory system that forecasts stock depletion and restock cadence from live order data for a multi-store e-commerce group.',
+    fullDescription:
+      'Built the material-projection engine of an internal inventory management system for a multi-store floral e-commerce group. Forecasts which materials run out fastest and recommends restock cadence from live order data, with timeline and lifecycle views (pending/completed/all), role-based stock-control access, passkey authentication, recipe/ingredient search, CSV export, and onboarding tours for new staff.',
+    image: null,
+    features: [
+      'Material-projection engine forecasting stock depletion and restock cadence from live order data',
+      'Timeline and lifecycle views (pending/completed/all) with sensible defaults',
+      'Role-based access control gating stock-control features',
+      'Passkey authentication',
+      'Recipe/ingredient search across materials',
+      'CSV import/export for stock and usage data',
+      'Onboarding tours for new staff',
+    ],
+    technologies: ['Laravel', 'Inertia.js', 'React 19', 'Tailwind CSS v4', 'Radix UI', 'MySQL'],
+    liveDemo: null,
+    github: null,
+    featured: true,
+    category: ['Laravel', 'React', 'Inventory Systems'],
+    type: 'commercial',
+  },
+  {
+    id: 2,
+    title: 'Multi-Store Order Management System',
+    description:
+      'Laravel OMS centralizing Shopify orders across 4 stores and 2 regions, with automated spares allocation and an order-lifecycle bot.',
+    fullDescription:
+      'Contributed to a multi-store Order Management System centralizing Shopify orders (via webhooks and GraphQL) across 4 stores in 2 regions. Owned an automated spares-allocation system with dry-run decision sheets and a Discord/WhatsApp bot for order-lifecycle lookups.',
+    image: null,
+    features: [
+      'Centralizes Shopify orders via webhooks and GraphQL across 4 stores, 2 regions',
+      'Automated spares allocation with dry-run decision sheets',
+      'Discord/WhatsApp bot for order-lifecycle lookups',
+      'Logistics and shipping coordination',
+    ],
+    technologies: ['Laravel 7', 'PHP', 'MySQL', 'Shopify Webhooks', 'GraphQL'],
+    liveDemo: null,
+    github: null,
+    featured: true,
+    category: ['Laravel', 'PHP', 'E-commerce'],
+    type: 'commercial',
+  },
+  {
+    id: 3,
+    title: 'AI Order Quality-Check & Vision Grading',
+    description:
+      'AI order quality-checking pipeline for a multi-store Shopify OMS, including a Gemini-native vision grading engine for automated spot-check review.',
+    fullDescription:
+      'Built "Spotcheck," an AI-assisted order quality-checking system for a multi-store OMS. Auto-passes orders against a reference-and-recipe check with staff approve/reject override, classifies human rejection reasons into weekly recurring-issue dashboards by product, and includes a shadow-gated AI grading engine using Gemini\'s native image and video understanding to visually grade spot-check submissions.',
+    image: null,
+    features: [
+      'AI-judged auto-pass pipeline gated on reference + recipe matching, with staff approve/reject override',
+      'Classifies human rejection reasons into categories with weekly recurring-issue dashboards',
+      'Vision grading engine using Gemini\'s native image/video understanding to auto-grade spot-check photos',
+      'WhatsApp integration labeling AI-judged vs. staff-altered verdicts',
+      'CSV export of AI verdicts with formula-injection sanitization',
+    ],
+    technologies: ['Laravel 7', 'PHP', 'Google Gemini', 'WhatsApp API', 'MySQL'],
+    liveDemo: null,
+    github: null,
+    featured: true,
+    category: ['Laravel', 'AI/ML', 'Computer Vision'],
+    type: 'commercial',
+  },
+  {
+    id: 4,
+    title: 'Multi-Channel POS Data Automation',
+    description:
+      'Automated browser-based extraction of POS sales and inventory reports, with Gmail-API OTP handling.',
+    fullDescription:
+      'Built a browser automation tool that logs into a POS platform (handling Gmail-API-based OTP verification), extracts sales and inventory reports on a schedule, and exports structured data for downstream analysis and dashboards.',
+    image: null,
+    features: [
+      'Automated login with Gmail API OTP handling',
+      'Scheduled extraction of sales and inventory reports',
+      'Structured data export (Excel/xlsx) for downstream analysis',
+      'Firebase integration for dashboard consumption',
+    ],
+    technologies: ['Playwright', 'Gmail API', 'Google Gemini', 'Firebase', 'xlsx'],
+    liveDemo: null,
+    github: null,
+    featured: true,
+    category: ['Automation', 'Node.js'],
+    type: 'commercial',
+  },
+  {
+    id: 5,
+    title: 'Superb OS — Retail BI Dashboard',
+    description:
+      'Real-time business intelligence dashboard consolidating POS data for a multi-branch bakery, with an iOS delivery app.',
+    fullDescription:
+      'Contributed to "Superb OS," a real-time business intelligence dashboard consolidating StoreHub POS data into multi-branch sales analytics, employee performance tracking, and inventory management with AI-powered insights, plus a companion SwiftUI delivery app on a Firebase backend.',
+    image: null,
+    features: [
+      'Real-time multi-branch sales analytics from POS data',
+      'Employee performance tracking',
+      'Inventory management with AI-powered insights',
+      'Companion SwiftUI delivery app on a Firebase backend',
+    ],
+    technologies: ['React', 'Firebase', 'SwiftUI', 'StoreHub POS API'],
+    liveDemo: null,
+    github: null,
+    featured: true,
+    category: ['React', 'Firebase', 'iOS'],
+    type: 'commercial',
+  },
+  {
+    id: 6,
+    title: 'MCP Server — Diagnostic Tooling',
+    description: 'Model Context Protocol server exposing internal diagnostic tools to AI agents.',
+    fullDescription:
+      'Built and led development of an internal Model Context Protocol (MCP) server exposing diagnostic tooling to AI coding agents, with test coverage for the happy path and validation of each diagnostic tool.',
+    image: null,
+    features: [
+      'MCP server exposing diagnostic tools to AI agents',
+      'Validated tool schemas and error handling',
+      'Test coverage for diagnostic tool happy paths',
+    ],
+    technologies: ['Model Context Protocol', 'Node.js'],
+    liveDemo: null,
+    github: null,
+    featured: true,
+    category: ['MCP', 'Node.js', 'AI Tooling'],
+    type: 'commercial',
+  },
+  {
+    id: 7,
     title: 'Operating System Emulator',
     description:
       'Command-line OS simulator that models process scheduling, virtual memory, and multi-core CPU allocation.',
@@ -28,9 +156,10 @@ export const projects = [
     github: null,
     featured: true,
     category: ['C++', 'Systems Programming'],
+    type: 'academic',
   },
   {
-    id: 2,
+    id: 8,
     title: 'Nodado General Hospital Management System',
     description:
       'Full-stack hospital management platform with patient records, pharmacy inventory, and real-time updates.',
@@ -64,9 +193,10 @@ export const projects = [
     github: null,
     featured: true,
     category: ['Full Stack', 'React', 'Node.js'],
+    type: 'academic',
   },
   {
-    id: 3,
+    id: 9,
     title: 'University Student Government Website',
     description:
       'Full-stack university student government platform for DLSU with admin dashboard and authentication.',
@@ -101,9 +231,10 @@ export const projects = [
     github: null,
     featured: true,
     category: ['Next.js', 'Full Stack', 'TypeScript'],
+    type: 'org',
   },
   {
-    id: 4,
+    id: 10,
     title: 'GDGOC-DLSU Main Website',
     description:
       'Comprehensive website with e-commerce platform, AI receipt analysis, and member management.',
@@ -130,9 +261,10 @@ export const projects = [
     github: null,
     featured: true,
     category: ['Next.js', 'React', 'TypeScript', 'Firebase'],
+    type: 'org',
   },
   {
-    id: 5,
+    id: 11,
     title: 'GDGOC-DLSU Organizational Management Platform',
     description:
       'Internal tools hub with member directory, order processing, and administrative dashboards.',
@@ -159,9 +291,10 @@ export const projects = [
     github: null,
     featured: true,
     category: ['Next.js', 'React', 'TypeScript', 'Firebase'],
+    type: 'org',
   },
   {
-    id: 6,
+    id: 12,
     title: 'La Salle Debate Society Official Website',
     description:
       'Organizational website with member management, event showcases, and learning resources portal.',
@@ -185,9 +318,10 @@ export const projects = [
     github: null,
     featured: true,
     category: ['Next.js', 'React', 'TypeScript'],
+    type: 'org',
   },
   {
-    id: 7,
+    id: 13,
     title: 'GDGOC-DLSU Recruitment Website',
     description:
       'Recruitment and showcase website with dynamic content management and member onboarding.',
@@ -212,9 +346,10 @@ export const projects = [
     github: null,
     featured: true,
     category: ['React', 'Firebase'],
+    type: 'org',
   },
   {
-    id: 8,
+    id: 14,
     title: 'Retrieval Augmented Generation Chatbot',
     description:
       'AI chatbot using Vertex AI and Gemini to assist university help desk with automated responses.',
@@ -239,9 +374,10 @@ export const projects = [
     github: null,
     featured: false,
     category: ['AI/ML', 'JavaScript'],
+    type: 'academic',
   },
   {
-    id: 9,
+    id: 15,
     title: 'M68HC11 EPROM Programmer',
     description:
       'Hardware EPROM programmer implementing the fast programming algorithm to interface a Motorola M68HC11 with a 2764 UVEPROM chip.',
@@ -265,9 +401,10 @@ export const projects = [
     github: null,
     featured: false,
     category: ['Assembly', 'Embedded Systems'],
+    type: 'academic',
   },
   {
-    id: 10,
+    id: 16,
     title: 'RGB to Grayscale Converter',
     description:
       'RGB to Grayscale converter linking C and Assembly with optimized conversion function.',
@@ -289,6 +426,7 @@ export const projects = [
     github: null,
     featured: false,
     category: ['Assembly', 'C'],
+    type: 'academic',
   },
 ];
 

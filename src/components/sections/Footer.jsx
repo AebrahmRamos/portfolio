@@ -34,11 +34,11 @@ const Footer = () => (
 
       <div className="footer__bottom">
         <p className="m3-body-small footer__copy">
-          &copy; 2025 Aebrahm Ramos. All rights reserved
+          &copy; {new Date().getFullYear()} Aebrahm Ramos. All rights reserved
         </p>
         <p className="m3-body-small footer__tagline">
-          Computer Systems Engineering Student at De La Salle University Manila. Specializing in MERN
-          stack development and organizational management systems.
+          Computer Systems Engineering Student at De La Salle University Manila. Building full-stack
+          web applications, e-commerce inventory systems, and AI-integrated tooling.
         </p>
       </div>
     </div>

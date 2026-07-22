@@ -18,6 +18,9 @@ export const skills = {
       'Material-UI',
       'Tailwind CSS',
       'DaisyUI',
+      'Inertia.js',
+      'Radix UI',
+      'SwiftUI',
     ],
   },
   backend: {
@@ -27,6 +30,8 @@ export const skills = {
     skills: [
       'Node.js',
       'Express.js',
+      'Laravel',
+      'PHP',
       'Python',
       'Java',
       'C/C++',
@@ -56,6 +61,11 @@ export const skills = {
       'Azure',
       'DigitalOcean',
       'PayloadCMS',
+      'Shopify (Liquid)',
+      'Cloudflare Workers',
+      'OpenAI',
+      'Model Context Protocol',
+      'Playwright',
     ],
   },
 };

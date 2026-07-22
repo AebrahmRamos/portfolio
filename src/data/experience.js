@@ -6,10 +6,34 @@
 export const experience = [
   {
     id: 1,
-    organization: 'Kiji Bakehouse / Superb Milestone Manufacturing Corp.',
+    organization: 'Siwa Marketing Group',
+    type: 'commercial',
     positions: [
       {
         id: '1-1',
+        title: 'Full-Stack / Internal Tools Engineer',
+        date: 'May 2025 - Present',
+        type: 'Contract',
+        description:
+          'Internal tooling for a multi-store floral e-commerce group (Ireland & UAE) — inventory forecasting, multi-store order management, and AI-assisted operations automation.',
+        responsibilities: [
+          'Built the material-projection engine of an internal inventory system that forecasts stock depletion and restock cadence from live order data',
+          'Owned three automation features in a multi-store Laravel OMS: AI-assisted order quality-checking, automated spares allocation, and a Discord/WhatsApp order-lifecycle bot',
+          'Led a WCAG/axe accessibility overhaul (ARIA + keyboard) and shipped AI storefront features (bouquet builder, gift-card assistant) across Shopify Liquid themes',
+          'Built an internal Model Context Protocol (MCP) server exposing diagnostic tooling to AI agents',
+        ],
+        current: true,
+      },
+    ],
+    iconColor: 'secondary',
+  },
+  {
+    id: 2,
+    organization: 'Kiji Bakehouse / Superb Milestone Manufacturing Corp.',
+    type: 'commercial',
+    positions: [
+      {
+        id: '2-1',
         title: 'AI Operations Intern',
         date: 'Jan 2026 - Mar 2026',
         type: 'Internship',
@@ -26,11 +50,12 @@ export const experience = [
     iconColor: 'tertiary',
   },
   {
-    id: 2,
+    id: 3,
     organization: 'VISON Technologies Corporation',
+    type: 'commercial',
     positions: [
       {
-        id: '2-1',
+        id: '3-1',
         title: 'Research Apprentice',
         date: 'Dec 2024 - Jul 2025',
         type: 'Internship',
