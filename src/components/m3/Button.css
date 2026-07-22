@@ -15,7 +15,7 @@
   text-decoration: none;
   border-radius: var(--md-sys-shape-corner-full);
   padding: 0 24px;
-  min-height: 40px;
+  min-height: 44px;
   transition:
     background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
     box-shadow var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
@@ -47,6 +47,9 @@
 .m3-btn:focus-visible:not(:disabled) .m3-btn__state { opacity: 0.12; }
 .m3-btn:active:not(:disabled) .m3-btn__state { opacity: 0.16; }
 
+/* Tactile press feedback (signature Material You) */
+.m3-btn:active:not(:disabled) { transform: scale(0.96); }
+
 .m3-btn__icon {
   display: inline-flex;
   align-items: center;
@@ -58,7 +61,7 @@
 
 .m3-btn--full { width: 100%; }
 .m3-btn--large { min-height: 48px; padding: 0 28px; font-size: 1rem; }
-.m3-btn--small { min-height: 32px; padding: 0 16px; font-size: 0.8125rem; }
+.m3-btn--small { min-height: 44px; padding: 0 16px; font-size: 0.8125rem; }
 
 /* Filled */
 .m3-btn--filled {
@@ -66,7 +69,7 @@
   color: var(--md-sys-color-on-primary);
   box-shadow: var(--md-sys-elevation-0);
 }
-.m3-btn--filled:hover:not(:disabled) { box-shadow: var(--md-sys-elevation-1); }
+.m3-btn--filled:hover:not(:disabled) { box-shadow: var(--md-sys-elevation-2); }
 
 /* Tonal */
 .m3-btn--tonal {

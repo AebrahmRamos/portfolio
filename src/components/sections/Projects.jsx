@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FiCode, FiExternalLink, FiX, FiGithub } from 'react-icons/fi';
+import { FiCode, FiExternalLink, FiX, FiGithub, FiArrowRight } from 'react-icons/fi';
 import { Card, Chip, Button, IconButton, Dialog } from '../m3';
 import { projects } from '../../data/projects';
 import './Projects.css';
@@ -36,9 +36,16 @@ const Projects = () => {
               interactive
               className="projects__card"
               as="article"
+              role="button"
+              aria-label={`View ${project.title} details`}
               onClick={() => handleOpen(project)}
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && handleOpen(project)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleOpen(project);
+                }
+              }}
             >
               <div className="m3-card__content projects__card-content">
                 <div className="projects__card-header">
@@ -54,13 +61,17 @@ const Projects = () => {
                     <Chip label={`+${project.technologies.length - 3}`} variant="assist" />
                   )}
                 </div>
+                <div className="projects__card-cta">
+                  <span className="m3-label-large">View details</span>
+                  <FiArrowRight size={16} aria-hidden="true" />
+                </div>
               </div>
             </Card>
           ))}
         </div>
       </div>
 
-      <Dialog open={openModal} onClose={handleClose} ariaLabel="Project details">
+      <Dialog open={openModal} onClose={handleClose} ariaLabelledby="project-modal-title">
         <div className="m3-dialog__header">
           <div className="projects__modal-title-row">
             <FiCode size={24} color="var(--md-sys-color-primary)" />

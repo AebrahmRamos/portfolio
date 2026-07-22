@@ -8,4 +8,3 @@ export { default as NavigationDrawer } from './NavigationDrawer';
 export { default as Fab } from './Fab';
 export { default as Banner } from './Banner';
 export { default as Progress } from './Progress';
-export { default as Avatar } from './Avatar';

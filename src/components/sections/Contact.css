@@ -1,9 +1,17 @@
+/* Contact — Material You section with a solid surface form card */
 .contact {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   background-color: var(--md-sys-color-surface);
-  padding: 80px 0;
+  padding-block: var(--md-sys-spacing-section-y-md);
 }
 
-@media (min-width: 900px) { .contact { padding: 96px 0; } }
+@media (min-width: 900px) { .contact { padding-block: var(--md-sys-spacing-section-y); } }
+
+@media (max-width: 600px) { .contact { padding-block: var(--md-sys-spacing-section-y-sm); } }
+
+.contact .section__container { position: relative; z-index: 1; }
 
 .contact__grid {
   display: grid;
@@ -11,7 +19,21 @@
 }
 
 @media (min-width: 900px) {
-  .contact__grid { grid-template-columns: 1fr 1fr; align-items: start; }
+  .contact__grid { grid-template-columns: 1.1fr 0.9fr; align-items: start; }
+}
+
+.contact__form-card {
+  border-radius: var(--md-sys-shape-corner-2xl);
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
+  box-shadow: var(--md-sys-elevation-2);
+}
+
+.contact__form-card .m3-card__content { padding: 32px; }
+
+@media (max-width: 600px) {
+  .contact__form-card { border-radius: var(--md-sys-shape-corner-xl); }
+  .contact__form-card .m3-card__content { padding: 24px; }
 }
 
 .contact__form-heading {
@@ -53,7 +75,10 @@
   margin-bottom: 32px;
 }
 
-.contact__link-card { text-decoration: none; }
+.contact__link-card {
+  text-decoration: none;
+  border-radius: var(--md-sys-shape-corner-lg);
+}
 
 .contact__link-content {
   display: flex;
@@ -63,15 +88,21 @@
   z-index: 1;
 }
 
+/* Brand-tinted icon disc (glyph color is set inline per-brand in the JSX) */
 .contact__link-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--md-sys-shape-corner-full);
-  background: color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 14%, transparent);
   flex-shrink: 0;
+  transition: background-color var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+}
+
+.contact__link-card:hover .contact__link-icon {
+  background: color-mix(in srgb, currentColor 24%, transparent);
 }
 
 .contact__link-value {

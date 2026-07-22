@@ -5,16 +5,32 @@
   justify-content: center;
   border: none;
   cursor: pointer;
-  border-radius: var(--md-sys-shape-corner-lg);
+  /* Expressive: tertiary container as the default emphasis surface */
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+  border-radius: var(--md-sys-shape-corner-2xl);
   box-shadow: var(--md-sys-elevation-3);
   transition:
     box-shadow var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
-    transform var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-emphasized);
+    transform var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
+    background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 
-.m3-fab--small { width: 40px; height: 40px; border-radius: var(--md-sys-shape-corner-md); }
-.m3-fab--medium { width: 56px; height: 56px; }
-.m3-fab--large { width: 96px; height: 96px; border-radius: var(--md-sys-shape-corner-xl); }
+.m3-fab--small {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--md-sys-shape-corner-lg);
+}
+.m3-fab--medium {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--md-sys-shape-corner-2xl);
+}
+.m3-fab--large {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--md-sys-shape-corner-3xl);
+}
 
 .m3-fab--primary {
   background: var(--md-sys-color-primary-container);
@@ -39,17 +55,31 @@
   transition: opacity var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 .m3-fab:hover .m3-fab__state { opacity: 0.08; }
-.m3-fab:focus-visible .m3-fab__state { opacity: 0.12; }
-.m3-fab:active .m3-fab__state { opacity: 0.16; }
-.m3-fab:hover { box-shadow: var(--md-sys-elevation-4); transform: translateY(-2px); }
+.m3-fab:focus-visible .m3-fab__state { opacity: 0.10; }
+.m3-fab:active .m3-fab__state { opacity: 0.12; }
 
-.m3-fab__content { position: relative; display: inline-flex; align-items: center; gap: 8px; }
+/* Elevation-3 at rest -> elevation-4 on hover, gentle lift; press settles back with a scale */
+.m3-fab:hover {
+  box-shadow: var(--md-sys-elevation-4);
+  transform: translateY(-2px);
+}
+.m3-fab:active {
+  box-shadow: var(--md-sys-elevation-3);
+  transform: translateY(0) scale(0.96);
+}
+
+.m3-fab__content {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
 
 .m3-fab--extended {
   width: auto;
   height: 56px;
   padding: 0 20px;
-  border-radius: var(--md-sys-shape-corner-lg);
+  border-radius: var(--md-sys-shape-corner-xl);
   font-family: var(--md-sys-typescale-font);
   font-size: var(--md-sys-typescale-label-large-size);
   font-weight: var(--md-sys-typescale-label-large-weight);

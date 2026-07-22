@@ -1,10 +1,12 @@
-/* M3 Shape Scale */
+/* M3 Shape Scale — expressive Material You (organic, generous rounding) */
 :root {
   --md-sys-shape-corner-none: 0;
-  --md-sys-shape-corner-xs: 4px;
-  --md-sys-shape-corner-sm: 8px;
-  --md-sys-shape-corner-md: 12px;
-  --md-sys-shape-corner-lg: 16px;
+  --md-sys-shape-corner-xs: 8px;
+  --md-sys-shape-corner-sm: 12px;
+  --md-sys-shape-corner-md: 16px;
+  --md-sys-shape-corner-lg: 24px;
   --md-sys-shape-corner-xl: 28px;
+  --md-sys-shape-corner-2xl: 36px;
+  --md-sys-shape-corner-3xl: 48px;
   --md-sys-shape-corner-full: 9999px;
 }

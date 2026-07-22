@@ -2,15 +2,17 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  border-radius: var(--md-sys-shape-corner-sm);
+  padding: 14px 18px;
+  /* Expressive: softer, larger rounding for tonal banners */
+  border-radius: var(--md-sys-shape-corner-lg);
   font-family: var(--md-sys-typescale-font);
   font-size: var(--md-sys-typescale-body-medium-size);
   line-height: var(--md-sys-typescale-body-medium-line);
 }
 
+/* Tonal severity colors mapped to container roles */
 .m3-banner--success {
-  background: color-mix(in srgb, var(--md-sys-color-tertiary-container) 100%, transparent);
+  background: var(--md-sys-color-tertiary-container);
   color: var(--md-sys-color-on-tertiary-container);
 }
 .m3-banner--error {
@@ -22,6 +24,6 @@
   color: var(--md-sys-color-on-secondary-container);
 }
 .m3-banner--warning {
-  background: color-mix(in srgb, var(--md-sys-color-tertiary-container) 100%, transparent);
+  background: var(--md-sys-color-tertiary-container);
   color: var(--md-sys-color-on-tertiary-container);
 }

@@ -1,7 +1,7 @@
 .m3-card {
   position: relative;
   display: block;
-  border-radius: var(--md-sys-shape-corner-md);
+  border-radius: var(--md-sys-shape-corner-lg);
   overflow: hidden;
   transition:
     box-shadow var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-standard),
@@ -43,9 +43,10 @@
 .m3-card--interactive:focus-visible .m3-card__state { opacity: 0.12; }
 .m3-card--interactive:active .m3-card__state { opacity: 0.16; }
 
-.m3-card--elevated.m3-card--interactive:hover { box-shadow: var(--md-sys-elevation-2); transform: translateY(-2px); }
-.m3-card--filled.m3-card--interactive:hover { box-shadow: var(--md-sys-elevation-1); transform: translateY(-2px); }
-.m3-card--outlined.m3-card--interactive:hover { transform: translateY(-2px); }
+.m3-card--elevated.m3-card--interactive:hover { box-shadow: var(--md-sys-elevation-3); transform: translateY(-4px) scale(1.02); }
+.m3-card--filled.m3-card--interactive:hover { box-shadow: var(--md-sys-elevation-2); transform: translateY(-4px) scale(1.02); }
+.m3-card--outlined.m3-card--interactive:hover { box-shadow: var(--md-sys-elevation-2); transform: translateY(-4px) scale(1.02); }
+.m3-card--interactive:active { transform: translateY(-2px) scale(0.99); }
 
 .m3-card__content {
   position: relative;

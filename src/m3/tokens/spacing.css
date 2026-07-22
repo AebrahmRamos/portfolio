@@ -1,0 +1,15 @@
+/* Shared spacing scale — every content section consumes these instead of
+   hand-picking its own padding-block, which had drifted to 8 different,
+   often asymmetric (top != bottom) values ranging 56-112px. */
+:root {
+  --md-sys-spacing-section-y-sm: 64px;  /* <=600px */
+  --md-sys-spacing-section-y-md: 80px;  /* 601-899px */
+  --md-sys-spacing-section-y: 96px;     /* >=900px */
+
+  /* Shared content container — was duplicated verbatim across 5 files
+     (sections.css, Hero, About, Footer, Navigation) with two of them
+     silently drifting on the mobile inline padding. */
+  --md-sys-spacing-container-max-width: 1200px;
+  --md-sys-spacing-container-inline: 24px;
+  --md-sys-spacing-container-inline-sm: 16px; /* <=600px */
+}

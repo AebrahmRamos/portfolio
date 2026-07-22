@@ -1,24 +1,95 @@
-/* Shared section layout utilities */
+/* =====================================================================
+   Shared section primitives — Material You (M3) expressive
+   Establishes the vertical rhythm, container width, and tonal alternation
+   that every section inherits.
+   Colors use --md-sys-color-* tokens only; radii use the shape scale.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   Container — centered max-width well that holds real content. Shared by
+   every section via the spacing tokens (m3/tokens/spacing.css) instead of
+   each section redeclaring its own copy of the same values.
+   --------------------------------------------------------------------- */
 .section__container {
-  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+  max-width: var(--md-sys-spacing-container-max-width);
   margin: 0 auto;
-  padding: 0 24px;
+  padding-inline: var(--md-sys-spacing-container-inline);
 }
 
+/* ---------------------------------------------------------------------
+   Section header — centered title block with breathing room.
+   --------------------------------------------------------------------- */
 .section__header {
+  position: relative;
+  z-index: 1;
   text-align: center;
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
-
-@media (min-width: 900px) { .section__header { margin-bottom: 64px; } }
 
 .section__title {
+  position: relative;
+  display: inline-block;
   color: var(--md-sys-color-on-surface);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  letter-spacing: -0.5px;
+}
+
+/* Expressive accent underline beneath the title — a short tertiary pill that
+   anchors the heading without competing with body text. */
+.section__title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  width: 56px;
+  height: 4px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-tertiary);
+  transform: translateX(-50%);
+  transition: width 300ms var(--md-sys-motion-easing-standard);
 }
 
 .section__subtitle {
   color: var(--md-sys-color-on-surface-variant);
   max-width: 720px;
   margin: 0 auto;
+}
+
+/* Optional eyebrow chip above a title — full-radius tonal pill. */
+.section__eyebrow {
+  display: inline-block;
+  margin-bottom: 16px;
+  padding: 6px 16px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------
+   Responsive — scale rhythm + radii down on smaller viewports.
+   --------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .section__header {
+    margin-bottom: 48px;
+  }
+}
+
+@media (max-width: 600px) {
+  .section__container {
+    padding-inline: var(--md-sys-spacing-container-inline-sm);
+  }
+
+  .section__header {
+    margin-bottom: 40px;
+  }
+
+  .section__title {
+    margin-bottom: 16px;
+  }
 }

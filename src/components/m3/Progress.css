@@ -3,13 +3,14 @@
   position: relative;
 }
 
+/* Circular (spinner) variant — primary indicator on a low-emphasis track */
 .m3-progress__spinner {
   display: block;
   width: 100%;
   height: 100%;
-  border: 3px solid var(--md-sys-color-surface-container-highest);
+  border: 3px solid var(--md-sys-color-surface-container-low);
   border-top-color: var(--md-sys-color-primary);
-  border-radius: 50%;
+  border-radius: var(--md-sys-shape-corner-full);
   animation: m3-spin 0.9s linear infinite;
 }
 

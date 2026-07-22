@@ -1,6 +1,7 @@
-/* M3 Type Scale - Inter font */
+/* M3 Type Scale - Roboto (Material Design canonical typeface) */
 :root {
-  --md-sys-typescale-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --md-sys-typescale-font: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --md-sys-typescale-font-mono: 'Roboto Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --md-sys-typescale-display-large-size: 3.5625rem;
   --md-sys-typescale-display-large-line: 1.12;

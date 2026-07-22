@@ -1,14 +1,18 @@
 .about {
-  background-color: var(--md-sys-color-surface-container-lowest);
-  padding: 80px 0;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--md-sys-color-surface);
+  padding-block: var(--md-sys-spacing-section-y-md);
 }
 
-@media (min-width: 900px) { .about { padding: 96px 0; } }
+@media (min-width: 900px) { .about { padding-block: var(--md-sys-spacing-section-y); } }
 
 .about__container {
-  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+  max-width: var(--md-sys-spacing-container-max-width);
   margin: 0 auto;
-  padding: 0 24px;
+  padding-inline: var(--md-sys-spacing-container-inline);
   display: grid;
   gap: 48px;
 }
@@ -25,10 +29,29 @@
 .about__para {
   color: var(--md-sys-color-on-surface-variant);
   margin-bottom: 20px;
+  /* Explicit reading measure rather than relying on the 2-col grid split
+     to accidentally keep line length reasonable — this column shouldn't
+     stretch past ~65-70 characters if the facts card is ever removed. */
+  max-width: 65ch;
 }
 
+/* Warm, personal facts card: tonal surface-container with a large 2xl radius */
 .about__facts-card {
   align-self: start;
+  background-color: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  padding: 40px;
+  border-radius: var(--md-sys-shape-corner-2xl);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: var(--md-sys-elevation-1);
+  transition:
+    transform 300ms var(--md-sys-motion-easing-standard),
+    box-shadow 300ms var(--md-sys-motion-easing-standard);
+}
+
+.about__facts-card:hover {
+  transform: scale(1.02);
+  box-shadow: var(--md-sys-elevation-3);
 }
 
 .about__facts-heading {
@@ -43,15 +66,57 @@
   gap: 20px;
 }
 
-.about__fact { }
+/* Each fact reads as a soft tonal chip nested on the card */
+.about__fact {
+  padding: 16px 20px;
+  border-radius: var(--md-sys-shape-corner-lg);
+  background-color: var(--md-sys-color-surface-container-high);
+  transition:
+    transform 300ms var(--md-sys-motion-easing-standard),
+    background-color 300ms var(--md-sys-motion-easing-standard);
+}
+
+.about__fact:hover {
+  background-color: var(--md-sys-color-secondary-container);
+  transform: translateX(4px);
+}
+
+.about__fact:hover .about__fact-label {
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+.about__fact:hover .about__fact-value {
+  color: var(--md-sys-color-on-secondary-container);
+}
 
 .about__fact-label {
   display: block;
   color: var(--md-sys-color-on-surface);
   margin-bottom: 4px;
+  transition: color 300ms var(--md-sys-motion-easing-standard);
 }
 
 .about__fact-value {
   display: block;
   color: var(--md-sys-color-on-surface-variant);
+  transition: color 300ms var(--md-sys-motion-easing-standard);
+}
+
+/* Responsive: tighten padding and step the big radius down on smaller screens */
+@media (max-width: 900px) {
+  .about__facts-card {
+    padding: 32px;
+    border-radius: var(--md-sys-shape-corner-xl);
+  }
+}
+
+@media (max-width: 600px) {
+  .about { padding-block: var(--md-sys-spacing-section-y-sm); }
+
+  .about__container { gap: 36px; padding-inline: var(--md-sys-spacing-container-inline-sm); }
+
+  .about__facts-card {
+    padding: 24px;
+    border-radius: var(--md-sys-shape-corner-xl);
+  }
 }

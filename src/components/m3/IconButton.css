@@ -3,6 +3,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  /* 44px minimum touch target */
   width: 44px;
   height: 44px;
   border: none;
@@ -10,10 +11,15 @@
   color: var(--md-sys-color-on-surface);
   cursor: pointer;
   border-radius: var(--md-sys-shape-corner-full);
-  transition: background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+  transition:
+    background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
+    transform var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 
 .m3-icon-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+
+/* Press scale for tactile feedback */
+.m3-icon-btn:active:not(:disabled) { transform: scale(0.92); }
 
 .m3-icon-btn__state {
   position: absolute;
@@ -26,8 +32,8 @@
 }
 
 .m3-icon-btn:hover:not(:disabled) .m3-icon-btn__state { opacity: 0.08; }
-.m3-icon-btn:focus-visible:not(:disabled) .m3-icon-btn__state { opacity: 0.12; }
-.m3-icon-btn:active:not(:disabled) .m3-icon-btn__state { opacity: 0.16; }
+.m3-icon-btn:focus-visible:not(:disabled) .m3-icon-btn__state { opacity: 0.10; }
+.m3-icon-btn:active:not(:disabled) .m3-icon-btn__state { opacity: 0.12; }
 
 .m3-icon-btn__icon { display: inline-flex; position: relative; }
 

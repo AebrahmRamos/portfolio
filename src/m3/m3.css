@@ -33,3 +33,9 @@ body {
   outline-offset: 2px;
   border-radius: var(--md-sys-shape-corner-xs);
 }
+
+/* Tactile press feedback for any clickable element */
+.m3-pressable {
+  transition: transform var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+}
+.m3-pressable:active { transform: scale(0.96); }

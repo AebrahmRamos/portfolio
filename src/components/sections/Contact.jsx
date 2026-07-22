@@ -91,16 +91,18 @@ const Contact = () => {
               <h3 className="m3-headline-medium contact__form-heading">Send a Message</h3>
 
               <form className="contact__form" onSubmit={handleSubmit} noValidate>
-                {submitStatus === 'success' && (
-                  <Banner severity="success" className="contact__banner">
-                    Message sent! I'll get back to you soon.
-                  </Banner>
-                )}
-                {submitStatus === 'error' && (
-                  <Banner severity="error" className="contact__banner">
-                    Failed to send. Please try again or contact me directly.
-                  </Banner>
-                )}
+                <div role="status" aria-live="polite" aria-atomic="true">
+                  {submitStatus === 'success' && (
+                    <Banner severity="success" className="contact__banner">
+                      Message sent! I'll get back to you soon.
+                    </Banner>
+                  )}
+                  {submitStatus === 'error' && (
+                    <Banner severity="error" className="contact__banner">
+                      Failed to send. Please try again or contact me directly.
+                    </Banner>
+                  )}
+                </div>
 
                 <div className="contact__row">
                   <TextField

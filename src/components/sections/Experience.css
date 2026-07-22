@@ -1,15 +1,16 @@
+/* Experience — Material You timeline with MD3 cards per entry and elevation
+   progression on hover. */
+
 .experience {
+  position: relative;
   background-color: var(--md-sys-color-surface);
-  padding: 64px 0 80px;
+  padding-block: var(--md-sys-spacing-section-y-md);
 }
 
-@media (min-width: 900px) { .experience { padding: 80px 0 96px; } }
+@media (min-width: 900px) { .experience { padding-block: var(--md-sys-spacing-section-y); } }
 
 .experience__title {
-  background: linear-gradient(135deg, var(--md-sys-color-secondary) 0%, var(--md-sys-color-tertiary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--md-sys-color-on-surface);
 }
 
 .timeline {
@@ -19,41 +20,49 @@
 
 @media (min-width: 900px) { .timeline { padding-left: 64px; } }
 
+/* Timeline rail — solid tonal line. */
 .timeline__line {
   position: absolute;
   left: 12px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(
-    180deg,
-    var(--md-sys-color-primary) 0%,
-    color-mix(in srgb, var(--md-sys-color-primary) 20%, transparent) 100%
-  );
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary);
 }
 
 @media (min-width: 900px) { .timeline__line { left: 20px; } }
 
 .timeline__entry {
   position: relative;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
+/* Timeline node — a primary-container token chip with a tonal ring. */
 .timeline__node {
   position: absolute;
   left: -44px;
-  top: 20px;
+  top: 24px;
   width: 36px;
   height: 36px;
   border-radius: var(--md-sys-shape-corner-full);
-  background: var(--md-sys-color-surface);
+  background: var(--md-sys-color-primary-container);
   border: 2px solid var(--md-sys-color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary-container);
   z-index: 2;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--md-sys-color-primary) 14%, transparent);
+  transition:
+    transform 300ms var(--md-sys-motion-easing-standard),
+    box-shadow 300ms var(--md-sys-motion-easing-standard);
+}
+
+/* Node pulses outward when its entry card is hovered. */
+.timeline__entry:hover .timeline__node {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 7px color-mix(in srgb, var(--md-sys-color-primary) 18%, transparent);
 }
 
 @media (min-width: 900px) {
@@ -61,15 +70,39 @@
 }
 
 .timeline__node--secondary {
-  border-color: var(--md-sys-color-secondary);
-  color: var(--md-sys-color-secondary);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--md-sys-color-secondary) 12%, transparent);
+  background: var(--md-sys-color-tertiary-container);
+  border-color: var(--md-sys-color-tertiary);
+  color: var(--md-sys-color-on-tertiary-container);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--md-sys-color-tertiary) 14%, transparent);
 }
 
+.timeline__entry:hover .timeline__node--secondary {
+  box-shadow: 0 0 0 7px color-mix(in srgb, var(--md-sys-color-tertiary) 18%, transparent);
+}
+
+/* Each entry is an MD3 card sitting on surface-container with hover lift. */
 .timeline__org {
+  position: relative;
   color: var(--md-sys-color-on-surface);
   margin-bottom: 16px;
+  padding: 24px;
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-lg);
+  box-shadow: var(--md-sys-elevation-1);
+  transition:
+    transform 300ms var(--md-sys-motion-easing-standard),
+    box-shadow 300ms var(--md-sys-motion-easing-standard),
+    background-color 300ms var(--md-sys-motion-easing-standard);
 }
+
+.timeline__org:hover {
+  transform: translateY(-4px) scale(1.02);
+  background: var(--md-sys-color-surface-container-high);
+  box-shadow: var(--md-sys-elevation-3);
+}
+
+@media (min-width: 900px) { .timeline__org { padding: 28px 32px; } }
 
 .timeline__position {
   margin-bottom: 16px;
@@ -98,8 +131,12 @@
   flex-wrap: wrap;
 }
 
+/* Date pill — tonal secondary-container chip. */
 .timeline__date {
-  color: var(--md-sys-color-on-surface-variant);
+  color: var(--md-sys-color-on-secondary-container);
+  background: var(--md-sys-color-secondary-container);
+  padding: 4px 12px;
+  border-radius: var(--md-sys-shape-corner-full);
   white-space: nowrap;
 }
 
@@ -114,10 +151,17 @@
 }
 .timeline__resps li { margin-bottom: 4px; }
 
+/* Closing call-to-action block on a tonal surface container. */
 .experience__opportunities {
   margin-top: 48px;
+  padding: 40px 24px;
   text-align: center;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-2xl);
+  box-shadow: var(--md-sys-elevation-1);
 }
+
 .experience__opp-title {
   color: var(--md-sys-color-on-surface);
   margin-bottom: 16px;
@@ -127,4 +171,15 @@
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+/* Responsive — soften radii and tighten spacing on smaller screens. */
+@media (max-width: 600px) {
+  .experience { padding-block: var(--md-sys-spacing-section-y-sm); }
+  .timeline__org { padding: 20px; border-radius: var(--md-sys-shape-corner-md); }
+  .experience__opportunities {
+    margin-top: 36px;
+    padding: 32px 20px;
+    border-radius: var(--md-sys-shape-corner-xl);
+  }
 }

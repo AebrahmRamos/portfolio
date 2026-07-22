@@ -1,20 +1,37 @@
+/* FAB-like scroll-to-top: applied to an <Fab>, so it inherits state layer + content.
+   Here we set placement, tonal emphasis, full rounding, elevation, and entrance. */
 .scroll-to-top {
   position: fixed;
   bottom: 80px;
   right: 20px;
   z-index: 1000;
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+  border-radius: var(--md-sys-shape-corner-full);
+  box-shadow: var(--md-sys-elevation-3);
   opacity: 0;
   pointer-events: none;
   transform: scale(0.8) translateY(8px);
   transition:
     opacity var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized),
-    transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized);
+    transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized),
+    box-shadow var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 
 .scroll-to-top--visible {
   opacity: 1;
   pointer-events: auto;
   transform: scale(1) translateY(0);
+}
+
+/* Lift on hover, settle with a press scale (composes with the visible transform) */
+.scroll-to-top--visible:hover {
+  box-shadow: var(--md-sys-elevation-4);
+  transform: scale(1) translateY(-2px);
+}
+.scroll-to-top--visible:active {
+  box-shadow: var(--md-sys-elevation-3);
+  transform: scale(0.94) translateY(0);
 }
 
 @media (min-width: 600px) {

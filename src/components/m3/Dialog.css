@@ -1,8 +1,16 @@
 .m3-dialog {
+  /* !important is load-bearing: Chromium's UA stylesheet forces a top-layer
+     modal <dialog> with custom inset to an absolute-equivalent used position
+     (verified via getComputedStyle) unless beaten at equal !important
+     strength. Without it, the dialog is anchored to document coordinates
+     instead of the viewport, so showModal() scrolls the whole page to y=0
+     to bring it into view — clicking any card jumps you back to the top. */
+  position: fixed !important;
   border: none;
   padding: 0;
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface);
+  /* Expressive: full 28px rounding on the sheet */
   border-radius: var(--md-sys-shape-corner-xl);
   box-shadow: var(--md-sys-elevation-3);
   max-width: 90vw;
@@ -26,9 +34,10 @@
   animation: m3-backdrop-in var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 
+/* Expressive entrance: rise + settle from a slightly larger, lower start */
 @keyframes m3-dialog-in {
-  from { opacity: 0; transform: scale(0.92); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.9) translateY(16px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 @keyframes m3-backdrop-in {
@@ -40,12 +49,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 24px 16px;
+  padding: 28px 28px 16px;
   gap: 16px;
 }
 
 .m3-dialog__body {
-  padding: 0 24px 24px;
+  padding: 0 28px 28px;
   overflow-y: auto;
   flex: 1;
 }

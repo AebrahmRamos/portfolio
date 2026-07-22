@@ -1,20 +1,31 @@
+/* Tonal footer slab: surface-container rising from the page bottom with a
+   large 3xl top radius and state-layer link hovers. */
 .footer {
-  background-color: var(--md-sys-color-surface);
-  padding: 48px 0 32px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  padding: 64px 0 40px;
+  border-top-left-radius: var(--md-sys-shape-corner-3xl);
+  border-top-right-radius: var(--md-sys-shape-corner-3xl);
+  box-shadow: var(--md-sys-elevation-1);
 }
 
 .footer__container {
-  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+  max-width: var(--md-sys-spacing-container-max-width);
   margin: 0 auto;
-  padding: 0 24px;
+  padding-inline: var(--md-sys-spacing-container-inline);
 }
 
 .footer__top {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 28px;
+  margin-bottom: 28px;
 }
 
 @media (min-width: 600px) {
@@ -24,11 +35,15 @@
 .footer__brand {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .footer__name {
   color: var(--md-sys-color-on-surface);
   text-decoration: underline;
+  text-decoration-color: var(--md-sys-color-primary);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
   font-weight: 700;
 }
 
@@ -41,7 +56,10 @@
 
 @media (min-width: 600px) { .footer__nav { justify-content: flex-end; } }
 
+/* Pill links with a primary state layer on hover and tactile press. */
 .footer__link {
+  position: relative;
+  isolation: isolate;
   border: none;
   background: none;
   cursor: pointer;
@@ -49,18 +67,59 @@
   font-size: var(--md-sys-typescale-body-medium-size);
   font-weight: 500;
   color: var(--md-sys-color-on-surface);
-  padding: 6px 8px;
-  border-radius: var(--md-sys-shape-corner-xs);
-  transition: color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+  padding: 8px 16px;
+  border-radius: var(--md-sys-shape-corner-full);
+  transition:
+    color 300ms var(--md-sys-motion-easing-standard),
+    transform 300ms var(--md-sys-motion-easing-standard);
 }
-.footer__link:hover { color: var(--md-sys-color-primary); }
+.footer__link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-color: var(--md-sys-color-primary);
+  opacity: 0;
+  transition: opacity 300ms var(--md-sys-motion-easing-standard);
+}
+.footer__link:hover {
+  color: var(--md-sys-color-primary);
+}
+.footer__link:hover::before {
+  opacity: 0.08;
+}
+.footer__link:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+.footer__link:active {
+  transform: scale(0.96);
+}
 
 .footer__divider {
   border: none;
   border-top: 1px solid var(--md-sys-color-outline-variant);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .footer__bottom { text-align: center; }
 .footer__copy { color: var(--md-sys-color-on-surface-variant); font-weight: 500; margin-bottom: 6px; }
 .footer__tagline { color: var(--md-sys-color-on-surface-variant); }
+
+@media (max-width: 900px) {
+  .footer {
+    padding: 56px 0 36px;
+    border-top-left-radius: var(--md-sys-shape-corner-2xl);
+    border-top-right-radius: var(--md-sys-shape-corner-2xl);
+  }
+}
+
+@media (max-width: 600px) {
+  .footer {
+    padding: 48px 0 32px;
+    border-top-left-radius: var(--md-sys-shape-corner-xl);
+    border-top-right-radius: var(--md-sys-shape-corner-xl);
+  }
+  .footer__container { padding-inline: var(--md-sys-spacing-container-inline-sm); }
+}

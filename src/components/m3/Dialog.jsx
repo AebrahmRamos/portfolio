@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import './Dialog.css';
 
-const Dialog = ({ open, onClose, ariaLabel, className = '', children }) => {
+const Dialog = ({ open, onClose, ariaLabel, ariaLabelledby, className = '', children }) => {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -32,7 +32,12 @@ const Dialog = ({ open, onClose, ariaLabel, className = '', children }) => {
   }, [onClose]);
 
   return (
-    <dialog ref={ref} className={`m3-dialog ${className}`} aria-label={ariaLabel}>
+    <dialog
+      ref={ref}
+      className={`m3-dialog ${className}`}
+      aria-label={ariaLabelledby ? undefined : ariaLabel}
+      aria-labelledby={ariaLabelledby}
+    >
       {children}
     </dialog>
   );

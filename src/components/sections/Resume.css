@@ -1,39 +1,72 @@
+/* ═══════════════════════════════════════════════════════════════════
+   RESUME — emphasis CTA moment.
+   A bold full-width primary container, rounded 3xl, floating on a calm
+   surface band. The download pill is the loudest thing on the page.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Outer band — calm surface so the primary slab pops against it. */
 .resume {
-  background-color: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
-  padding: 80px 0;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--md-sys-color-surface);
+  padding-block: var(--md-sys-spacing-section-y-md);
 }
 
-@media (min-width: 900px) { .resume { padding: 96px 0; } }
+@media (min-width: 900px) { .resume { padding-block: var(--md-sys-spacing-section-y); } }
 
+/* The CTA slab itself — bold primary container, rounded 3xl, lifted.
+   This is the emphasis surface; everything inside reads on-primary. */
 .resume__container {
-  max-width: 800px;
+  position: relative;
+  z-index: 1;
+  /* Deliberately narrower than the shared 1200px content well — this is a
+     single centered CTA slab, not a grid, and framing it as an intentional
+     ~960px "emphasis" width (vs. the old 880px) reads as a considered
+     choice rather than the abrupt ~320px narrower jump the old value made
+     next to the full-width Contact/Footer sections on either side of it. */
+  max-width: 960px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 64px 48px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 24px;
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-radius: var(--md-sys-shape-corner-3xl);
+  box-shadow: var(--md-sys-elevation-4);
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .resume__icon {
+  position: relative;
+  z-index: 1;
   color: var(--md-sys-color-on-primary);
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
 .resume__title {
+  position: relative;
+  z-index: 1;
   color: var(--md-sys-color-on-primary);
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .resume__subtitle {
+  position: relative;
+  z-index: 1;
   color: var(--md-sys-color-on-primary);
-  opacity: 0.85;
+  opacity: 0.9;
   font-weight: 400;
   max-width: 600px;
 }
 
 .resume__ctas {
+  position: relative;
+  z-index: 1;
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
@@ -45,22 +78,42 @@
   .resume__ctas .m3-btn { width: 100%; }
 }
 
+/* Download pill — the loudest CTA. Inverted on-primary fill, full radius,
+   lifted with a tactile press. */
 .resume__btn-download {
   background-color: var(--md-sys-color-on-primary) !important;
   color: var(--md-sys-color-primary) !important;
+  border-radius: var(--md-sys-shape-corner-full) !important;
+  box-shadow: var(--md-sys-elevation-2);
+  transition: transform 300ms var(--md-sys-motion-easing-standard),
+    box-shadow 300ms var(--md-sys-motion-easing-standard);
 }
+.resume__btn-download:hover {
+  transform: scale(1.04);
+  box-shadow: var(--md-sys-elevation-4);
+}
+.resume__btn-download:active { transform: scale(0.96); }
 
+/* View pill — outlined on the slab, on-primary border + text. */
 .resume__btn-view {
   border-color: var(--md-sys-color-on-primary) !important;
   color: var(--md-sys-color-on-primary) !important;
+  border-radius: var(--md-sys-shape-corner-full) !important;
+  transition: transform 300ms var(--md-sys-motion-easing-standard),
+    background-color 300ms var(--md-sys-motion-easing-standard);
 }
 .resume__btn-view:hover {
   background-color: color-mix(in srgb, var(--md-sys-color-on-primary) 12%, transparent) !important;
 }
+.resume__btn-view:active { transform: scale(0.96); }
 
+/* Feature panel nested on the slab — lighter tonal surface over the primary fill. */
 .resume__features {
+  position: relative;
+  z-index: 1;
   background: color-mix(in srgb, var(--md-sys-color-on-primary) 12%, transparent);
-  border-radius: var(--md-sys-shape-corner-md);
+  border: 1px solid color-mix(in srgb, var(--md-sys-color-on-primary) 20%, transparent);
+  border-radius: var(--md-sys-shape-corner-lg);
   padding: 28px 32px;
   max-width: 560px;
   width: 100%;
@@ -91,7 +144,7 @@
 .resume__feature-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: var(--md-sys-shape-corner-full);
   background: var(--md-sys-color-on-primary);
   flex-shrink: 0;
 }
@@ -101,11 +154,15 @@
 }
 
 .resume__updated {
+  position: relative;
+  z-index: 1;
   color: var(--md-sys-color-on-primary);
-  opacity: 0.65;
+  opacity: 0.7;
 }
 
-/* Modal */
+/* ═══════════════════════════════════════════════════════════════════
+   Modal — PDF preview. Neutral surface, no slab atmosphere.
+   ═══════════════════════════════════════════════════════════════════ */
 .resume__modal-header {
   display: flex;
   justify-content: space-between;
@@ -133,4 +190,20 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Responsive — scale the slab radius / padding down on mobile.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .resume__container { padding: 56px 36px; border-radius: var(--md-sys-shape-corner-2xl); }
+}
+
+@media (max-width: 600px) {
+  .resume { padding-block: var(--md-sys-spacing-section-y-sm); }
+  .resume__container {
+    padding: 44px 24px;
+    border-radius: var(--md-sys-shape-corner-xl);
+  }
+  .resume__features { padding: 24px; }
 }

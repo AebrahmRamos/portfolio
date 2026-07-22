@@ -1,19 +1,28 @@
+/* ═══════════════════════════════════════════════════════════════════
+   HERO — flagship section.
+   Flat tonal surface with the existing photo frame + float treatment.
+   ═══════════════════════════════════════════════════════════════════ */
+
 .hero {
+  position: relative;
+  overflow: hidden;
   background-color: var(--md-sys-color-surface);
   min-height: calc(100vh - 56px);
   display: flex;
   align-items: center;
-  padding: 80px 0 64px;
+  padding-block: var(--md-sys-spacing-section-y-md);
 }
 
 @media (min-width: 900px) {
-  .hero { min-height: calc(100vh - 64px); padding: 96px 0; }
+  .hero { min-height: calc(100vh - 64px); padding-block: var(--md-sys-spacing-section-y); }
 }
 
 .hero__container {
-  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+  max-width: var(--md-sys-spacing-container-max-width);
   margin: 0 auto;
-  padding: 0 24px;
+  padding-inline: var(--md-sys-spacing-container-inline);
   display: flex;
   flex-direction: column-reverse;
   align-items: center;
@@ -28,6 +37,7 @@
 }
 
 .hero__text {
+  position: relative;
   flex: 7;
   display: flex;
   flex-direction: column;
@@ -35,8 +45,10 @@
 }
 
 .hero__greeting {
-  color: var(--md-sys-color-on-surface);
+  color: var(--md-sys-color-on-surface-variant);
   margin-bottom: 4px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .hero__name-wrap {
@@ -49,6 +61,8 @@
   color: var(--md-sys-color-primary);
   position: relative;
   z-index: 1;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .hero__name-accent {
@@ -56,11 +70,11 @@
   bottom: 8px;
   left: 0;
   width: 100%;
-  height: 10px;
+  height: 12px;
   background: var(--md-sys-color-secondary-container);
-  opacity: 0.6;
+  opacity: 0.7;
   z-index: 0;
-  border-radius: var(--md-sys-shape-corner-xs);
+  border-radius: var(--md-sys-shape-corner-full);
 }
 
 .hero__desc {
@@ -84,6 +98,7 @@
 }
 
 .hero__image-wrap {
+  position: relative;
   flex: 5;
   display: flex;
   justify-content: center;
@@ -94,7 +109,7 @@
   height: 240px;
   border-radius: var(--md-sys-shape-corner-full);
   object-fit: cover;
-  border: 4px solid var(--md-sys-color-primary);
+  border: 4px solid var(--md-sys-color-surface);
   box-shadow: var(--md-sys-elevation-3);
   transition: transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized);
 }
@@ -107,4 +122,74 @@
 
 @media (min-width: 900px) {
   .hero__image { width: 380px; height: 380px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Motion — keeps the existing layout, just brings it to life.
+   All of this is auto-disabled by the global prefers-reduced-motion
+   catch-all in index.css (animations collapse to their end state).
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* T1 — staggered fade-up of the hero text on load (nth-child is robust to
+   element type: greeting, name, 2× desc, ctas). */
+.hero__text > * {
+  opacity: 0;
+  animation: hero-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.hero__text > *:nth-child(1) { animation-delay: 0.05s; }
+.hero__text > *:nth-child(2) { animation-delay: 0.15s; }
+.hero__text > *:nth-child(3) { animation-delay: 0.28s; }
+.hero__text > *:nth-child(4) { animation-delay: 0.38s; }
+.hero__text > *:nth-child(5) { animation-delay: 0.50s; }
+
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* T1 — the name underline sweeps in instead of just sitting there */
+.hero__name-accent {
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: hero-accent-draw 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.7s forwards;
+}
+
+@keyframes hero-accent-draw { to { transform: scaleX(1); } }
+
+/* T3 — rotating role word fades up on each swap (keyed remount replays it) */
+.hero__role {
+  display: inline-block;
+  color: var(--md-sys-color-primary);
+  font-weight: 600;
+  animation: hero-role-swap 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@keyframes hero-role-swap {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* T2 — photo: gentle float */
+.hero__image-frame {
+  position: relative;
+  display: inline-flex;
+  border-radius: var(--md-sys-shape-corner-full);
+  animation: hero-float 6s ease-in-out infinite;
+}
+
+/* image keeps its border + hover-scale */
+.hero__image { position: relative; z-index: 1; }
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Responsive — trim padding on mobile.
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 600px) {
+  .hero { padding-block: var(--md-sys-spacing-section-y-sm); }
+  .hero__container { padding-inline: var(--md-sys-spacing-container-inline-sm); }
 }

@@ -1,18 +1,20 @@
 .m3-tf { display: inline-block; }
 .m3-tf--full { display: block; width: 100%; }
 
+/* Material 3 filled text field: tonal fill, rounded top, square bottom, bottom border */
 .m3-tf__field {
   position: relative;
-  background: var(--md-sys-color-surface-container-lowest);
-  border-radius: var(--md-sys-shape-corner-xs);
+  background: var(--md-sys-color-surface-container-highest);
+  border-radius: var(--md-sys-shape-corner-sm) var(--md-sys-shape-corner-sm) 0 0;
 }
 
 .m3-tf__input {
   display: block;
   width: 100%;
   padding: 24px 16px 8px;
-  border: 1px solid var(--md-sys-color-outline);
-  border-radius: var(--md-sys-shape-corner-xs);
+  border: none;
+  border-bottom: 1px solid var(--md-sys-color-on-surface-variant);
+  border-radius: var(--md-sys-shape-corner-sm) var(--md-sys-shape-corner-sm) 0 0;
   background: transparent;
   color: var(--md-sys-color-on-surface);
   font-family: var(--md-sys-typescale-font);
@@ -28,24 +30,18 @@
   min-height: auto;
   padding-top: 26px;
   resize: vertical;
-  font-family: var(--md-sys-typescale-font);
 }
 
-.m3-tf__input:hover { border-color: var(--md-sys-color-on-surface); }
+.m3-tf__input:hover { border-bottom-color: var(--md-sys-color-on-surface); }
 
 .m3-tf--focused .m3-tf__input,
 .m3-tf__input:focus {
-  border-color: var(--md-sys-color-primary);
-  border-width: 2px;
-  padding: 23px 15px 7px;
-}
-
-.m3-tf--multiline.m3-tf--focused .m3-tf__input {
-  padding-top: 25px;
+  border-bottom: 2px solid var(--md-sys-color-primary);
+  padding-bottom: 7px;
 }
 
 .m3-tf--error .m3-tf__input {
-  border-color: var(--md-sys-color-error);
+  border-bottom-color: var(--md-sys-color-error);
 }
 
 .m3-tf__label {
@@ -61,14 +57,13 @@
     transform var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
     color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
   background: transparent;
-  padding: 0 4px;
+  transform-origin: left top;
 }
 
 .m3-tf--filled .m3-tf__label,
 .m3-tf--focused .m3-tf__label {
-  transform: translateY(-14px) scale(0.75);
+  transform: translateY(-12px) scale(0.75);
   color: var(--md-sys-color-on-surface-variant);
-  background: var(--md-sys-color-surface-container-lowest);
 }
 
 .m3-tf--focused .m3-tf__label { color: var(--md-sys-color-primary); }
