@@ -8,22 +8,23 @@ import About from './components/sections/About';
 import Loading from './components/common/Loading';
 import Reveal from './components/common/Reveal';
 
-// Lazy-load below-the-fold portfolio sections
+// Lazy-load below-the-fold portfolio sections.
 const Experience = lazy(() => import('./components/sections/Experience'));
 const Projects = lazy(() => import('./components/sections/Projects'));
 const Skills = lazy(() => import('./components/sections/Skills'));
 const Education = lazy(() => import('./components/sections/Education'));
 const Organizations = lazy(() => import('./components/sections/Organizations'));
 const Contact = lazy(() => import('./components/sections/Contact'));
-const Resume = lazy(() => import('./components/sections/Resume'));
 const Footer = lazy(() => import('./components/sections/Footer'));
 
-// Lazy-load blog and admin (separate code-split bundles)
+// Lazy-load blog and admin (separate code-split bundles).
 const BlogIndex = lazy(() => import('./components/blog/BlogIndex'));
 const BlogPost = lazy(() => import('./components/blog/BlogPost'));
 const BlogSeries = lazy(() => import('./components/blog/BlogSeries'));
 const AdminPanel = lazy(() => import('./components/admin/AdminPanel'));
 
+// The Resume section is gone as a standalone block; it is one row inside
+// Contact now, which still carries id="resume" so /#resume keeps working.
 function PortfolioPage() {
   const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
   return (
@@ -37,7 +38,6 @@ function PortfolioPage() {
         <Reveal><Education /></Reveal>
         <Reveal><Organizations /></Reveal>
         <Reveal><Contact /></Reveal>
-        <Reveal><Resume /></Reveal>
         <Footer />
       </Suspense>
     </GoogleReCaptchaProvider>

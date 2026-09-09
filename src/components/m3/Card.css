@@ -2,7 +2,7 @@
   position: relative;
   display: block;
   /* Real M3's elevated/filled/outlined card spec calls for corner-medium,
-     not corner-large — verified against material-web's generated tokens. */
+     not corner-large, verified against material-web's generated tokens. */
   border-radius: var(--md-sys-shape-corner-md);
   overflow: hidden;
   transition:

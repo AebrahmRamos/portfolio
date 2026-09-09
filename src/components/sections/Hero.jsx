@@ -1,88 +1,89 @@
-import React, { useState, useEffect } from 'react';
-import { FiMail, FiBriefcase } from 'react-icons/fi';
+import React from 'react';
+import { PiArrowRightBold, PiGithubLogoBold, PiLinkedinLogoBold } from 'react-icons/pi';
 import { scrollToSection } from '../../utils/helpers';
 import { Button } from '../m3';
-import localProfile from '../../assets/profile.jpg';
+import profileImg from '../../assets/profile.webp';
 import './Hero.css';
 
-const remoteProfile = 'https://wcnushafgkumpgjy.public.blob.vercel-storage.com/IMG_9191-2.jpg';
+// Four text elements, hard cap: eyebrow-equivalent status line, headline,
+// subtext, CTAs. The old hero had five ("Hi, I'm" at display size, the name,
+// two description paragraphs, CTAs) and on a 390x844 phone the second CTA
+// landed below the fold.
+//
+// The cycling "Specializing in <word>" interval and the 6s photo float are
+// gone: both looped forever and communicated nothing, and the cycling word
+// meant two of the three specialisms were always hidden.
+const Hero = () => (
+  <section id="hero" className="hero">
+    <div className="hero__container">
+      <div className="hero__text">
+        <p className="hero__status">
+          <span className="hero__status-dot" aria-hidden="true" />
+          Available for freelance and full-time work
+        </p>
 
-const ROLES = ['full-stack development', 'system design', 'AI-powered solutions'];
-const ROLES_SENTENCE = 'full-stack development, system design, and AI-powered solutions';
-const prefersReducedMotion = () =>
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        <h1 className="hero__headline m3-display-large">
+          Internal tools that run real businesses.
+        </h1>
 
-const Hero = () => {
-  // Reduced-motion users get the full static sentence instead of a cycling word,
-  // so no specialization is dropped for them (or for reduced-motion crawlers).
-  const [reduced] = useState(prefersReducedMotion);
-  const [roleIdx, setRoleIdx] = useState(0);
+        <p className="hero__lead m3-body-large">
+          I am Aebrahm Ramos, a full-stack engineer in Manila building inventory
+          forecasting, order systems, and AI tooling.
+        </p>
 
-  useEffect(() => {
-    if (reduced) return;
-    const id = setInterval(() => setRoleIdx(i => (i + 1) % ROLES.length), 2600);
-    return () => clearInterval(id);
-  }, [reduced]);
+        <div className="hero__actions">
+          <Button
+            variant="filled"
+            size="large"
+            endIcon={<PiArrowRightBold />}
+            onClick={() => scrollToSection('projects')}
+          >
+            See the work
+          </Button>
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={() => scrollToSection('contact')}
+          >
+            Get in touch
+          </Button>
 
-  return (
-    <section id="hero" className="hero">
-      <div className="hero__container">
-        <div className="hero__text">
-          <p className="hero__greeting m3-display-large">Hi, I'm</p>
-          <div className="hero__name-wrap">
-            <h1 className="hero__name m3-display-large">Aebrahm Ramos</h1>
-            <span className="hero__name-accent" aria-hidden="true" />
-          </div>
-
-          <p className="hero__desc m3-headline-small">
-            Computer Systems Engineering student at De La Salle University Manila, graduating August 2027.
-          </p>
-          <p className="hero__desc m3-headline-small">
-            Specializing in{' '}
-            {reduced
-              ? ROLES_SENTENCE
-              : <span key={roleIdx} className="hero__role">{ROLES[roleIdx]}</span>}.
-          </p>
-
-          <div className="hero__ctas">
-            <Button
-              variant="filled"
-              size="large"
-              startIcon={<FiMail />}
-              onClick={() => scrollToSection('contact')}
+          <span className="hero__socials">
+            <a
+              className="hero__social"
+              href="https://github.com/AebrahmRamos"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub profile"
             >
-              Get in touch
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              startIcon={<FiBriefcase />}
-              onClick={() => scrollToSection('projects')}
+              <PiGithubLogoBold size={20} />
+            </a>
+            <a
+              className="hero__social"
+              href="https://linkedin.com/in/aebrahmramos"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn profile"
             >
-              View my work
-            </Button>
-          </div>
-        </div>
-
-        <div className="hero__image-wrap">
-          <div className="hero__image-frame">
-            <img
-              className="hero__image"
-              src={remoteProfile}
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = localProfile;
-              }}
-              alt="Aebrahm Ramos"
-              width="380"
-              height="380"
-              fetchPriority="high"
-            />
-          </div>
+              <PiLinkedinLogoBold size={20} />
+            </a>
+          </span>
         </div>
       </div>
-    </section>
-  );
-};
+
+      <div className="hero__media">
+        <img
+          className="hero__image"
+          src={profileImg}
+          alt="Aebrahm Ramos"
+          width="420"
+          height="420"
+          fetchPriority="high"
+          decoding="async"
+        />
+      </div>
+    </div>
+  </section>
+);
 
 export default Hero;

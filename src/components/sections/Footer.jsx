@@ -1,45 +1,55 @@
 import React from 'react';
-import { scrollToSection } from '../../utils/helpers';
+import { PiGithubLogoBold, PiLinkedinLogoBold, PiEnvelopeSimpleBold } from 'react-icons/pi';
 import './Footer.css';
 
 const navItems = [
   { label: 'About', id: 'about' },
-  { label: 'Projects', id: 'projects' },
   { label: 'Experience', id: 'experience' },
+  { label: 'Projects', id: 'projects' },
   { label: 'Contact', id: 'contact' },
+];
+
+const socials = [
+  { label: 'GitHub', href: 'https://github.com/AebrahmRamos', icon: <PiGithubLogoBold size={18} /> },
+  { label: 'LinkedIn', href: 'https://linkedin.com/in/aebrahmramos', icon: <PiLinkedinLogoBold size={18} /> },
+  { label: 'Email', href: 'mailto:aebrahmramos.dev@gmail.com', icon: <PiEnvelopeSimpleBold size={18} /> },
 ];
 
 const Footer = () => (
   <footer className="footer">
-    <div className="footer__container">
+    <div className="section__container footer__container">
       <div className="footer__top">
-        <div className="footer__brand">
-          <span className="m3-title-large footer__name">Aebrahm</span>
-          <span className="m3-title-large footer__name">Ramos</span>
-        </div>
-        <nav className="footer__nav" aria-label="Footer navigation">
+        <p className="m3-title-medium footer__name">Aebrahm Ramos</p>
+
+        <nav className="footer__nav" aria-label="Footer">
           {navItems.map((item) => (
-            <button
-              key={item.id}
-              className="footer__link"
-              onClick={() => scrollToSection(item.id)}
-            >
+            <a key={item.id} href={`#${item.id}`} className="footer__link">
               {item.label}
-            </button>
+            </a>
           ))}
         </nav>
-      </div>
 
-      <hr className="footer__divider" />
+        <div className="footer__socials">
+          {socials.map((s) => (
+            <a
+              key={s.label}
+              className="footer__social"
+              href={s.href}
+              aria-label={s.label}
+              target={s.href.startsWith('mailto:') ? undefined : '_blank'}
+              rel="noopener noreferrer"
+            >
+              {s.icon}
+            </a>
+          ))}
+        </div>
+      </div>
 
       <div className="footer__bottom">
         <p className="m3-body-small footer__copy">
           &copy; {new Date().getFullYear()} Aebrahm Ramos. All rights reserved
         </p>
-        <p className="m3-body-small footer__tagline">
-          Computer Systems Engineering Student at De La Salle University Manila. Building full-stack
-          web applications, e-commerce inventory systems, and AI-integrated tooling.
-        </p>
+        <p className="m3-body-small footer__place">Manila, Philippines</p>
       </div>
     </div>
   </footer>

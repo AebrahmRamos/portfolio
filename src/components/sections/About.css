@@ -1,6 +1,9 @@
+/* About. Prose column plus a hairline fact list.
+   No cards. Grouping is done with a rule and negative space (Section 4.4),
+   which also removes the card-inside-card-inside-card nesting the old markup
+   had. */
+
 .about {
-  position: relative;
-  overflow: hidden;
   background-color: var(--md-sys-color-surface);
   padding-block: var(--md-sys-spacing-section-y-md);
 }
@@ -8,115 +11,53 @@
 @media (min-width: 900px) { .about { padding-block: var(--md-sys-spacing-section-y); } }
 
 .about__container {
-  position: relative;
-  z-index: 1;
-  max-width: var(--md-sys-spacing-container-max-width);
-  margin: 0 auto;
-  padding-inline: var(--md-sys-spacing-container-inline);
   display: grid;
   gap: 48px;
+  align-items: start;
 }
 
 @media (min-width: 900px) {
-  .about__container { grid-template-columns: 1fr 1fr; align-items: start; }
-}
-
-.about__heading {
-  color: var(--md-sys-color-on-surface);
-  margin-bottom: 32px;
+  .about__container { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 72px; }
 }
 
 .about__para {
   color: var(--md-sys-color-on-surface-variant);
-  margin-bottom: 20px;
-  /* Explicit reading measure rather than relying on the 2-col grid split
-     to accidentally keep line length reasonable — this column shouldn't
-     stretch past ~65-70 characters if the facts card is ever removed. */
-  max-width: 65ch;
+  max-width: var(--md-sys-spacing-measure);
 }
 
-/* Warm, personal facts card: tonal surface-container with an extra-large radius */
-.about__facts-card {
-  align-self: start;
-  background-color: var(--md-sys-color-surface-container);
-  color: var(--md-sys-color-on-surface);
-  padding: 40px;
-  border-radius: var(--md-sys-shape-corner-xl);
-  border: 1px solid var(--md-sys-color-outline-variant);
-  box-shadow: var(--md-sys-elevation-1);
-  transition:
-    transform 300ms var(--md-sys-motion-easing-standard),
-    box-shadow 300ms var(--md-sys-motion-easing-standard);
-}
+.about__para:first-of-type { margin-top: 28px; }
+.about__para + .about__para { margin-top: 20px; }
 
-.about__facts-card:hover {
-  transform: scale(1.02);
-  box-shadow: var(--md-sys-elevation-3);
-}
-
-.about__facts-heading {
-  color: var(--md-sys-color-primary);
-  margin-bottom: 24px;
-  text-align: center;
-}
-
-.about__facts-list {
+.about__facts {
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
-/* Each fact reads as a soft tonal chip nested on the card */
+@media (min-width: 900px) {
+  /* Optical alignment with the first body paragraph, which sits below the
+     section title and its rule. */
+  .about__facts { margin-top: 96px; }
+}
+
 .about__fact {
-  padding: 16px 20px;
-  border-radius: var(--md-sys-shape-corner-lg);
-  background-color: var(--md-sys-color-surface-container-high);
-  transition:
-    transform 300ms var(--md-sys-motion-easing-standard),
-    background-color 300ms var(--md-sys-motion-easing-standard);
+  display: grid;
+  gap: 4px;
+  padding-block: 16px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
 }
 
-.about__fact:hover {
-  background-color: var(--md-sys-color-secondary-container);
-  transform: translateX(4px);
-}
-
-.about__fact:hover .about__fact-label {
-  color: var(--md-sys-color-on-secondary-container);
-}
-
-.about__fact:hover .about__fact-value {
-  color: var(--md-sys-color-on-secondary-container);
-}
+.about__fact:last-child { border-bottom: 1px solid var(--md-sys-color-outline-variant); }
 
 .about__fact-label {
-  display: block;
-  color: var(--md-sys-color-on-surface);
-  margin-bottom: 4px;
-  transition: color 300ms var(--md-sys-motion-easing-standard);
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 .about__fact-value {
-  display: block;
-  color: var(--md-sys-color-on-surface-variant);
-  transition: color 300ms var(--md-sys-motion-easing-standard);
-}
-
-/* Responsive: tighten padding and step the big radius down on smaller screens */
-@media (max-width: 900px) {
-  .about__facts-card {
-    padding: 32px;
-    border-radius: var(--md-sys-shape-corner-xl);
-  }
+  color: var(--md-sys-color-on-surface);
+  font-weight: 500;
 }
 
 @media (max-width: 600px) {
   .about { padding-block: var(--md-sys-spacing-section-y-sm); }
-
-  .about__container { gap: 36px; padding-inline: var(--md-sys-spacing-container-inline-sm); }
-
-  .about__facts-card {
-    padding: 24px;
-    border-radius: var(--md-sys-shape-corner-xl);
-  }
+  .about__container { gap: 36px; }
 }

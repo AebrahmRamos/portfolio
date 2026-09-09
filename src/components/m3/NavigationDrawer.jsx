@@ -5,7 +5,7 @@ const NavigationDrawer = ({ open, onClose, children, side = 'right' }) => {
   const drawerRef = useRef(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) return undefined;
 
     const handleKey = (e) => {
       if (e.key === 'Escape') onClose?.();
@@ -35,6 +35,14 @@ const NavigationDrawer = ({ open, onClose, children, side = 'right' }) => {
         role="dialog"
         aria-modal="true"
         aria-hidden={!open}
+        // aria-hidden alone was an accessibility violation: the closed drawer
+        // stayed in the DOM with its links tabbable, so keyboard focus walked
+        // into a panel screen readers had been told to ignore. `inert` removes
+        // the whole subtree from focus and the a11y tree together, and it is
+        // the attribute aria-hidden is supposed to be paired with here.
+        // React 19 treats inert as a real boolean prop: an empty string is
+        // falsy here and the attribute never lands.
+        inert={!open || undefined}
       >
         {children}
       </aside>

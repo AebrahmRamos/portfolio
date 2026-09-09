@@ -1,4 +1,4 @@
-/* M3 Shape Scale — matches the real Material 3 spec (6 named tiers + pill),
+/* Shape scale. Matches the real Material 3 spec (6 named tiers + pill),
    verified against material-components/material-web's generated tokens
    (tokens/versions/v0_192/_md-sys-shape.scss). The previous scale invented
    3 extra tiers beyond spec (24/36/48px) which made every surface using

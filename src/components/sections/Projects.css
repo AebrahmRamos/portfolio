@@ -1,226 +1,207 @@
+/* Projects. Four case-study rows, then a compact index.
+   Replaces the 16-card 3-up grid. Two layout families here (large rows and a
+   two-column index) and neither is reused anywhere else on the page. */
+
 .projects {
-  position: relative;
-  overflow: hidden;
-  background: var(--md-sys-color-surface);
+  background-color: var(--md-sys-color-surface);
   padding-block: var(--md-sys-spacing-section-y-md);
 }
 
-@media (min-width: 900px) {
-  .projects { padding-block: var(--md-sys-spacing-section-y); }
+@media (min-width: 900px) { .projects { padding-block: var(--md-sys-spacing-section-y); } }
+
+/* ── Spotlight rows ─────────────────────────────────────────────────────── */
+
+.work {
+  list-style: none;
+  /* No border-top: the section header's rule already closes the header, and
+     a second hairline 48px below it read as a rendering bug. */
+  margin: 0 0 72px;
+  padding: 0;
 }
 
-/* Keep real content above the atmosphere */
-.projects > * {
-  position: relative;
-  z-index: 1;
-}
+.work__item { border-bottom: 1px solid var(--md-sys-color-outline-variant); }
 
-.projects__title {
-  color: var(--md-sys-color-on-surface);
-}
-
-.projects__grid {
+.work__row {
   display: grid;
+  grid-template-columns: auto 1fr auto;
   gap: 24px;
-}
-
-@media (min-width: 600px) { .projects__grid { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 900px) { .projects__grid { grid-template-columns: repeat(3, 1fr); } }
-
-/* Interactive feature card — matches the shared .m3-card lift+scale energy */
-.projects__card {
-  position: relative;
-  height: 100%;
-  border-radius: var(--md-sys-shape-corner-md);
-  background: var(--md-sys-color-surface-container);
-  box-shadow: var(--md-sys-elevation-1);
-  overflow: hidden;
-  transition:
-    transform 300ms var(--md-sys-motion-easing-standard),
-    box-shadow 300ms var(--md-sys-motion-easing-standard),
-    background-color 300ms var(--md-sys-motion-easing-standard);
-}
-
-.projects__card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: var(--md-sys-elevation-3);
-  background: var(--md-sys-color-surface-container-high);
-}
-
-.projects__card:active {
-  transform: scale(0.96);
-  box-shadow: var(--md-sys-elevation-1);
-}
-
-.projects__card:focus-visible {
-  outline: 3px solid var(--md-sys-color-primary);
-  outline-offset: 3px;
-}
-
-/* Image wrapper — clips the zoom so it stays within the card radius */
-.projects__card-image {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--md-sys-shape-corner-md);
-  margin-bottom: 16px;
-  background: var(--md-sys-color-surface-container-highest);
-}
-
-.projects__card-image img {
-  display: block;
+  align-items: start;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 300ms var(--md-sys-motion-easing-standard);
+  padding: 32px 0;
+  background: none;
+  text-align: left;
+  color: inherit;
+  transition:
+    padding var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-standard),
+    background-color var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-standard);
 }
 
-/* Image zoom on card hover */
-.projects__card:hover .projects__card-image img {
-  transform: scale(1.05);
+/* Hover pulls the row inward instead of lifting a card. Motivation: feedback,
+   it marks the row the pointer will open. */
+@media (hover: hover) {
+  .work__row:hover {
+    background-color: var(--md-sys-color-surface-container-low);
+    padding-inline: 20px;
+  }
 }
 
-.projects__card-content {
+.work__row:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -2px;
+}
+
+.work__index {
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: var(--md-sys-typescale-label-medium-size);
+  color: var(--md-sys-color-outline);
+  padding-top: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.work__main {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.work__title {
+  color: var(--md-sys-color-on-surface);
+  text-wrap: balance;
+}
+
+.work__desc {
+  color: var(--md-sys-color-on-surface-variant);
+  max-width: 62ch;
+}
+
+.work__stack {
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  z-index: 1;
-  position: relative;
-  /* padding comes from the shared .m3-card__content (Card.css) — this used
-     to set its own 20px, winning over Card.css's 24px only by accident of
-     CSS import order, not deliberate design. */
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 4px;
 }
 
-.projects__card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+/* Stack items are plain mono text, not 16 tonal pills. */
+.work__tech {
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: var(--md-sys-typescale-label-small-size);
+  color: var(--md-sys-color-on-surface-variant);
 }
 
-/* Tertiary-accented leading icon/avatar inside the header */
-.projects__card-header > :first-child:not(.projects__card-title) {
+.work__arrow {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--md-sys-color-on-tertiary-container);
-  background: var(--md-sys-color-tertiary-container);
+  width: 40px;
+  height: 40px;
   border-radius: var(--md-sys-shape-corner-full);
-}
-
-.projects__card-title {
-  color: var(--md-sys-color-on-surface);
-  flex: 1;
-}
-
-.projects__card-desc {
-  color: var(--md-sys-color-on-surface-variant);
-  flex: 1;
-  margin-bottom: 16px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.projects__card-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: auto;
-}
-
-/* Persistent (not hover-only) affordance — hover states don't exist on
-   touch, so this is the only signal mobile visitors get that cards open. */
-.projects__card-cta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--md-sys-color-outline-variant);
   color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-surface-container);
+  flex-shrink: 0;
+  transition: transform var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized);
 }
 
-.projects__card-cta svg {
-  transition: transform 300ms var(--md-sys-motion-easing-standard);
+@media (hover: hover) {
+  .work__row:hover .work__arrow { transform: translate(3px, -3px); }
 }
 
-.projects__card:hover .projects__card-cta svg {
-  transform: translateX(4px);
-}
+/* ── Compact index ──────────────────────────────────────────────────────── */
 
-/* Tertiary-tinted tech chips/badges */
-.projects__card-chips > * {
-  border-radius: var(--md-sys-shape-corner-full);
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
-}
-
-/* Modal */
-.projects__modal-title-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.projects__modal-image {
-  margin-bottom: 20px;
-  border-radius: var(--md-sys-shape-corner-lg);
-  overflow: hidden;
-  box-shadow: var(--md-sys-elevation-1);
-}
-
-.projects__modal-image img {
-  width: 100%;
-  max-height: 400px;
-  object-fit: cover;
-  display: block;
-}
-
-.projects__modal-desc {
+.work-index__heading {
   color: var(--md-sys-color-on-surface-variant);
-  margin-bottom: 20px;
-}
-
-.projects__modal-section { margin-bottom: 20px; }
-
-.projects__modal-section-title {
-  color: var(--md-sys-color-on-surface);
   margin-bottom: 12px;
 }
 
-.projects__modal-list {
-  padding-left: 20px;
-  color: var(--md-sys-color-on-surface-variant);
+.work-index__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
 }
 
-.projects__modal-list li { margin-bottom: 6px; }
+@media (min-width: 700px) {
+  /* Two columns so twelve rows read as an index, not a scroll. */
+  .work-index__list {
+    columns: 2;
+    column-gap: 48px;
+  }
+  .work-index__list li { break-inside: avoid; }
+}
 
-.projects__modal-chips {
+.work-index__row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  padding: 13px 0;
+  background: none;
+  text-align: left;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface);
+  font-size: var(--md-sys-typescale-body-medium-size);
+  transition: color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 
-.projects__modal-chips > * {
-  border-radius: var(--md-sys-shape-corner-full);
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
+.work-index__row:hover { color: var(--md-sys-color-primary); }
+.work-index__row:focus-visible { outline: 2px solid var(--md-sys-color-primary); outline-offset: -2px; }
+
+.work-index__title { min-width: 0; }
+
+.work-index__tech {
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: var(--md-sys-typescale-label-small-size);
+  color: var(--md-sys-color-on-surface-variant);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.projects__modal-actions {
+/* ── Detail dialog ──────────────────────────────────────────────────────── */
+
+.projects__dialog-desc {
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 28px;
+}
+
+.projects__dialog-block { margin-bottom: 24px; }
+
+.projects__dialog-label {
+  display: block;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 10px;
+}
+
+.projects__dialog-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--md-sys-color-on-surface);
+}
+
+.projects__dialog-list li { margin-bottom: 6px; }
+.projects__dialog-list li::marker { color: var(--md-sys-color-outline); }
+
+.projects__dialog-stack {
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: var(--md-sys-typescale-label-medium-size);
+}
+
+.projects__dialog-actions {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
   padding-top: 4px;
 }
 
-/* Responsive: tighten radii + padding on smaller screens */
-@media (max-width: 900px) {
-  .projects__modal-image { border-radius: var(--md-sys-shape-corner-md); }
-}
-
 @media (max-width: 600px) {
   .projects { padding-block: var(--md-sys-spacing-section-y-sm); }
-  .projects__grid { gap: 16px; }
+  .work { margin-bottom: 56px; }
+  .work__row {
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    padding: 24px 0;
+  }
+  /* The index number is decoration on a phone; the arrow carries the
+     affordance. */
+  .work__index { display: none; }
 }

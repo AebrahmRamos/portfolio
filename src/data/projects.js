@@ -1,6 +1,7 @@
 export const projects = [
   {
     id: 1,
+    spotlight: true,
     title: 'Inventory Forecasting & Materials Planning',
     description:
       'Internal inventory system that forecasts stock depletion and restock cadence from live order data for a multi-store e-commerce group.',
@@ -25,6 +26,7 @@ export const projects = [
   },
   {
     id: 2,
+    spotlight: true,
     title: 'Multi-Store Order Management System',
     description:
       'Laravel OMS centralizing Shopify orders across 4 stores and 2 regions, with automated spares allocation and an order-lifecycle bot.',
@@ -46,6 +48,7 @@ export const projects = [
   },
   {
     id: 3,
+    spotlight: true,
     title: 'AI Order Quality-Check & Vision Grading',
     description:
       'AI order quality-checking pipeline for a multi-store Shopify OMS, including a Gemini-native vision grading engine for automated spot-check review.',
@@ -89,7 +92,7 @@ export const projects = [
   },
   {
     id: 5,
-    title: 'Superb OS — Retail BI Dashboard',
+    title: 'Superb OS: Retail BI Dashboard',
     description:
       'Real-time business intelligence dashboard consolidating POS data for a multi-branch bakery, with an iOS delivery app.',
     fullDescription:
@@ -110,7 +113,8 @@ export const projects = [
   },
   {
     id: 6,
-    title: 'MCP Server — Diagnostic Tooling',
+    spotlight: true,
+    title: 'MCP Server for Diagnostic Tooling',
     description: 'Model Context Protocol server exposing internal diagnostic tools to AI agents.',
     fullDescription:
       'Built and led development of an internal Model Context Protocol (MCP) server exposing diagnostic tooling to AI coding agents, with test coverage for the happy path and validation of each diagnostic tool.',

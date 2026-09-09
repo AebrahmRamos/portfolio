@@ -36,7 +36,7 @@ const MCP_SERVER_CARD = {
   serverInfo: {
     name: 'aebrahmramos-portfolio',
     version: '1.1.0',
-    description: 'Portfolio and blog of Aebrahm Ramos — CS student and developer at DLSU',
+    description: 'Portfolio and blog of Aebrahm Ramos, CS student and developer at DLSU',
   },
   transport: { type: 'webmcp' },
   capabilities: {
@@ -200,7 +200,7 @@ async function handleGetPosts(request, env) {
   ]);
 
   const total = countResult?.total ?? 0;
-  // Short TTL for the list — stale-while-revalidate so CDN stays fast but refreshes quickly
+  // Short TTL for the list. stale-while-revalidate keeps the CDN fast but fresh.
   return new Response(JSON.stringify({
     posts: rowsResult.results.map(p => ({ ...p, tags: parseTags(p.tags) })),
     total, page, limit,
@@ -272,7 +272,7 @@ async function handleFeed(env) {
 
   const feed = {
     version: 'https://jsonfeed.org/version/1.1',
-    title: 'Aebrahm Ramos — Blog',
+    title: 'Aebrahm Ramos: Blog',
     home_page_url: 'https://aebrahmramos.dev/blog',
     feed_url: 'https://aebrahmramos.dev/api/blog/feed.json',
     description: 'Technical writing on systems programming, embedded systems, and software engineering.',
@@ -313,7 +313,7 @@ async function handleLlmsTxt(env) {
       ).join('\n')
     : '';
 
-  const txt = `# Aebrahm Ramos — Technical Writing
+  const txt = `# Aebrahm Ramos: Technical Writing
 
 > CS student and developer at DLSU. Writing about systems programming, embedded systems, and software engineering.
 
@@ -401,7 +401,7 @@ async function handleAdminUpdatePost(id, request, env) {
   const existing = await env.DB.prepare(`SELECT * FROM posts WHERE id = ?`).bind(id).first();
   if (!existing) return adminJson({ error: 'not_found' }, 404);
 
-  // Reject unknown status at the boundary — otherwise it hits the DB CHECK and 500s.
+  // Reject unknown status at the boundary, otherwise it hits the DB CHECK and 500s.
   if (body.status != null && body.status !== 'draft' && body.status !== 'published') {
     return adminJson({ error: 'invalid_status', status: body.status }, 400);
   }
@@ -562,8 +562,8 @@ async function handleBlogHtml(pathname, request, env) {
     ).bind(slug).first();
     if (!row) return htmlResponse(baseHtml, 404); // real 404, not a soft-404
     const url = `${SITE}/blog/${row.slug}`;
-    const title = `${row.title} — Aebrahm Ramos`;
-    const description = row.summary || `${row.title} — writing by Aebrahm Ramos.`;
+    const title = `${row.title} | Aebrahm Ramos`;
+    const description = row.summary || `${row.title}, writing by Aebrahm Ramos.`;
     let html = applyMeta(baseHtml, { title, description, url, image: OG_IMAGE, ogType: 'article' });
     html = injectJsonLd(html,
       blogPostingJsonLd(row, url),
@@ -581,7 +581,7 @@ async function handleBlogHtml(pathname, request, env) {
     const series = await env.DB.prepare(`SELECT slug, title, description FROM series WHERE slug = ?`).bind(slug).first();
     if (!series) return htmlResponse(baseHtml, 404);
     const url = `${SITE}/blog/series/${series.slug}`;
-    const title = `${series.title} — Series — Aebrahm Ramos`;
+    const title = `${series.title} series | Aebrahm Ramos`;
     const description = series.description || `Posts in the ${series.title} series by Aebrahm Ramos.`;
     let html = applyMeta(baseHtml, { title, description, url, image: OG_IMAGE });
     html = injectJsonLd(html, breadcrumbJsonLd([
@@ -594,7 +594,7 @@ async function handleBlogHtml(pathname, request, env) {
 
   // /blog index
   const url = `${SITE}/blog`;
-  const title = 'Writing — Aebrahm Ramos';
+  const title = 'Writing | Aebrahm Ramos';
   const description = 'Technical writing on systems programming, embedded systems, and software engineering by Aebrahm Ramos.';
   let html = applyMeta(baseHtml, { title, description, url, image: OG_IMAGE });
   html = injectJsonLd(html, breadcrumbJsonLd([
@@ -643,7 +643,7 @@ async function handleRssFeed(env) {
   ).join('\n');
   const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<rss version="2.0">\n  <channel>\n` +
-    `    <title>Aebrahm Ramos — Blog</title>\n` +
+    `    <title>Aebrahm Ramos: Blog</title>\n` +
     `    <link>${SITE}/blog</link>\n` +
     `    <description>Technical writing on systems programming, embedded systems, and software engineering.</description>\n` +
     `${items}\n  </channel>\n</rss>\n`;
@@ -710,7 +710,7 @@ export default {
       return handleBlogHtml(pathname, request, env);
     }
 
-    // Markdown content negotiation — only for portfolio root, not blog/api paths
+    // Markdown content negotiation, portfolio root only, not blog/api paths
     const accept = request.headers.get('Accept') ?? '';
     if (accept.includes('text/markdown') && !pathname.startsWith('/api/') && !pathname.startsWith('/blog/')) {
       return new Response(portfolioMarkdown, {
@@ -724,7 +724,7 @@ export default {
       });
     }
 
-    // SPA fallback — all unmatched paths (including /blog/*, /admin/*) serve index.html
+    // SPA fallback: all unmatched paths (including /blog/*, /admin/*) serve index.html
     const response = await env.ASSETS.fetch(request);
     const contentType = response.headers.get('Content-Type') ?? '';
     if (contentType.includes('text/html')) return injectLinkHeader(response);

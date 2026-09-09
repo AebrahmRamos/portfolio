@@ -1,4 +1,4 @@
-// Shared agent-facing data — used by worker.js (markdown/JSON endpoints)
+// Shared agent-facing data, used by worker.js (markdown/JSON endpoints)
 // and main.jsx (WebMCP tool registration).
 
 export const aboutData = {
@@ -9,11 +9,11 @@ export const aboutData = {
     degree: 'Bachelor of Science in Computer Science',
     major: 'Major in Computer Systems Engineering',
     institution: 'De La Salle University',
-    period: 'Aug 2023 – Aug 2027',
+    period: 'Aug 2023 - Aug 2027',
     status: 'Current',
   },
   summary:
-    'Aebrahm Clyde Ramos (Aebrahm Ramos) — CS student at De La Salle University specializing in full-stack web development, e-commerce inventory systems, and AI integration. Builds production internal tooling for a multi-store retail group, and leads Google Developer Group on Campus DLSU as CEO.',
+    'Aebrahm Clyde Ramos (Aebrahm Ramos) is a CS student at De La Salle University specializing in full-stack web development, e-commerce inventory systems, and AI integration. Builds production internal tooling for a multi-store retail group, and leads Google Developer Group on Campus DLSU as CEO.',
   links: {
     email: 'eon.aebrahm@gmail.com',
     github: 'https://github.com/AebrahmRamos',
@@ -27,7 +27,7 @@ export const experienceData = [
   {
     organization: 'Siwa Marketing Group',
     title: 'Full-Stack / Internal Tools Engineer',
-    period: 'May 2025 – Present',
+    period: 'May 2025 - Present',
     type: 'Contract',
     highlights: [
       'Built the material-projection engine of an internal inventory system forecasting stock depletion and restock cadence from live order data',
@@ -39,7 +39,7 @@ export const experienceData = [
   {
     organization: 'Kiji Bakehouse / Superb Milestone Manufacturing Corp.',
     title: 'AI Operations Intern',
-    period: 'Jan 2026 – Mar 2026',
+    period: 'Jan 2026 - Mar 2026',
     type: 'Internship',
     highlights: [
       'Co-engineered "Superb OS," a unified business management platform with real-time financial dashboards and ML-driven purchase order automation',
@@ -50,7 +50,7 @@ export const experienceData = [
   {
     organization: 'VISON Technologies Corporation',
     title: 'Research Apprentice',
-    period: 'Dec 2024 – Jul 2025',
+    period: 'Dec 2024 - Jul 2025',
     type: 'Internship',
     highlights: [
       'OCR research paper accepted at Philippine Computing Science Congress (completed in under 9 days)',
@@ -82,12 +82,12 @@ export const projectsData = [
     technologies: ['Playwright', 'Gmail API', 'Google Gemini', 'Firebase'],
   },
   {
-    title: 'Superb OS — Retail BI Dashboard',
+    title: 'Superb OS: Retail BI Dashboard',
     description: 'Real-time BI dashboard consolidating POS data for a multi-branch bakery, with an iOS delivery app.',
     technologies: ['React', 'Firebase', 'SwiftUI'],
   },
   {
-    title: 'MCP Server — Diagnostic Tooling',
+    title: 'MCP Server for Diagnostic Tooling',
     description: 'Model Context Protocol server exposing internal diagnostic tools to AI agents.',
     technologies: ['Model Context Protocol', 'Node.js'],
   },
@@ -151,29 +151,29 @@ export const contactData = {
   portfolio: 'https://aebrahmramos.dev',
 };
 
-export const portfolioMarkdown = `# Aebrahm Ramos (Aebrahm Clyde Ramos) — Portfolio
+export const portfolioMarkdown = `# Aebrahm Ramos (Aebrahm Clyde Ramos): Portfolio
 
-CS student at De La Salle University (BS Computer Science, Major in Computer Systems Engineering, Aug 2023–2027). Software engineer specializing in full-stack web development, e-commerce inventory systems, and AI integration.
+CS student at De La Salle University (BS Computer Science, Major in Computer Systems Engineering, Aug 2023-2027). Software engineer specializing in full-stack web development, e-commerce inventory systems, and AI integration.
 
 ## Experience
 
-### Full-Stack / Internal Tools Engineer — Siwa Marketing Group
-*May 2025 – Present*
+### Full-Stack / Internal Tools Engineer, Siwa Marketing Group
+*May 2025 - Present*
 
 - Built the material-projection engine of an internal inventory system forecasting stock depletion and restock cadence from live order data
 - Owned AI-assisted order quality-checking, automated spares allocation, and a Discord/WhatsApp order-lifecycle bot in a multi-store Laravel OMS
 - Led a WCAG/axe accessibility overhaul and shipped AI storefront features across Shopify Liquid themes
 - Built an internal Model Context Protocol (MCP) server exposing diagnostic tooling to AI agents
 
-### AI Operations Intern — Kiji Bakehouse / Superb Milestone Manufacturing Corp.
-*Jan 2026 – Mar 2026*
+### AI Operations Intern, Kiji Bakehouse / Superb Milestone Manufacturing Corp.
+*Jan 2026 - Mar 2026*
 
 - Co-engineered "Superb OS," a unified business management platform with real-time financial dashboards and an ML-driven purchase order system trained on 3 years of transaction data
 - Built a tri-agent automation pipeline using Claude Code for agentic refactoring
 - Integrated drag-and-drop staff scheduling and remote branch music/queue management
 
-### Research Apprentice — VISON Technologies Corporation
-*Dec 2024 – Jul 2025*
+### Research Apprentice, VISON Technologies Corporation
+*Dec 2024 - Jul 2025*
 
 - OCR research paper accepted at Philippine Computing Science Congress (completed in 9 days)
 - Developed time-based, server-authenticated desktop access control system for TITAN computer vision software
@@ -187,8 +187,8 @@ CS student at De La Salle University (BS Computer Science, Major in Computer Sys
 | Multi-Store Order Management System | Laravel 7, PHP, MySQL, Shopify Webhooks |
 | AI Order Quality-Check & Vision Grading | Laravel 7, PHP, Google Gemini, WhatsApp API |
 | Multi-Channel POS Data Automation | Playwright, Gmail API, Gemini, Firebase |
-| Superb OS — Retail BI Dashboard | React, Firebase, SwiftUI |
-| MCP Server — Diagnostic Tooling | Model Context Protocol, Node.js |
+| Superb OS: Retail BI Dashboard | React, Firebase, SwiftUI |
+| MCP Server for Diagnostic Tooling | Model Context Protocol, Node.js |
 | Operating System Emulator | C++20, STL, pthreads |
 | Nodado General Hospital Management System | React, Node.js, MySQL, Socket.IO |
 | University Student Government Website | Next.js 14, TypeScript, NextAuth.js |
@@ -209,7 +209,7 @@ CS student at De La Salle University (BS Computer Science, Major in Computer Sys
 
 ## Education
 
-**De La Salle University** — BS Computer Science, Major in Computer Systems Engineering (Aug 2023–2027, Current)
+**De La Salle University**, BS Computer Science, Major in Computer Systems Engineering (Aug 2023-2027, Current)
 
 Relevant coursework: Data Structures & Algorithms, Operating Systems, Software Engineering, Computer Architecture, Digital Signal Processing, Embedded Hardware Design, Parallel Computing
 

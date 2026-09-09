@@ -15,7 +15,7 @@ export const experience = [
         date: 'May 2025 - Present',
         type: 'Contract',
         description:
-          'Internal tooling for a multi-store floral e-commerce group (Ireland & UAE) — inventory forecasting, multi-store order management, and AI-assisted operations automation.',
+          'Internal tooling for a multi-store floral e-commerce group (Ireland & UAE). Inventory forecasting, multi-store order management, and AI-assisted operations automation.',
         responsibilities: [
           'Built the material-projection engine of an internal inventory system that forecasts stock depletion and restock cadence from live order data',
           'Owned three automation features in a multi-store Laravel OMS: AI-assisted order quality-checking, automated spares allocation, and a Discord/WhatsApp order-lifecycle bot',

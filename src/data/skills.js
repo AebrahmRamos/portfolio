@@ -1,96 +1,63 @@
 /**
- * Skills and technologies data for portfolio
- * Organized by categories: Frontend, Backend, Database, and Tools
- * Also includes MERN stack proficiency data
+ * Skills grouped by area.
+ *
+ * The per-category `color` fields (#377dff, #f9b934, #2e7d32, #ed6c02) and the
+ * `mernStack` export are gone. The colours were MUI-era hardcodes that put four
+ * competing accents on one page, and MERN as a headline stack reads as dated
+ * next to the Laravel and systems work that is actually shipping.
  */
 
-export const skills = {
-  frontend: {
-    title: 'Frontend Development',
-    icon: 'Web', // Icon identifier
-    color: '#377dff', // Blue
-    skills: [
+export const skills = [
+  {
+    key: 'frontend',
+    title: 'Frontend',
+    items: [
       'React',
       'Next.js',
       'TypeScript',
       'JavaScript',
       'HTML/CSS',
-      'Material-UI',
       'Tailwind CSS',
-      'DaisyUI',
       'Inertia.js',
       'Radix UI',
       'SwiftUI',
     ],
   },
-  backend: {
-    title: 'Backend Development',
-    icon: 'Code',
-    color: '#f9b934', // Yellow
-    skills: [
-      'Node.js',
-      'Express.js',
+  {
+    key: 'backend',
+    title: 'Backend',
+    items: [
       'Laravel',
       'PHP',
+      'Node.js',
+      'Express.js',
       'Python',
       'Java',
       'C/C++',
       'x86 Assembly',
     ],
   },
-  database: {
-    title: 'Database & Storage',
-    icon: 'Storage',
-    color: '#2e7d32', // Green
-    skills: [
-      'MongoDB',
-      'MySQL',
-      'Firebase',
-      'Supabase',
-      'SQLite',
-    ],
+  {
+    key: 'data',
+    title: 'Data',
+    items: ['MySQL', 'MongoDB', 'PostgreSQL', 'Firebase', 'Supabase', 'SQLite'],
   },
-  tools: {
-    title: 'Tools & Platforms',
-    icon: 'Tools',
-    color: '#ed6c02', // Orange
-    skills: [
-      'GitHub',
+  {
+    key: 'platform',
+    title: 'Platform and tooling',
+    items: [
+      'Cloudflare Workers',
       'Docker',
       'GCP',
       'Azure',
       'DigitalOcean',
-      'PayloadCMS',
       'Shopify (Liquid)',
-      'Cloudflare Workers',
-      'OpenAI',
       'Model Context Protocol',
+      'Google Gemini',
+      'OpenAI',
       'Playwright',
+      'Git',
     ],
-  },
-};
-
-// MERN Stack proficiency badges
-export const mernStack = [
-  {
-    id: 1,
-    name: 'MongoDB',
-    color: '#47A248',
-  },
-  {
-    id: 2,
-    name: 'Express.js',
-    color: '#000000',
-  },
-  {
-    id: 3,
-    name: 'React',
-    color: '#61DAFB',
-  },
-  {
-    id: 4,
-    name: 'Node.js',
-    color: '#339933',
   },
 ];
 

@@ -1,51 +1,31 @@
-/* Contact — Material You section with a solid surface form card */
+/* Contact. Form plus a links aside that also carries the resume row.
+   The "Quick Connect" GitHub/LinkedIn button pair is gone: it duplicated two
+   of the three link cards directly above it. */
+
 .contact {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  background-color: var(--md-sys-color-surface);
+  background-color: var(--md-sys-color-surface-container-low);
   padding-block: var(--md-sys-spacing-section-y-md);
 }
 
 @media (min-width: 900px) { .contact { padding-block: var(--md-sys-spacing-section-y); } }
 
-@media (max-width: 600px) { .contact { padding-block: var(--md-sys-spacing-section-y-sm); } }
-
-.contact .section__container { position: relative; z-index: 1; }
-
 .contact__grid {
   display: grid;
-  gap: 40px;
+  gap: 48px;
+  align-items: start;
 }
 
 @media (min-width: 900px) {
-  .contact__grid { grid-template-columns: 1.1fr 0.9fr; align-items: start; }
-}
-
-.contact__form-card {
-  border-radius: var(--md-sys-shape-corner-xl);
-  background: var(--md-sys-color-surface-container-high);
-  border: 1px solid color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
-  box-shadow: var(--md-sys-elevation-2);
-}
-
-.contact__form-card .m3-card__content { padding: 32px; }
-
-@media (max-width: 600px) {
-  .contact__form-card { border-radius: var(--md-sys-shape-corner-xl); }
-  .contact__form-card .m3-card__content { padding: 24px; }
-}
-
-.contact__form-heading {
-  color: var(--md-sys-color-on-surface);
-  margin-bottom: 24px;
+  .contact__grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 72px; }
 }
 
 .contact__form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  gap: 20px;
+  justify-items: start;
 }
+
+.contact__form > .m3-btn { margin-top: 4px; }
 
 .contact__banner { margin-bottom: 4px; }
 
@@ -53,69 +33,96 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  width: 100%;
 }
 
-@media (max-width: 500px) { .contact__row { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .contact__row { grid-template-columns: 1fr; } }
 
-.contact__note {
-  color: var(--md-sys-color-on-surface-variant);
-  text-align: center;
-  margin-top: 4px;
-}
-
-.contact__info-heading {
-  color: var(--md-sys-color-on-surface);
-  margin-bottom: 24px;
-}
+/* ── Links ──────────────────────────────────────────────────────────────── */
 
 .contact__links {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
 }
 
-.contact__link-card {
-  text-decoration: none;
-  border-radius: var(--md-sys-shape-corner-md);
-}
-
-.contact__link-content {
+.contact__link {
   display: flex;
   align-items: center;
-  gap: 16px;
-  position: relative;
-  z-index: 1;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface);
+  transition: color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 
-/* Brand-tinted icon disc (glyph color is set inline per-brand in the JSX) */
+.contact__link:hover { color: var(--md-sys-color-primary); }
+
 .contact__link-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--md-sys-shape-corner-full);
-  background: color-mix(in srgb, currentColor 14%, transparent);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-variant);
   flex-shrink: 0;
-  transition: background-color var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard);
+  transition:
+    background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
+    color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 
-.contact__link-card:hover .contact__link-icon {
-  background: color-mix(in srgb, currentColor 24%, transparent);
+.contact__link:hover .contact__link-icon {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
 }
+
+.contact__link-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.contact__link-title { color: var(--md-sys-color-on-surface-variant); }
 
 .contact__link-value {
-  color: var(--md-sys-color-on-surface-variant);
-  margin-top: 2px;
+  color: inherit;
+  overflow-wrap: anywhere;
 }
 
-.contact__quick-title {
-  color: var(--md-sys-color-on-surface);
-  margin-bottom: 12px;
+.contact__link-arrow {
+  margin-left: auto;
+  color: var(--md-sys-color-outline);
+  flex-shrink: 0;
 }
 
-.contact__quick-btns {
+/* ── Resume row ─────────────────────────────────────────────────────────── */
+
+.contact__resume {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+  padding: 20px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-md);
+  /* Offset from the section ground so the anchor target is visible when a
+     /#resume link lands on it. */
+  background: var(--md-sys-color-surface);
+  scroll-margin-top: 96px;
+}
+
+.contact__resume-title { color: var(--md-sys-color-on-surface); }
+.contact__resume-note { color: var(--md-sys-color-on-surface-variant); margin-top: 2px; }
+
+@media (max-width: 600px) {
+  .contact { padding-block: var(--md-sys-spacing-section-y-sm); }
+  .contact__grid { gap: 40px; }
+  .contact__form > .m3-btn { width: 100%; }
+  .contact__resume { flex-direction: column; align-items: stretch; }
+  .contact__resume .m3-btn { width: 100%; }
 }

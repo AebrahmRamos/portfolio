@@ -26,4 +26,12 @@ export default defineConfig([
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
+  {
+    // Tests and the Worker run on Node / workerd, not in a browser tab, so
+    // they get the Node globals (process, Buffer) on top of the browser set.
+    files: ['tests/**/*.js', 'src/worker.js', '*.config.js'],
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node },
+    },
+  },
 ])

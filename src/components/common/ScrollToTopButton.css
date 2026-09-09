@@ -1,39 +1,50 @@
-/* FAB-like scroll-to-top: applied to an <Fab>, so it inherits state layer + content.
-   Here we set placement, tonal emphasis, full rounding, elevation, and entrance. */
+/* Sentinel sits ~1.5 viewports down; the button appears once it is above the
+   fold, which is the same trigger point as the old scrollY > 300 test without
+   the per-frame handler. */
+.scroll-to-top__sentinel {
+  position: absolute;
+  top: 150vh;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
 .scroll-to-top {
   position: fixed;
-  bottom: 80px;
+  bottom: 24px;
   right: 20px;
-  z-index: 1000;
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
+  z-index: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   border-radius: var(--md-sys-shape-corner-full);
-  box-shadow: var(--md-sys-elevation-3);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--md-sys-elevation-2);
   opacity: 0;
   pointer-events: none;
-  transform: scale(0.8) translateY(8px);
+  transform: translateY(8px);
   transition:
-    opacity var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized),
-    transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized),
-    box-shadow var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+    opacity var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-standard),
+    transform var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized),
+    background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 
 .scroll-to-top--visible {
   opacity: 1;
   pointer-events: auto;
-  transform: scale(1) translateY(0);
+  transform: none;
 }
 
-/* Lift on hover, settle with a press scale (composes with the visible transform) */
 .scroll-to-top--visible:hover {
-  box-shadow: var(--md-sys-elevation-4);
-  transform: scale(1) translateY(-2px);
+  background: var(--md-sys-color-surface-container-highest);
 }
-.scroll-to-top--visible:active {
-  box-shadow: var(--md-sys-elevation-3);
-  transform: scale(0.94) translateY(0);
-}
+
+.scroll-to-top--visible:active { transform: scale(0.94); }
 
 @media (min-width: 600px) {
-  .scroll-to-top { right: 32px; bottom: 90px; }
+  .scroll-to-top { right: 28px; bottom: 28px; }
 }

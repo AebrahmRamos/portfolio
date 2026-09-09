@@ -1,23 +1,61 @@
-/* Organizations — Material You section.
-   Tonal surface, lift+scale cards (styling lives on the shared .m3-card
-   component — this file only owns section-level layout). */
+/* Organizations. Three-column role rows.
+   Distinct from the Experience timeline above it and from the Skills
+   label/content rows: this one is a record list, read left to right. */
 
 .organizations {
-  position: relative;
-  overflow: hidden;
   background-color: var(--md-sys-color-surface-container-low);
   padding-block: var(--md-sys-spacing-section-y-md);
 }
 
-@media (min-width: 900px) {
-  .organizations { padding-block: var(--md-sys-spacing-section-y); }
+@media (min-width: 900px) { .organizations { padding-block: var(--md-sys-spacing-section-y); } }
+
+.orgs {
+  /* See Projects.css: the section rule above is the top boundary. */
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.organizations__title {
+.orgs__row {
+  display: grid;
+  gap: 4px;
+  padding-block: 18px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+@media (min-width: 800px) {
+  .orgs__row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) auto;
+    gap: 32px;
+    align-items: baseline;
+  }
+}
+
+.orgs__role {
   color: var(--md-sys-color-on-surface);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-/* Mobile: tighten section padding. */
+.orgs__now {
+  font-size: var(--md-sys-typescale-label-small-size);
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+.orgs__org { color: var(--md-sys-color-on-surface-variant); }
+
+.orgs__date {
+  color: var(--md-sys-color-on-surface-variant);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 @media (max-width: 600px) {
   .organizations { padding-block: var(--md-sys-spacing-section-y-sm); }
 }

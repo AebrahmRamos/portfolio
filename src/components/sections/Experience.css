@@ -1,170 +1,147 @@
-/* Experience — Material You timeline with MD3 cards per entry and elevation
-   progression on hover. */
+/* Experience. The preserved timeline, rebuilt without cards.
+   The rail and nodes stay because they are the site's recognisable pattern.
+   The elevated card per entry goes: it added a container the content did not
+   need, and on the dark theme every one of them carried a black drop shadow. */
 
 .experience {
-  position: relative;
-  background-color: var(--md-sys-color-surface);
+  background-color: var(--md-sys-color-surface-container-low);
   padding-block: var(--md-sys-spacing-section-y-md);
 }
 
 @media (min-width: 900px) { .experience { padding-block: var(--md-sys-spacing-section-y); } }
 
-.experience__title {
-  color: var(--md-sys-color-on-surface);
-}
-
 .timeline {
+  list-style: none;
   position: relative;
-  padding-left: 48px;
+  margin: 0;
+  padding: 0 0 0 28px;
 }
 
-@media (min-width: 900px) { .timeline { padding-left: 64px; } }
-
-/* Timeline rail — solid tonal line. */
-.timeline__line {
+/* Rail drawn on the list itself rather than as an extra aria-hidden div. */
+.timeline::before {
+  content: "";
   position: absolute;
-  left: 12px;
+  left: 3px;
   top: 8px;
   bottom: 8px;
-  width: 3px;
-  border-radius: var(--md-sys-shape-corner-full);
-  background: var(--md-sys-color-primary);
-}
-
-@media (min-width: 900px) { .timeline__line { left: 20px; } }
-
-.timeline__entry {
-  position: relative;
-  margin-bottom: 28px;
-}
-
-/* Timeline node — a primary-container token chip with a tonal ring. */
-.timeline__node {
-  position: absolute;
-  left: -44px;
-  top: 24px;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--md-sys-shape-corner-full);
-  background: var(--md-sys-color-primary-container);
-  border: 2px solid var(--md-sys-color-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--md-sys-color-on-primary-container);
-  z-index: 2;
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--md-sys-color-primary) 14%, transparent);
-  transition:
-    transform 300ms var(--md-sys-motion-easing-standard),
-    box-shadow 300ms var(--md-sys-motion-easing-standard);
-}
-
-/* Node pulses outward when its entry card is hovered. */
-.timeline__entry:hover .timeline__node {
-  transform: scale(1.08);
-  box-shadow: 0 0 0 7px color-mix(in srgb, var(--md-sys-color-primary) 18%, transparent);
+  width: 1px;
+  background: var(--md-sys-color-outline-variant);
 }
 
 @media (min-width: 900px) {
-  .timeline__node { left: -60px; width: 48px; height: 48px; }
+  .timeline { padding-left: 40px; }
+  .timeline::before { left: 4px; }
 }
 
-.timeline__node--secondary {
-  background: var(--md-sys-color-tertiary-container);
-  border-color: var(--md-sys-color-tertiary);
-  color: var(--md-sys-color-on-tertiary-container);
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--md-sys-color-tertiary) 14%, transparent);
+.timeline__entry {
+  position: relative;
+  padding-bottom: 48px;
 }
 
-.timeline__entry:hover .timeline__node--secondary {
-  box-shadow: 0 0 0 7px color-mix(in srgb, var(--md-sys-color-tertiary) 18%, transparent);
+.timeline__entry:last-child { padding-bottom: 0; }
+
+.timeline__node {
+  position: absolute;
+  left: -28px;
+  top: 9px;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-surface-container-low);
+  box-shadow: 0 0 0 2px var(--md-sys-color-outline);
 }
 
-/* Just the org-name text — the Card wrapper (now `interactive`) already
-   supplies the surface, padding, radius, shadow, and hover lift for the
-   whole entry. This used to duplicate all of that on the org name alone,
-   nesting a second card-styled box inside the first and making hover
-   feedback only trigger over the title instead of the full entry. */
+@media (min-width: 900px) {
+  .timeline__node { left: -40px; }
+}
+
+/* Only the current role gets a filled node, so the accent marks state
+   rather than decorating every row. */
+.timeline__entry:first-child .timeline__node {
+  background: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 2px var(--md-sys-color-primary);
+}
+
 .timeline__org {
   color: var(--md-sys-color-on-surface);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
-.timeline__position {
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-}
-
-.timeline__position--divider {
-  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+.timeline__position + .timeline__position {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
 }
 
 .timeline__position-header {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 4px;
+  margin-bottom: 12px;
 }
 
-@media (min-width: 600px) {
-  .timeline__position-header { flex-direction: row; justify-content: space-between; align-items: flex-start; }
+@media (min-width: 700px) {
+  .timeline__position-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+  }
 }
 
-.timeline__position-meta {
+.timeline__role {
+  color: var(--md-sys-color-on-surface);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
-/* Date pill — tonal secondary-container chip. */
-.timeline__date {
-  color: var(--md-sys-color-on-secondary-container);
-  background: var(--md-sys-color-secondary-container);
-  padding: 4px 12px;
+/* Current-role marker. Text, not a coloured dot. */
+.timeline__now {
+  font-size: var(--md-sys-typescale-label-small-size);
+  font-weight: 500;
+  letter-spacing: 0;
+  padding: 2px 8px;
   border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+.timeline__meta {
+  color: var(--md-sys-color-on-surface-variant);
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Hairline separator instead of a middle dot. */
+.timeline__meta-sep {
+  width: 12px;
+  height: 1px;
+  background: var(--md-sys-color-outline-variant);
 }
 
 .timeline__desc {
-  color: var(--md-sys-color-on-surface-variant);
-  margin-bottom: 8px;
+  color: var(--md-sys-color-on-surface);
+  max-width: var(--md-sys-spacing-measure);
+  margin-bottom: 12px;
 }
 
-.timeline__resps {
+.timeline__points {
+  margin: 0;
   padding-left: 18px;
   color: var(--md-sys-color-on-surface-variant);
-}
-.timeline__resps li { margin-bottom: 4px; }
-
-/* Closing call-to-action block on a tonal surface container. */
-.experience__opportunities {
-  margin-top: 48px;
-  padding: 40px 24px;
-  text-align: center;
-  background: var(--md-sys-color-surface-container-low);
-  border: 1px solid var(--md-sys-color-outline-variant);
-  border-radius: var(--md-sys-shape-corner-xl);
-  box-shadow: var(--md-sys-elevation-1);
+  max-width: var(--md-sys-spacing-measure);
 }
 
-.experience__opp-title {
-  color: var(--md-sys-color-on-surface);
-  margin-bottom: 16px;
-}
-.experience__opp-chips {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
+.timeline__points li { margin-bottom: 6px; }
+.timeline__points li::marker { color: var(--md-sys-color-outline); }
 
-/* Responsive — soften radii and tighten spacing on smaller screens. */
 @media (max-width: 600px) {
   .experience { padding-block: var(--md-sys-spacing-section-y-sm); }
-  .experience__opportunities {
-    margin-top: 36px;
-    padding: 32px 20px;
-    border-radius: var(--md-sys-shape-corner-xl);
-  }
+  .timeline__entry { padding-bottom: 40px; }
+  .timeline__meta { white-space: normal; }
 }

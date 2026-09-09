@@ -1,46 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Aebrahm Ramos (Aebrahm Clyde Ramos) - Computer Systems Engineering student at De La Salle University Manila, building full-stack web applications, e-commerce inventory systems, and AI-integrated tooling." />
-    <meta name="keywords" content="Aebrahm Ramos, Aebrahm Clyde Ramos, Portfolio, Full-Stack Developer, Software Engineer, Computer Science, DLSU" />
     <meta name="author" content="Aebrahm Ramos" />
-  <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#377dff" />
+    <meta name="robots" content="index, follow" />
+    <!-- Theme color tracks the palette in m3/tokens/color.css so the mobile
+         browser chrome matches the page instead of the old seed blue. -->
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101215" media="(prefers-color-scheme: dark)" />
+
+    <!-- The SPA shell only ever renders the portfolio root; blog routes get
+         their canonical rewritten server-side in worker.js. -->
+    <link rel="canonical" href="https://aebrahmramos.dev/" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Aebrahm Ramos - Portfolio" />
+    <meta property="og:site_name" content="Aebrahm Ramos" />
+    <meta property="og:title" content="Aebrahm Ramos - Full-Stack Developer" />
     <meta property="og:description" content="Computer Systems Engineering student building full-stack web applications, e-commerce inventory systems, and AI-integrated tooling" />
-  <meta property="og:url" content="https://aebrahmramos.dev/" />
-  <meta property="og:image" content="https://wcnushafgkumpgjy.public.blob.vercel-storage.com/og-image.png" />
+    <meta property="og:url" content="https://aebrahmramos.dev/" />
+    <meta property="og:image" content="https://aebrahmramos.dev/images/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Aebrahm Ramos, full-stack developer portfolio" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="Aebrahm Ramos - Portfolio" />
+    <meta property="twitter:title" content="Aebrahm Ramos - Full-Stack Developer" />
     <meta property="twitter:description" content="Computer Systems Engineering student building full-stack web applications, e-commerce inventory systems, and AI-integrated tooling" />
-  <meta property="twitter:url" content="https://aebrahmramos.dev/" />
-  <meta property="twitter:image" content="https://wcnushafgkumpgjy.public.blob.vercel-storage.com/og-image.png" />
-  <!-- Optional square preview for some social platforms -->
-  <meta property="og:image:alt" content="Aebrahm Ramos — Portfolio preview" />
-  <meta name="twitter:image:alt" content="Aebrahm Ramos — Portfolio preview" />
+    <meta property="twitter:url" content="https://aebrahmramos.dev/" />
+    <meta property="twitter:image" content="https://aebrahmramos.dev/images/og-image.jpg" />
+    <meta name="twitter:image:alt" content="Aebrahm Ramos, full-stack developer portfolio" />
 
     <!-- Blog feeds -->
-    <link rel="alternate" type="application/rss+xml" title="Aebrahm Ramos — Blog" href="/feed.xml" />
-    <link rel="alternate" type="application/feed+json" title="Aebrahm Ramos — Blog" href="/api/blog/feed.json" />
-    
-    <!-- Preconnect to Google Fonts for better performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Material You: Roboto (canonical Material typeface) + Roboto Mono for code -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    
-    <!-- Preload critical assets for faster LCP -->
-    <link rel="preload" as="image" href="https://wcnushafgkumpgjy.public.blob.vercel-storage.com/IMG_9191-2.jpg" />
-    <link rel="preload" as="image" href="https://wcnushafgkumpgjy.public.blob.vercel-storage.com/og-image.png" />
-    
+    <link rel="alternate" type="application/rss+xml" title="Aebrahm Ramos Blog" href="/feed.xml" />
+    <link rel="alternate" type="application/feed+json" title="Aebrahm Ramos Blog" href="/api/blog/feed.json" />
+
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
     {
@@ -60,6 +58,7 @@
       },
       "email": "mailto:aebrahmramos.dev@gmail.com",
       "url": "https://aebrahmramos.dev",
+      "image": "https://aebrahmramos.dev/images/og-image.jpg",
       "sameAs": [
         "https://github.com/AebrahmRamos",
         "https://www.linkedin.com/in/aebrahmramos/"
@@ -101,7 +100,7 @@
     }
     </script>
 
-    <title>Aebrahm Ramos - Portfolio</title>
+    <title>Aebrahm Ramos - Full-Stack Developer</title>
   </head>
   <body>
     <div id="root"></div>

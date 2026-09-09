@@ -1,4 +1,4 @@
-# Blog Setup — One-time steps
+# Blog Setup: one-time steps
 
 The blog is fully built and merged to main. Code is ready; D1 database is provisioned.
 One step required to get it live: add your Cloudflare API token to GitHub.
@@ -10,7 +10,7 @@ Create a token with:
 - **Workers Scripts: Edit** (for the `portfolio` worker)
 - **Account: Cloudflare Workers for Platforms: Read** (optional)
 
-Or use "Edit Cloudflare Workers" template — it has everything needed.
+Or use the "Edit Cloudflare Workers" template, it has everything needed.
 
 ## 2. Add GitHub secrets (takes 2 minutes)
 
@@ -45,7 +45,7 @@ Then log in at https://aebrahmramos.dev/admin using that token.
 
 ## What's already done
 
-- D1 database `portfolio-blog` (uuid: `da664f90-3880-4e3b-934a-dbbd4cb802b8`) — schema applied
+- D1 database `portfolio-blog` (uuid: `da664f90-3880-4e3b-934a-dbbd4cb802b8`), schema applied
 - All blog code merged to main
 - GitHub Actions workflow ready to deploy
 - `/llms.txt` will auto-generate from your posts

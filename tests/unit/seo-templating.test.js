@@ -15,15 +15,15 @@ const SHELL = `<!DOCTYPE html><html><head>
 
 test('applyMeta rewrites title, description, og, type and adds canonical', () => {
   const out = applyMeta(SHELL, {
-    title: 'Hello, RTOS — Aebrahm Ramos',
+    title: 'Hello, RTOS | Aebrahm Ramos',
     description: 'A tiny RTOS.',
     url: 'https://aebrahmramos.dev/blog/hello-rtos',
     image: 'https://img/og.png',
     ogType: 'article',
   });
-  assert.match(out, /<title>Hello, RTOS — Aebrahm Ramos<\/title>/);
+  assert.match(out, /<title>Hello, RTOS | Aebrahm Ramos<\/title>/);
   assert.match(out, /<meta name="description" content="A tiny RTOS\." \/>/);
-  assert.match(out, /<meta property="og:title" content="Hello, RTOS — Aebrahm Ramos"/);
+  assert.match(out, /<meta property="og:title" content="Hello, RTOS | Aebrahm Ramos"/);
   assert.match(out, /<meta property="og:url" content="https:\/\/aebrahmramos\.dev\/blog\/hello-rtos"/);
   assert.match(out, /<meta property="og:type" content="article"/);
   assert.match(out, /<link rel="canonical" href="https:\/\/aebrahmramos\.dev\/blog\/hello-rtos" \/>/);
@@ -69,4 +69,20 @@ test('breadcrumbList numbers items from 1 in order', () => {
   assert.equal(bc.itemListElement[2].position, 3);
   assert.equal(bc.itemListElement[2].name, 'Post');
   assert.equal(bc.itemListElement[2].item, 'p');
+});
+
+test('applyMeta replaces an existing canonical rather than adding a second', () => {
+  const shell = SHELL.replace(
+    '</head>',
+    '<link rel="canonical" href="https://aebrahmramos.dev/" />\n</head>'
+  );
+  const out = applyMeta(shell, {
+    title: 'T',
+    description: 'D',
+    url: 'https://aebrahmramos.dev/blog/x',
+    image: 'i',
+  });
+  const canonicals = out.match(/<link rel="canonical"/g) ?? [];
+  assert.equal(canonicals.length, 1);
+  assert.match(out, /<link rel="canonical" href="https:\/\/aebrahmramos\.dev\/blog\/x" \/>/);
 });

@@ -135,7 +135,7 @@ export default function PostEditor({ token }) {
     ],
     editorProps: {
       attributes: { 'aria-label': 'Post body', role: 'textbox' },
-      // Handle image paste and drag-drop — convert to base64 and insert
+      // Handle image paste and drag-drop, convert to base64 and insert
       handlePaste(view, event) {
         const items = Array.from(event.clipboardData?.items ?? []);
         const imageItem = items.find(item => item.type.startsWith('image/'));
@@ -366,7 +366,7 @@ export default function PostEditor({ token }) {
               <div className="admin-field">
                 <label>Series</label>
                 <select value={seriesSlug} onChange={e => setSeriesSlug(e.target.value)}>
-                  <option value="">— None —</option>
+                  <option value="">No series</option>
                   {allSeries.map(s => (
                     <option key={s.slug} value={s.slug}>{s.title}</option>
                   ))}

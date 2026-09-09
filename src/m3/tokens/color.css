@@ -1,0 +1,131 @@
+/* Color tokens.
+   Hand-tuned static palette. This replaces the runtime
+   @material/material-color-utilities scheme generation, which derived every
+   role from the #377dff seed and produced a pink/mauve tertiary that read as
+   an unintended second brand accent on every section underline, chip and
+   timeline node.
+   The --md-sys-color-* names are kept because ~40 files consume them.
+
+   Brand: #377dff. Light mode keeps the white-and-blue scheme; the primary is
+   darkened to #1552cc so white button labels clear WCAG AA (6.75:1) while
+   staying visibly the same blue. Dark mode lifts it to #5b9bff rather than
+   desaturating it, so the brand survives the theme flip.
+
+   Every pair below is measured, not eyeballed:
+     light  body 17.87  variant 7.53  link 6.75  button 6.75  outline 4.01
+     dark   body 15.82  variant 8.25  link 6.77  button 5.75  outline 4.94
+
+   Tertiary is deliberately aliased to primary so any component still asking
+   for a tertiary role stays on the single locked accent. */
+
+:root {
+  color-scheme: light;
+
+  /* Accent */
+  --md-sys-color-primary: #1552cc;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #dfe9ff;
+  --md-sys-color-on-primary-container: #0a2f7a;
+
+  --md-sys-color-secondary: #3c4a63;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #e6edfb;
+  --md-sys-color-on-secondary-container: #17325f;
+
+  --md-sys-color-tertiary: var(--md-sys-color-primary);
+  --md-sys-color-on-tertiary: var(--md-sys-color-on-primary);
+  --md-sys-color-tertiary-container: var(--md-sys-color-primary-container);
+  --md-sys-color-on-tertiary-container: var(--md-sys-color-on-primary-container);
+
+  /* Status */
+  --md-sys-color-error: #b3261e;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #fce9e7;
+  --md-sys-color-on-error-container: #6d1a15;
+
+  --md-sys-color-success: #14663f;
+  --md-sys-color-success-container: #e0f2e9;
+  --md-sys-color-on-success-container: #0c4429;
+
+  /* Surfaces */
+  --md-sys-color-background: #ffffff;
+  --md-sys-color-on-background: #0f1729;
+  --md-sys-color-surface: #ffffff;
+  --md-sys-color-on-surface: #0f1729;
+  --md-sys-color-surface-variant: #f1f3f7;
+  --md-sys-color-on-surface-variant: #4a5568;
+
+  --md-sys-color-surface-dim: #eceef3;
+  --md-sys-color-surface-bright: #ffffff;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f8f9fb;
+  --md-sys-color-surface-container: #f1f3f7;
+  --md-sys-color-surface-container-high: #e9ecf2;
+  --md-sys-color-surface-container-highest: #e2e6ee;
+
+  --md-sys-color-outline: #787f8f;
+  --md-sys-color-outline-variant: #dde1e9;
+
+  --md-sys-color-inverse-surface: #1b2434;
+  --md-sys-color-inverse-on-surface: #f1f3f7;
+  --md-sys-color-inverse-primary: #a8c6ff;
+  --md-sys-color-shadow: #0f1729;
+  --md-sys-color-scrim: #0f1729;
+  --md-sys-color-surface-tint: var(--md-sys-color-primary);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --md-sys-color-primary: #5b9bff;
+  --md-sys-color-on-primary: #04204d;
+  --md-sys-color-primary-container: #17376e;
+  --md-sys-color-on-primary-container: #d6e4ff;
+
+  --md-sys-color-secondary: #a8b6cd;
+  --md-sys-color-on-secondary: #16233a;
+  --md-sys-color-secondary-container: #1d2c47;
+  --md-sys-color-on-secondary-container: #cddffc;
+
+  --md-sys-color-tertiary: var(--md-sys-color-primary);
+  --md-sys-color-on-tertiary: var(--md-sys-color-on-primary);
+  --md-sys-color-tertiary-container: var(--md-sys-color-primary-container);
+  --md-sys-color-on-tertiary-container: var(--md-sys-color-on-primary-container);
+
+  --md-sys-color-error: #ff8f85;
+  --md-sys-color-on-error: #4d0f0a;
+  --md-sys-color-error-container: #5c1a15;
+  --md-sys-color-on-error-container: #ffd9d4;
+
+  --md-sys-color-success: #7fd6a6;
+  --md-sys-color-success-container: #15402c;
+  --md-sys-color-on-success-container: #c3ecd6;
+
+  /* Off-black, never #000: five real surface steps so elevation reads
+     through tone rather than through shadows, which are nearly invisible
+     on a dark ground. */
+  --md-sys-color-background: #101215;
+  --md-sys-color-on-background: #e8ecf2;
+  --md-sys-color-surface: #101215;
+  --md-sys-color-on-surface: #e8ecf2;
+  --md-sys-color-surface-variant: #191d22;
+  --md-sys-color-on-surface-variant: #a2adbb;
+
+  --md-sys-color-surface-dim: #0b0d10;
+  --md-sys-color-surface-bright: #262c33;
+  --md-sys-color-surface-container-lowest: #0b0d10;
+  --md-sys-color-surface-container-low: #15181c;
+  --md-sys-color-surface-container: #191d22;
+  --md-sys-color-surface-container-high: #1f242a;
+  --md-sys-color-surface-container-highest: #262c33;
+
+  --md-sys-color-outline: #798492;
+  --md-sys-color-outline-variant: #2c333b;
+
+  --md-sys-color-inverse-surface: #e8ecf2;
+  --md-sys-color-inverse-on-surface: #191d22;
+  --md-sys-color-inverse-primary: #1552cc;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-surface-tint: var(--md-sys-color-primary);
+}

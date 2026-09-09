@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { FiMenu, FiX, FiSun, FiMoon, FiDownload } from 'react-icons/fi';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { PiListBold, PiXBold, PiSunBold, PiMoonBold, PiDownloadSimpleBold } from 'react-icons/pi';
 import { useThemeContext } from '../../context/ThemeContext';
-import { scrollToSection } from '../../utils/helpers';
 import { IconButton, Button, NavigationDrawer } from '../m3';
 import './Navigation.css';
 
+// Labels and order are unchanged; they are the site's primary nav.
 const navItems = [
   { label: 'About', id: 'about' },
   { label: 'Experience', id: 'experience' },
@@ -18,122 +18,140 @@ const navItems = [
 
 const Navigation = () => {
   const { darkMode, toggleDarkMode } = useThemeContext();
-  const location = useLocation();
-  const isBlogPage = location.pathname.startsWith('/blog') || location.pathname.startsWith('/admin');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { pathname } = useLocation();
+  const isPortfolio = pathname === '/';
+  const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
+  const sentinel = useRef(null);
 
+  // Scrolled state via a sentinel instead of a scroll listener. The old
+  // version ran a handler on every scroll frame to compare scrollY > 20.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    const onResize = () => setIsMobile(window.innerWidth < 900);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onResize);
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onResize);
-    };
+    const el = sentinel.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setScrolled(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
+  // Active-section highlight. Only the portfolio route has these targets.
   useEffect(() => {
+    if (!isPortfolio) return undefined;
     const observer = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && setActiveSection(e.target.id)),
-      { rootMargin: '-100px 0px -80% 0px', threshold: 0 }
+      { rootMargin: '-96px 0px -70% 0px', threshold: 0 }
     );
     ['hero', ...navItems.map((n) => n.id)].forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
-  }, []);
+  }, [isPortfolio]);
 
-  const handleNavClick = (id) => {
-    scrollToSection(id, isMobile ? 56 : 64);
-    setMobileMenuOpen(false);
-  };
+  // Close the drawer on route change so a back/forward never leaves it open.
+  useEffect(() => setMenuOpen(false), [pathname]);
 
   return (
     <>
-      <header className={`nav ${scrolled ? 'nav--scrolled' : ''} ${darkMode ? 'nav--dark' : 'nav--light'}`}>
-        <div className="nav__container">
-          <button className="nav__logo" onClick={() => handleNavClick('hero')}>
-            Aebrahm Ramos
-          </button>
+      <span ref={sentinel} className="nav__sentinel" aria-hidden="true" />
 
-          {!isMobile && (
+      <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
+        <div className="nav__container">
+          <Link to="/" className="nav__logo">Aebrahm Ramos</Link>
+
+          {/* Section links are real anchors now, not buttons calling a scroll
+              helper: they are crawlable, deep-linkable and keyboard-native.
+              They only render on the portfolio route, where the targets exist. */}
+          {isPortfolio && (
             <nav className="nav__desktop" aria-label="Primary">
-              {!isBlogPage && navItems.map((item) => (
-                <button
+              {navItems.map((item) => (
+                <a
                   key={item.id}
+                  href={`#${item.id}`}
                   className={`nav__link ${activeSection === item.id ? 'nav__link--active' : ''}`}
-                  onClick={() => handleNavClick(item.id)}
+                  aria-current={activeSection === item.id ? 'true' : undefined}
                 >
                   {item.label}
-                </button>
+                </a>
               ))}
-              <IconButton onClick={toggleDarkMode} aria-label="Toggle dark mode">
-                {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
-              </IconButton>
-              <Button
-                variant="outlined"
-                startIcon={<FiDownload />}
-                href="/resume/ramos-aebrahm-resume.pdf"
-                download
-              >
-                Resume
-              </Button>
             </nav>
           )}
 
-          {isMobile && (
-            <div className="nav__mobile-actions">
-              <IconButton onClick={toggleDarkMode} aria-label="Toggle dark mode">
-                {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
-              </IconButton>
+          <div className="nav__actions">
+            <IconButton
+              onClick={toggleDarkMode}
+              aria-label={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
+            >
+              {darkMode ? <PiSunBold size={18} /> : <PiMoonBold size={18} />}
+            </IconButton>
+
+            <Button
+              className="nav__resume"
+              variant="outlined"
+              size="small"
+              startIcon={<PiDownloadSimpleBold />}
+              href="/resume/ramos-aebrahm-resume.pdf"
+              download
+            >
+              Resume
+            </Button>
+
+            {isPortfolio && (
               <IconButton
-                onClick={() => setMobileMenuOpen(true)}
+                className="nav__menu-btn"
+                onClick={() => setMenuOpen(true)}
                 aria-label="Open navigation menu"
-                aria-expanded={mobileMenuOpen}
+                aria-expanded={menuOpen}
               >
-                <FiMenu size={24} />
+                <PiListBold size={20} />
               </IconButton>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </header>
 
-      <NavigationDrawer open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}>
+      {/* Gated on the portfolio route for the same reason as the desktop nav:
+          its links are in-page anchors. Rendered unconditionally, the drawer
+          left seven dead #section links in the DOM on every blog route, which
+          the hamburger did not even expose but a screen reader still reached. */}
+      {isPortfolio && (
+      <NavigationDrawer open={menuOpen} onClose={() => setMenuOpen(false)}>
         <div className="drawer__inner">
           <div className="drawer__header">
-            <IconButton onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
-              <FiX size={24} />
+            <IconButton onClick={() => setMenuOpen(false)} aria-label="Close menu">
+              <PiXBold size={20} />
             </IconButton>
           </div>
-          <nav className="drawer__nav">
+          <nav className="drawer__nav" aria-label="Primary">
             {navItems.map((item) => (
-              <button
+              <a
                 key={item.id}
+                href={`#${item.id}`}
                 className={`drawer__item ${activeSection === item.id ? 'drawer__item--active' : ''}`}
-                onClick={() => handleNavClick(item.id)}
+                onClick={() => setMenuOpen(false)}
               >
                 {item.label}
-              </button>
+              </a>
             ))}
           </nav>
           <div className="drawer__footer">
             <Button
               variant="outlined"
-              startIcon={<FiDownload />}
+              startIcon={<PiDownloadSimpleBold />}
               href="/resume/ramos-aebrahm-resume.pdf"
               download
               fullWidth
             >
-              Download Resume
+              Resume
             </Button>
           </div>
         </div>
       </NavigationDrawer>
+      )}
     </>
   );
 };

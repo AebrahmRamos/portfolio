@@ -2,6 +2,9 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
+// Self-hosted so the critical path has no third-party font round trip.
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
 import './m3/tokens/index.css';
 import './m3/m3.css';
 import './index.css';
@@ -12,7 +15,7 @@ import { aboutData, experienceData, projectsData, contactData } from './agent/po
 const saved = localStorage.getItem('darkMode');
 applyTheme(saved && JSON.parse(saved) ? 'dark' : 'light');
 
-// WebMCP — expose portfolio data and blog to browser-based AI agents
+// WebMCP: expose portfolio data and blog to browser-based AI agents
 if (typeof navigator !== 'undefined' && 'modelContext' in navigator) {
   navigator.modelContext.provideContext({
     tools: [

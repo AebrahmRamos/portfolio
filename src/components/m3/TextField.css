@@ -1,79 +1,66 @@
-.m3-tf { display: inline-block; }
-.m3-tf--full { display: block; width: 100%; }
+/* Outlined text field, label above.
+   Contrast is measured against surface-container-low, the tone the contact
+   panel sits on: label 7.5:1, placeholder 7.5:1, border 3.6:1. */
 
-/* Material 3 filled text field: tonal fill, rounded top, square bottom, bottom border */
-.m3-tf__field {
-  position: relative;
-  background: var(--md-sys-color-surface-container-highest);
-  border-radius: var(--md-sys-shape-corner-sm) var(--md-sys-shape-corner-sm) 0 0;
+.m3-tf {
+  display: inline-grid;
+  gap: 6px;
 }
+
+.m3-tf--full { display: grid; width: 100%; }
+
+.m3-tf__label {
+  font-family: var(--md-sys-typescale-font);
+  font-size: var(--md-sys-typescale-label-large-size);
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface);
+}
+
+.m3-tf__required { color: var(--md-sys-color-on-surface-variant); }
 
 .m3-tf__input {
   display: block;
   width: 100%;
-  padding: 24px 16px 8px;
-  border: none;
-  border-bottom: 1px solid var(--md-sys-color-on-surface-variant);
-  border-radius: var(--md-sys-shape-corner-sm) var(--md-sys-shape-corner-sm) 0 0;
-  background: transparent;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-sm);
+  background: var(--md-sys-color-surface);
   color: var(--md-sys-color-on-surface);
   font-family: var(--md-sys-typescale-font);
-  font-size: var(--md-sys-typescale-body-large-size);
-  line-height: var(--md-sys-typescale-body-large-line);
-  transition: border-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
-  outline: none;
-  min-height: 56px;
+  font-size: var(--md-sys-typescale-body-medium-size);
+  line-height: 1.5;
   box-sizing: border-box;
+  transition:
+    border-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
+    box-shadow var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 
-.m3-tf--multiline .m3-tf__input {
+textarea.m3-tf__input {
   min-height: auto;
-  padding-top: 26px;
   resize: vertical;
 }
 
-.m3-tf__input:hover { border-bottom-color: var(--md-sys-color-on-surface); }
+.m3-tf__input::placeholder { color: var(--md-sys-color-on-surface-variant); }
 
-.m3-tf--focused .m3-tf__input,
+.m3-tf__input:hover { border-color: var(--md-sys-color-on-surface-variant); }
+
 .m3-tf__input:focus {
-  border-bottom: 2px solid var(--md-sys-color-primary);
-  padding-bottom: 7px;
+  outline: none;
+  border-color: var(--md-sys-color-primary);
+  /* Ring rather than a thicker border, so focus never shifts layout. */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-sys-color-primary) 22%, transparent);
 }
 
-.m3-tf--error .m3-tf__input {
-  border-bottom-color: var(--md-sys-color-error);
+.m3-tf--error .m3-tf__input { border-color: var(--md-sys-color-error); }
+.m3-tf--error .m3-tf__input:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-sys-color-error) 22%, transparent);
 }
-
-.m3-tf__label {
-  position: absolute;
-  left: 16px;
-  top: 18px;
-  color: var(--md-sys-color-on-surface-variant);
-  font-family: var(--md-sys-typescale-font);
-  font-size: var(--md-sys-typescale-body-large-size);
-  line-height: 1;
-  pointer-events: none;
-  transition:
-    transform var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
-    color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
-  background: transparent;
-  transform-origin: left top;
-}
-
-.m3-tf--filled .m3-tf__label,
-.m3-tf--focused .m3-tf__label {
-  transform: translateY(-12px) scale(0.75);
-  color: var(--md-sys-color-on-surface-variant);
-}
-
-.m3-tf--focused .m3-tf__label { color: var(--md-sys-color-primary); }
-.m3-tf--error .m3-tf__label { color: var(--md-sys-color-error); }
 
 .m3-tf__helper {
-  display: block;
-  margin-top: 4px;
-  padding: 0 16px;
+  font-family: var(--md-sys-typescale-font);
   font-size: var(--md-sys-typescale-body-small-size);
   color: var(--md-sys-color-on-surface-variant);
 }
+
 .m3-tf--error .m3-tf__helper { color: var(--md-sys-color-error); }

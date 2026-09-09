@@ -1,39 +1,45 @@
 import React, { useState } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
-import { FiMail, FiSend, FiLinkedin, FiGithub } from 'react-icons/fi';
+import {
+  PiEnvelopeSimpleBold,
+  PiGithubLogoBold,
+  PiLinkedinLogoBold,
+  PiPaperPlaneTiltBold,
+  PiArrowUpRightBold,
+  PiDownloadSimpleBold,
+} from 'react-icons/pi';
 import emailjs from '@emailjs/browser';
-import { Card, TextField, Button, Banner, Progress } from '../m3';
+import { TextField, Button, Banner, Progress } from '../m3';
 import './Contact.css';
 
-const contactInfo = [
+// Field names are unchanged (firstName, lastName, email, subject, message):
+// the EmailJS template and any downstream tracking key off them.
+const links = [
   {
     title: 'Email',
     value: 'aebrahmramos.dev@gmail.com',
-    link: 'mailto:aebrahmramos.dev@gmail.com',
-    icon: <FiMail size={22} />,
-    color: 'var(--md-sys-color-primary)',
+    href: 'mailto:aebrahmramos.dev@gmail.com',
+    icon: <PiEnvelopeSimpleBold size={18} />,
   },
   {
     title: 'LinkedIn',
     value: 'linkedin.com/in/aebrahmramos',
-    link: 'https://linkedin.com/in/aebrahmramos',
-    icon: <FiLinkedin size={22} />,
-    color: '#0077B5',
+    href: 'https://linkedin.com/in/aebrahmramos',
+    icon: <PiLinkedinLogoBold size={18} />,
   },
   {
     title: 'GitHub',
     value: 'github.com/AebrahmRamos',
-    link: 'https://github.com/AebrahmRamos',
-    icon: <FiGithub size={22} />,
-    color: 'var(--md-sys-color-on-surface)',
+    href: 'https://github.com/AebrahmRamos',
+    icon: <PiGithubLogoBold size={18} />,
   },
 ];
 
+const EMPTY = { firstName: '', lastName: '', email: '', subject: '', message: '' };
+
 const Contact = () => {
   const { executeRecaptcha } = useGoogleReCaptcha();
-  const [formData, setFormData] = useState({
-    firstName: '', lastName: '', email: '', subject: '', message: '',
-  });
+  const [formData, setFormData] = useState(EMPTY);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
 
@@ -65,7 +71,7 @@ const Contact = () => {
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY
       );
       setSubmitStatus('success');
-      setFormData({ firstName: '', lastName: '', email: '', subject: '', message: '' });
+      setFormData(EMPTY);
     } catch {
       setSubmitStatus('error');
     } finally {
@@ -73,150 +79,134 @@ const Contact = () => {
     }
   };
 
-  const isFormValid = formData.firstName && formData.lastName && formData.email && formData.message;
+  const isFormValid =
+    formData.firstName && formData.lastName && formData.email && formData.message;
 
   return (
     <section id="contact" className="contact">
       <div className="section__container">
         <div className="section__header">
-          <h2 className="m3-display-small section__title">Let's Get In Touch</h2>
+          <h2 className="m3-display-small section__title">Get in touch</h2>
           <p className="m3-body-large section__subtitle">
-            I'm always open to discussing new opportunities, projects, or just connecting with fellow developers
+            Freelance work, full-time roles, or a question about something I built.
           </p>
+          <hr className="section__rule" />
         </div>
 
         <div className="contact__grid">
-          <Card variant="filled" className="contact__form-card">
-            <div className="m3-card__content">
-              <h3 className="m3-headline-medium contact__form-heading">Send a Message</h3>
-
-              <form className="contact__form" onSubmit={handleSubmit} noValidate>
-                <div role="status" aria-live="polite" aria-atomic="true">
-                  {submitStatus === 'success' && (
-                    <Banner severity="success" className="contact__banner">
-                      Message sent! I'll get back to you soon.
-                    </Banner>
-                  )}
-                  {submitStatus === 'error' && (
-                    <Banner severity="error" className="contact__banner">
-                      Failed to send. Please try again or contact me directly.
-                    </Banner>
-                  )}
-                </div>
-
-                <div className="contact__row">
-                  <TextField
-                    label="First Name"
-                    name="firstName"
-                    required
-                    value={formData.firstName}
-                    onChange={handleChange}
-                  />
-                  <TextField
-                    label="Last Name"
-                    name="lastName"
-                    required
-                    value={formData.lastName}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <TextField
-                  label="Email Address"
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-                <TextField
-                  label="Subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                />
-                <TextField
-                  label="Message"
-                  name="message"
-                  multiline
-                  rows={5}
-                  required
-                  placeholder="Tell me about your project or just say hello!"
-                  value={formData.message}
-                  onChange={handleChange}
-                />
-
-                <Button
-                  type="submit"
-                  variant="filled"
-                  fullWidth
-                  disabled={!isFormValid || isSubmitting}
-                  size="large"
-                  startIcon={isSubmitting ? <Progress size={18} /> : <FiSend />}
-                >
-                  {isSubmitting ? 'Sending...' : 'Send Message'}
-                </Button>
-
-                <p className="m3-body-small contact__note">
-                  I typically respond within 24-48 hours. Looking forward to hearing from you!
-                </p>
-              </form>
+          <form className="contact__form" onSubmit={handleSubmit} noValidate>
+            <div role="status" aria-live="polite" aria-atomic="true">
+              {submitStatus === 'success' && (
+                <Banner severity="success" className="contact__banner">
+                  Message sent. I will get back to you soon.
+                </Banner>
+              )}
+              {submitStatus === 'error' && (
+                <Banner severity="error" className="contact__banner">
+                  That did not send. Please try again, or email me directly.
+                </Banner>
+              )}
             </div>
-          </Card>
 
-          <div className="contact__info">
-            <h3 className="m3-headline-medium contact__info-heading">Contact Information</h3>
-            <div className="contact__links">
-              {contactInfo.map((info) => (
-                <Card
-                  key={info.title}
-                  variant="elevated"
-                  interactive
-                  as="a"
-                  href={info.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="contact__link-card"
-                >
-                  <div className="m3-card__content contact__link-content">
-                    <span className="contact__link-icon" style={{ color: info.color }}>
-                      {info.icon}
+            <div className="contact__row">
+              <TextField
+                label="First name"
+                name="firstName"
+                autoComplete="given-name"
+                required
+                value={formData.firstName}
+                onChange={handleChange}
+              />
+              <TextField
+                label="Last name"
+                name="lastName"
+                autoComplete="family-name"
+                required
+                value={formData.lastName}
+                onChange={handleChange}
+              />
+            </div>
+
+            <TextField
+              label="Email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Subject"
+              name="subject"
+              value={formData.subject}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Message"
+              name="message"
+              multiline
+              rows={6}
+              required
+              value={formData.message}
+              onChange={handleChange}
+              helperText="What are you building, and where do you need help?"
+            />
+
+            <Button
+              type="submit"
+              variant="filled"
+              size="large"
+              disabled={!isFormValid || isSubmitting}
+              startIcon={isSubmitting ? <Progress size={16} /> : <PiPaperPlaneTiltBold />}
+            >
+              {isSubmitting ? 'Sending' : 'Send message'}
+            </Button>
+          </form>
+
+          <aside className="contact__aside">
+            <ul className="contact__links">
+              {links.map((link) => (
+                <li key={link.title}>
+                  <a
+                    className="contact__link"
+                    href={link.href}
+                    target={link.href.startsWith('mailto:') ? undefined : '_blank'}
+                    rel="noopener noreferrer"
+                  >
+                    <span className="contact__link-icon" aria-hidden="true">{link.icon}</span>
+                    <span className="contact__link-text">
+                      <span className="m3-label-medium contact__link-title">{link.title}</span>
+                      <span className="m3-body-medium contact__link-value">{link.value}</span>
                     </span>
-                    <div>
-                      <p className="m3-title-medium">{info.title}</p>
-                      <p className="m3-body-small contact__link-value">{info.value}</p>
-                    </div>
-                  </div>
-                </Card>
+                    <PiArrowUpRightBold className="contact__link-arrow" size={16} aria-hidden="true" />
+                  </a>
+                </li>
               ))}
-            </div>
+            </ul>
 
-            <div className="contact__quick">
-              <p className="m3-title-medium contact__quick-title">Quick Connect</p>
-              <div className="contact__quick-btns">
-                <Button
-                  variant="outlined"
-                  startIcon={<FiGithub />}
-                  href="https://github.com/AebrahmRamos"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  fullWidth
-                >
-                  GitHub
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<FiLinkedin />}
-                  href="https://linkedin.com/in/aebrahmramos"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  fullWidth
-                >
-                  LinkedIn
-                </Button>
+            {/* The resume section used to be a full-width primary slab with its
+                own heading, two CTAs, a nested "What's Inside" panel and a PDF
+                viewer dialog. In dark mode that slab was a light-blue block in
+                the middle of a dark page. It is one row now; the #resume anchor
+                stays so existing links still land. */}
+            <div id="resume" className="contact__resume">
+              <div>
+                <p className="m3-title-small contact__resume-title">Resume</p>
+                <p className="m3-body-small contact__resume-note">
+                  One page, PDF, updated April 2026.
+                </p>
               </div>
+              <Button
+                variant="outlined"
+                startIcon={<PiDownloadSimpleBold />}
+                href="/resume/ramos-aebrahm-resume.pdf"
+                download
+              >
+                Download
+              </Button>
             </div>
-          </div>
+          </aside>
         </div>
       </div>
     </section>

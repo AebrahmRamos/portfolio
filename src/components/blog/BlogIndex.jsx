@@ -1,34 +1,34 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { PiMagnifyingGlassBold } from 'react-icons/pi';
 import { formatPostDate } from './format';
 import './blog.css';
 
-function readingTime(summary) {
-  if (!summary) return null;
-  const words = summary.split(/\s+/).length;
-  return `${Math.max(1, Math.ceil(words / 200))} min read`;
-}
-
-function PostRow({ post, onTagClick, index, seriesTitle }) {
-  const rt = readingTime(post.summary);
-  // Stretched-link pattern: the row is a non-interactive <article>, the title
-  // holds the link (covers the row via ::after), and tag buttons sit above it.
-  // Avoids the invalid <button> inside <a> nesting the old markup had.
+// The old index derived a "N min read" from the length of the post *summary*,
+// which measured the wrong text and reported a number for it. The index has no
+// body to measure, so it no longer claims one.
+function PostRow({ post, onTagClick, seriesTitle }) {
   return (
-    <article className="blog-post-row" style={{ animationDelay: `${index * 40}ms` }}>
-      <div className="blog-post-row__header">
-        <span className="blog-post-row__date">{formatPostDate(post.published_at)}</span>
-        {post.series_slug && <span className="blog-post-row__series">{seriesTitle ?? post.series_slug}</span>}
-        {rt && <span className="blog-post-row__read">{rt}</span>}
+    <article className="post-row">
+      <div className="post-row__meta">
+        <time dateTime={new Date(post.published_at * 1000).toISOString()}>
+          {formatPostDate(post.published_at)}
+        </time>
+        {post.series_slug && (
+          <span className="post-row__series">{seriesTitle ?? post.series_slug}</span>
+        )}
       </div>
-      <h2 className="blog-post-row__title">
-        <Link to={`/blog/${post.slug}`} className="blog-post-row__link">{post.title}</Link>
+
+      <h2 className="post-row__title">
+        <Link to={`/blog/${post.slug}`} className="post-row__link">{post.title}</Link>
       </h2>
-      {post.summary && <p className="blog-post-row__summary">{post.summary}</p>}
+
+      {post.summary && <p className="post-row__summary">{post.summary}</p>}
+
       {post.tags?.length > 0 && (
-        <div className="blog-post-row__tags">
-          {post.tags.slice(0, 5).map(tag => (
-            <button key={tag} className="blog-tag" onClick={() => onTagClick(tag)}>
+        <div className="post-row__tags">
+          {post.tags.slice(0, 5).map((tag) => (
+            <button key={tag} type="button" className="tag" onClick={() => onTagClick(tag)}>
               {tag}
             </button>
           ))}
@@ -40,20 +40,16 @@ function PostRow({ post, onTagClick, index, seriesTitle }) {
 
 function SkeletonRows() {
   return (
-    <>
-      {[80, 60, 90, 70].map((w, i) => (
-        <div key={i} className="blog-skeleton-row">
-          <div className="skeleton" style={{ width: 120, height: 10, marginBottom: 12 }} />
-          <div className="skeleton" style={{ width: `${w}%`, height: 22, marginBottom: 10 }} />
+    <div aria-hidden="true">
+      {[82, 64, 91].map((w, i) => (
+        <div key={i} className="post-row post-row--skeleton">
+          <div className="skeleton" style={{ width: 120, height: 10, marginBottom: 14 }} />
+          <div className="skeleton" style={{ width: `${w}%`, height: 22, marginBottom: 12 }} />
           <div className="skeleton" style={{ width: '100%', height: 12, marginBottom: 6 }} />
-          <div className="skeleton" style={{ width: '85%', height: 12, marginBottom: 12 }} />
-          <div style={{ display: 'flex', gap: 6 }}>
-            <div className="skeleton" style={{ width: 60, height: 20, borderRadius: 100 }} />
-            <div className="skeleton" style={{ width: 50, height: 20, borderRadius: 100 }} />
-          </div>
+          <div className="skeleton" style={{ width: '78%', height: 12 }} />
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -65,7 +61,6 @@ export default function BlogIndex() {
   const [searchParams] = useSearchParams();
   const [rawQuery, setRawQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  // Seed filters from ?tag=… so tag links from posts actually filter the index.
   const [activeTags, setActiveTags] = useState(() => {
     const t = searchParams.get('tag');
     return new Set(t ? [t] : []);
@@ -74,7 +69,7 @@ export default function BlogIndex() {
   const debounceRef = useRef(null);
 
   useEffect(() => {
-    const asJson = r => {
+    const asJson = (r) => {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.json();
     };
@@ -87,17 +82,17 @@ export default function BlogIndex() {
         setSeries(sd.series ?? []);
         setLoading(false);
       })
-      .catch(() => { setError('Failed to load posts.'); setLoading(false); });
+      .catch(() => { setError('Could not load posts.'); setLoading(false); });
   }, []);
 
-  const handleSearch = useCallback(val => {
+  const handleSearch = useCallback((val) => {
     setRawQuery(val);
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => setDebouncedQuery(val), 300);
   }, []);
 
-  const toggleTag = useCallback(tag => {
-    setActiveTags(prev => {
+  const toggleTag = useCallback((tag) => {
+    setActiveTags((prev) => {
       const next = new Set(prev);
       if (next.has(tag)) next.delete(tag);
       else next.add(tag);
@@ -105,31 +100,26 @@ export default function BlogIndex() {
     });
   }, []);
 
-  // Clear any pending debounce timer on unmount to avoid a state update after unmount.
   useEffect(() => () => clearTimeout(debounceRef.current), []);
 
-  // Re-seed the active tag when the ?tag= param changes (e.g. clicking a tag link
-  // from a post while the index is already mounted, or back/forward navigation).
   useEffect(() => {
     const t = searchParams.get('tag');
     setActiveTags(t ? new Set([t]) : new Set());
   }, [searchParams]);
 
   const seriesTitleBySlug = useMemo(
-    () => Object.fromEntries(series.map(s => [s.slug, s.title])),
+    () => Object.fromEntries(series.map((s) => [s.slug, s.title])),
     [series]
   );
 
   const allTags = useMemo(() => {
     const map = new Map();
-    allPosts.forEach(p => (p.tags ?? []).forEach(t => map.set(t, (map.get(t) ?? 0) + 1)));
+    allPosts.forEach((p) => (p.tags ?? []).forEach((t) => map.set(t, (map.get(t) ?? 0) + 1)));
     return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20).map(([t]) => t);
   }, [allPosts]);
 
-  // Always surface active tags as toggles, even if they fall outside the top-20
-  // (e.g. a ?tag=rare deep-link), so the user can always deselect them.
   const visibleTags = useMemo(() => {
-    const extra = [...activeTags].filter(t => !allTags.includes(t));
+    const extra = [...activeTags].filter((t) => !allTags.includes(t));
     return [...allTags, ...extra];
   }, [allTags, activeTags]);
 
@@ -137,132 +127,145 @@ export default function BlogIndex() {
     let posts = allPosts;
     if (debouncedQuery.trim()) {
       const q = debouncedQuery.toLowerCase();
-      posts = posts.filter(p =>
+      posts = posts.filter((p) =>
         p.title.toLowerCase().includes(q) ||
         (p.summary ?? '').toLowerCase().includes(q) ||
-        (p.tags ?? []).some(t => t.toLowerCase().includes(q))
+        (p.tags ?? []).some((t) => t.toLowerCase().includes(q))
       );
     }
     if (activeTags.size) {
-      // OR semantics: a post matches if it carries any selected tag.
-      posts = posts.filter(p => (p.tags ?? []).some(t => activeTags.has(t)));
+      posts = posts.filter((p) => (p.tags ?? []).some((t) => activeTags.has(t)));
     }
     return sort === 'oldest'
       ? [...posts].sort((a, b) => a.published_at - b.published_at)
       : posts;
   }, [allPosts, debouncedQuery, activeTags, sort]);
 
-  const isFiltered = debouncedQuery.trim() || activeTags.size > 0;
+  const isFiltered = Boolean(debouncedQuery.trim()) || activeTags.size > 0;
 
   return (
-    <div className="blog-index">
-      <div className="blog-hero">
-        <div className="blog-hero__inner">
-          <p className="blog-hero__eyebrow">Writing</p>
-          <h1 className="blog-hero__title">The Stack</h1>
-          <p className="blog-hero__sub">
-            Things I've figured out — systems programming, embedded systems, and software engineering.
+    <div className="blog">
+      <header className="blog__head">
+        <div className="blog__head-inner">
+          <h1 className="blog__title">Writing</h1>
+          <p className="blog__lead">
+            Notes on systems programming, embedded work, and shipping software.
           </p>
         </div>
-      </div>
+      </header>
 
-      {series.length > 0 && (
-        <div className="blog-series-chips">
-          {series.map(s => (
-            <Link key={s.slug} to={`/blog/series/${s.slug}`} style={{ textDecoration: 'none' }}>
-              <span className="blog-tag">{s.title} ({s.post_count})</span>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      <div className="blog-body">
-        <div>
-          <div className="blog-controls">
-            <div className="blog-search">
-              <span className="blog-search__icon">⌕</span>
+      <div className="blog__body">
+        <main>
+          <div className="blog__controls">
+            <div className="blog__search">
+              <PiMagnifyingGlassBold className="blog__search-icon" size={16} aria-hidden="true" />
               <input
                 type="search"
-                className="blog-search__input"
-                placeholder="Search posts…"
+                className="blog__search-input"
+                placeholder="Search posts"
                 aria-label="Search posts"
                 value={rawQuery}
-                onChange={e => handleSearch(e.target.value)}
+                onChange={(e) => handleSearch(e.target.value)}
               />
             </div>
-            <select className="blog-sort" value={sort} onChange={e => setSort(e.target.value)}>
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
-            </select>
+            <label className="blog__sort-wrap">
+              <span className="blog__sr">Sort posts</span>
+              <select
+                className="blog__sort"
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+              >
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+              </select>
+            </label>
           </div>
 
           {visibleTags.length > 0 && (
-            <div className="blog-tags">
-              {activeTags.size > 0 && (
-                <button className="blog-tag blog-tag--clear" onClick={() => setActiveTags(new Set())}>
-                  ✕ Clear
-                </button>
-              )}
-              {visibleTags.map(tag => (
-                <button key={tag}
-                  className={`blog-tag ${activeTags.has(tag) ? 'blog-tag--active' : ''}`}
+            <div className="blog__tags">
+              {visibleTags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  className={`tag ${activeTags.has(tag) ? 'tag--active' : ''}`}
                   aria-pressed={activeTags.has(tag)}
-                  onClick={() => toggleTag(tag)}>
+                  onClick={() => toggleTag(tag)}
+                >
                   {tag}
                 </button>
               ))}
+              {activeTags.size > 0 && (
+                <button
+                  type="button"
+                  className="tag tag--clear"
+                  onClick={() => setActiveTags(new Set())}
+                >
+                  Clear
+                </button>
+              )}
             </div>
           )}
 
-          {loading ? <SkeletonRows /> : error ? (
-            <div className="blog-empty">
-              <p className="blog-empty__sub" style={{ color: 'var(--md-sys-color-error)' }}>{error}</p>
+          {loading ? (
+            <SkeletonRows />
+          ) : error ? (
+            <div className="blog__empty">
+              <p className="blog__empty-title">{error}</p>
+              <p className="blog__empty-sub">Refresh the page to try again.</p>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="blog-empty">
-              <div style={{ fontSize: '2rem', marginBottom: 16, opacity: 0.45 }}>◈</div>
-              <p className="blog-empty__title">{isFiltered ? 'No posts match your filters' : 'Nothing here yet'}</p>
-              <p className="blog-empty__sub">{isFiltered ? 'Try adjusting your search or clearing filters.' : 'First post coming soon.'}</p>
+            <div className="blog__empty">
+              <p className="blog__empty-title">
+                {isFiltered ? 'No posts match those filters' : 'No posts yet'}
+              </p>
+              <p className="blog__empty-sub">
+                {isFiltered
+                  ? 'Try a different search, or clear the filters.'
+                  : 'The first one is being written.'}
+              </p>
               {isFiltered && (
-                <button className="blog-empty__action"
-                  onClick={() => { setRawQuery(''); setDebouncedQuery(''); setActiveTags(new Set()); }}>
+                <button
+                  type="button"
+                  className="blog__empty-action"
+                  onClick={() => {
+                    setRawQuery('');
+                    setDebouncedQuery('');
+                    setActiveTags(new Set());
+                  }}
+                >
                   Clear filters
                 </button>
               )}
             </div>
           ) : (
-            <div>{filtered.map((post, i) => <PostRow key={post.id} post={post} onTagClick={toggleTag} index={i} seriesTitle={seriesTitleBySlug[post.series_slug]} />)}</div>
-          )}
-        </div>
-
-        <aside className="blog-sidebar">
-          {series.length > 0 && (
-            <div className="blog-sidebar__section">
-              <p className="blog-sidebar__label">Series</p>
-              {series.map(s => (
-                <Link key={s.slug} to={`/blog/series/${s.slug}`} className="blog-sidebar__series-item">
-                  <span>{s.title}</span>
-                  <span className="blog-sidebar__series-count">{s.post_count}</span>
-                </Link>
+            <div className="blog__list">
+              {filtered.map((post) => (
+                <PostRow
+                  key={post.id}
+                  post={post}
+                  onTagClick={toggleTag}
+                  seriesTitle={seriesTitleBySlug[post.series_slug]}
+                />
               ))}
             </div>
           )}
-          {allTags.length > 0 && (
-            <div className="blog-sidebar__section">
-              <p className="blog-sidebar__label">Topics</p>
-              <div className="blog-sidebar__tag-cloud">
-                {allTags.slice(0, 12).map(tag => (
-                  <button key={tag}
-                    className={`blog-tag ${activeTags.has(tag) ? 'blog-tag--active' : ''}`}
-                    aria-pressed={activeTags.has(tag)}
-                    onClick={() => toggleTag(tag)}>
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </aside>
+        </main>
+
+        {series.length > 0 && (
+          <aside className="blog__aside">
+            <h2 className="blog__aside-title">Series</h2>
+            <ul className="blog__series">
+              {series.map((s) => (
+                <li key={s.slug}>
+                  <Link to={`/blog/series/${s.slug}`} className="blog__series-link">
+                    <span>{s.title}</span>
+                    <span className="blog__series-count">{s.post_count}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
       </div>
     </div>
   );

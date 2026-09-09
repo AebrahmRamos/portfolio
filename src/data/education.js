@@ -31,24 +31,6 @@ export const education = [
       },
     ],
   },
-  {
-    id: 2,
-    degree: 'Senior High School — General Academic Strand',
-    major: null,
-    institution: 'OB Montessori Center Inc.',
-    date: null,
-    current: false,
-    tracks: null,
-  },
-  {
-    id: 3,
-    degree: 'Junior High School',
-    major: null,
-    institution: 'OB Montessori Center Inc.',
-    date: null,
-    current: false,
-    tracks: null,
-  },
 ];
 
 export default education;

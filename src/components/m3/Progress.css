@@ -3,7 +3,7 @@
   position: relative;
 }
 
-/* Circular (spinner) variant — primary indicator on a low-emphasis track */
+/* Circular (spinner) variant: primary indicator on a low-emphasis track */
 .m3-progress__spinner {
   display: block;
   width: 100%;

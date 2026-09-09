@@ -1,62 +1,53 @@
 import React from 'react';
-import { Card } from '../m3';
 import './About.css';
 
+// Facts render as a plain definition list with hairline rows. They used to be
+// five tonal pill boxes nested inside an elevated card inside a section, three
+// levels of container for five key/value pairs.
 const quickFacts = [
-  { label: 'University:', value: 'DLSU Manila' },
-  { label: 'Program and Major:', value: 'Computer Science major in Computer Systems Engineering' },
-  { label: 'Expected Graduation:', value: 'August 2027' },
-  { label: 'Achievement:', value: 'Globe Innovania 2025 - Top 2' },
-  { label: 'Current Role:', value: 'CEO, GDGOC DLSU' },
+  { label: 'University', value: 'DLSU Manila' },
+  { label: 'Program', value: 'BS Computer Science, Computer Systems Engineering' },
+  { label: 'Graduating', value: 'August 2027' },
+  { label: 'Recognition', value: 'Globe Innovania 2025, Top 2' },
+  { label: 'Current role', value: 'CEO, GDGOC DLSU' },
 ];
 
 const About = () => (
   <section id="about" className="about">
-    <div className="about__container">
+    <div className="section__container about__container">
       <div className="about__text">
-        <h2 className="m3-display-small about__heading">About Me</h2>
+        <h2 className="m3-display-small section__title">About</h2>
+        <hr className="section__rule" />
+
         <p className="m3-body-large about__para">
-          I'm Aebrahm Clyde Ramos — most often just Aebrahm Ramos — a Computer Systems Engineering
-          student at De La Salle University Manila, expected to graduate in August 2027. My academic
-          journey combines software development fundamentals with deep computer systems knowledge —
-          from web development and databases to computer architecture, operating systems, and
-          microprocessor interfacing.
+          I am Aebrahm Clyde Ramos, most often just Aebrahm Ramos. I study Computer
+          Systems Engineering at De La Salle University Manila and graduate in August
+          2027. The degree pairs software fundamentals with the layer underneath them:
+          computer architecture, operating systems, and microprocessor interfacing.
         </p>
         <p className="m3-body-large about__para">
-          Since May 2025, I've been building production software for a multi-store e-commerce
-          group — an inventory-forecasting engine that predicts stock depletion and restock cadence
-          from live order data, a multi-store order management system with AI-assisted quality
-          checks, and an internal MCP server exposing diagnostics to AI agents.
+          Since May 2025 I have been building production software for a multi-store
+          e-commerce group. That work includes an inventory-forecasting engine that
+          predicts stock depletion from live order data, an order management system
+          with AI-assisted quality checks, and an internal MCP server that exposes
+          diagnostics to AI agents.
         </p>
         <p className="m3-body-large about__para">
-          As Chief Executive Officer of Google Developer Group on Campus DLSU, I lead the development
-          of internal tools and educational workshops. Previously as Chief Developer, I spearheaded
-          projects that tripled membership from 120 to 360 members, including facial recognition
-          systems, organizational portals, and AI-powered chatbots. I've also contributed to
-          research — my OCR paper was accepted at the Philippine Computing Science Congress,
-          completed in under 9 days.
-        </p>
-        <p className="m3-body-large about__para">
-          What excites me most is building solutions that bridge theory and practice — whether it's
-          engineering inventory forecasting systems for real businesses, developing full-stack
-          hospital management systems, creating OS emulators in C++, or designing university-wide
-          web platforms.
+          I also lead Google Developer Group on Campus DLSU as Chief Executive Officer.
+          As Chief Developer before that, I shipped the recruitment platform that took
+          membership from 120 to 360. My OCR research paper was accepted at the
+          Philippine Computing Science Congress, written in under nine days.
         </p>
       </div>
 
-      <Card variant="elevated" className="about__facts-card">
-        <div className="m3-card__content">
-          <h3 className="m3-headline-small about__facts-heading">Quick Facts</h3>
-          <dl className="about__facts-list">
-            {quickFacts.map((fact) => (
-              <div key={fact.label} className="about__fact">
-                <dt className="m3-label-large about__fact-label">{fact.label}</dt>
-                <dd className="m3-body-medium about__fact-value">{fact.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </Card>
+      <dl className="about__facts">
+        {quickFacts.map((fact) => (
+          <div key={fact.label} className="about__fact">
+            <dt className="m3-label-medium about__fact-label">{fact.label}</dt>
+            <dd className="m3-body-medium about__fact-value">{fact.value}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   </section>
 );

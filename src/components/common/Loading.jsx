@@ -1,11 +1,13 @@
 import React from 'react';
-import { Progress } from '../m3';
 import './Loading.css';
 
+// Route-neutral: this fallback also covers /blog and /admin, where "Loading
+// Portfolio..." was simply wrong. Renders a quiet placeholder rather than a
+// spinner plus label, so a fast chunk load does not flash a message.
 const Loading = () => (
-  <div className="loading">
-    <Progress size={60} />
-    <p className="m3-title-medium loading__text">Loading Portfolio...</p>
+  <div className="loading" role="status" aria-live="polite">
+    <span className="loading__bar" aria-hidden="true" />
+    <span className="loading__sr">Loading</span>
   </div>
 );
 

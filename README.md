@@ -1,6 +1,6 @@
 # Aebrahm Ramos - Portfolio Website
 
-A modern, responsive portfolio website built with React, Material-UI, and Vite. Features a clean design with dark mode support, smooth animations, and accessibility-first approach.
+Portfolio and technical blog for Aebrahm Ramos. React 19 and Vite on the front, a Cloudflare Worker with D1 behind it. Light and dark themes, self-hosted fonts, and an accessibility-first build.
 
 ## 🚀 Features
 
@@ -13,25 +13,29 @@ A modern, responsive portfolio website built with React, Material-UI, and Vite. 
 
 ## 📋 Sections
 
-1. **Hero** - Introduction with profile image and call-to-action buttons
-2. **About Me** - Personal background and quick facts
-3. **Education** - Academic background with timeline
-4. **Skills & Technologies** - Technical expertise across full-stack development
-5. **Featured Projects** - Showcase of development work with live demos
-6. **Experience** - Professional experience and internships
-7. **Contact** - Contact form and social links
-8. **Resume** - Downloadable PDF resume
-9. **Footer** - Site navigation and copyright
+1. **Hero** - Positioning statement, availability, primary calls to action
+2. **About** - Background plus a short fact list
+3. **Experience** - Professional timeline
+4. **Projects** - Four spotlight case studies, then a compact index of the rest
+5. **Skills** - Grouped by area
+6. **Education** - Degree and coursework
+7. **Organizations** - Leadership roles
+8. **Contact** - Form, direct links, resume download (`#resume`)
+9. **Footer** - Secondary navigation
+
+Plus `/blog`, `/blog/:slug`, `/blog/series/:slug` and an authenticated `/admin`.
 
 ## 🛠️ Tech Stack
 
-- **Frontend Framework:** React 19.1.1
-- **Build Tool:** Vite 7.1.7
-- **UI Library:** Material-UI (MUI) 7.3.5
-- **Styling:** Emotion (CSS-in-JS)
-- **Icons:** React Icons 5.5.0
-- **Form Handling:** React Hook Form 7.66.0
-- **Language:** JavaScript (ES6+)
+- **Framework:** React 19 + React Router 7
+- **Build:** Vite 7
+- **Hosting / API:** Cloudflare Workers + D1 (`src/worker.js`)
+- **Styling:** Plain CSS with a design-token layer in `src/m3/tokens/`
+- **Fonts:** Geist Variable + Geist Mono, self-hosted via `@fontsource-variable`
+- **Icons:** Phosphor, via `react-icons/pi`
+- **Editor:** Tiptap (admin blog editor)
+- **Mail:** EmailJS + reCAPTCHA v3
+- **Language:** JavaScript (ES modules)
 
 ## 📦 Installation
 
@@ -88,8 +92,9 @@ portfolio/
 │   │   ├── experience.js
 │   │   ├── projects.js
 │   │   └── skills.js
-│   ├── theme/           # MUI theme configuration
-│   │   └── theme.js
+│   ├── m3/              # Design tokens (color, type, shape, spacing, motion)
+│   │   ├── tokens/
+│   │   └── theme.js     # data-theme attribute flip
 │   ├── utils/           # Utility functions
 │   │   └── helpers.js
 │   ├── App.jsx          # Main app component
@@ -119,21 +124,15 @@ Update the following files with your information:
 
 3. **Contact Information** (`src/components/sections/Contact.jsx`)
    - Update email, LinkedIn, GitHub links
+   - Form field names (`firstName`, `lastName`, `email`, `subject`, `message`) must
+     stay in sync with the EmailJS template
 
-### Theme Colors
+### Theme colors
 
-Edit `src/theme/theme.js` to customize colors:
-
-```javascript
-primary: {
-  main: '#377dff',  // Primary blue
-  // ...
-},
-secondary: {
-  main: '#f9b934',  // Secondary yellow
-  // ...
-},
-```
+Both palettes are static custom properties in `src/m3/tokens/color.css`, keyed on
+`:root` and `:root[data-theme="dark"]`. The brand accent is `#377dff`, rendered as
+`#1552cc` in light mode and `#5b9bff` in dark so button and link text clears WCAG AA.
+`src/m3/theme.js` only flips the `data-theme` attribute.
 
 ### Images
 
@@ -201,8 +200,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 🙏 Acknowledgments
 
-- Material-UI team for the excellent component library
-- React Icons for the icon set
+- Phosphor Icons, via React Icons
 - Vite team for the blazing fast build tool
 
 ---

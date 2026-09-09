@@ -59,7 +59,7 @@ export function sanitizeBodyHtml(html) {
   try {
     return sanitizeHtml(html, OPTIONS);
   } catch {
-    // Fail safe: never store raw HTML if the sanitizer errors — escape to text
+    // Fail safe: never store raw HTML if the sanitizer errors, escape to text
     // so a downstream renderer can't execute it.
     return String(html).replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }

@@ -4,20 +4,21 @@
      (verified via getComputedStyle) unless beaten at equal !important
      strength. Without it, the dialog is anchored to document coordinates
      instead of the viewport, so showModal() scrolls the whole page to y=0
-     to bring it into view — clicking any card jumps you back to the top. */
+     to bring it into view, clicking any card jumps you back to the top. */
   position: fixed !important;
   border: none;
   padding: 0;
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface);
-  /* Expressive: full 28px rounding on the sheet */
-  border-radius: var(--md-sys-shape-corner-xl);
+  /* lg, not xl: 16px matches the Education panel and the resume row, which
+     are the only other large surfaces on the page. */
+  border-radius: var(--md-sys-shape-corner-lg);
   box-shadow: var(--md-sys-elevation-3);
   max-width: 90vw;
   max-height: 90vh;
   width: min(800px, 90vw);
   overflow: hidden;
-  /* Force centering — overrides browser UA left:0/right:0 without top/bottom */
+  /* Force centering: overrides browser UA left:0/right:0 without top/bottom */
   inset: 0;
   margin: auto;
 }
@@ -28,9 +29,12 @@
   animation: m3-dialog-in var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate);
 }
 
+/* ::backdrop does not inherit custom properties from :root in every engine,
+   so the scrim is a literal color here rather than var(--md-sys-color-scrim).
+   0.5 opacity on top of a dark page left the content behind clearly readable
+   and the dialog looked like an overlay rather than a modal. */
 .m3-dialog::backdrop {
-  background: var(--md-sys-color-scrim, rgba(0, 0, 0, 0.5));
-  opacity: 0.5;
+  background: rgba(6, 8, 11, 0.62);
   animation: m3-backdrop-in var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 
@@ -42,7 +46,7 @@
 
 @keyframes m3-backdrop-in {
   from { opacity: 0; }
-  to { opacity: 0.5; }
+  to { opacity: 1; }
 }
 
 .m3-dialog__header {

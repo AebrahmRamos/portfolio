@@ -2,7 +2,10 @@
 // Run with: npx playwright test tests/blog.spec.js
 import { test, expect } from '@playwright/test';
 
-const BASE = 'https://aebrahmramos.dev';
+// Defaults to production, but a local run can point at `wrangler dev` or a
+// preview build with BLOG_TEST_BASE=http://127.0.0.1:5200 so the suite is
+// runnable before a deploy rather than only after one.
+const BASE = process.env.BLOG_TEST_BASE ?? 'https://aebrahmramos.dev';
 const ADMIN_TOKEN = 'dev-change-me-in-production';
 
 // ─── Public Blog API ─────────────────────────────────────────────────────────
@@ -135,7 +138,7 @@ test.describe('Admin API', () => {
     const body = await res.json();
     expect(body).toHaveProperty('slug');
 
-    // Clean up — delete the test post
+    // Clean up: delete the test post
     if (body.id) {
       await request.delete(`${BASE}/api/admin/posts/${body.id}`, {
         headers: { Authorization: `Bearer ${ADMIN_TOKEN}` },
@@ -163,53 +166,72 @@ test.describe('Admin API', () => {
 });
 
 // ─── Browser: Blog UI ─────────────────────────────────────────────────────────
-// Note: SPAs never reach 'networkidle' — use element-level waits instead.
+// Note: SPAs never reach 'networkidle', use element-level waits instead.
 
 test.describe('Blog UI', () => {
-  test('blog index page loads and shows post', async ({ page }) => {
+  // These used to hardcode the production seed post ('test-post', 'first post
+  // for testing', the tag 'c++'), so the whole block failed against any other
+  // database. They now read the first post off the index and follow it, which
+  // exercises the same paths without pinning to one row.
+  async function openFirstPost(page) {
     await page.goto(`${BASE}/blog`);
-    // Wait for React to hydrate and the post list to render (API fetch completes)
-    const posts = page.locator('.post-row, [class*="post-row"], article, .post-card, [class*="post-card"]');
+    const link = page.locator('.post-row__link').first();
+    await expect(link).toBeVisible({ timeout: 20000 });
+    const title = (await link.innerText()).trim();
+    await link.click();
+    await expect(page.locator('h1')).toContainText(title, { timeout: 20000 });
+    return title;
+  }
+
+  test('blog index lists at least one post', async ({ page }) => {
+    await page.goto(`${BASE}/blog`);
+    const posts = page.locator('.post-row');
     await expect(posts.first()).toBeVisible({ timeout: 20000 });
-    await expect(posts.first()).toContainText('Test Post');
+    expect(await posts.count()).toBeGreaterThan(0);
   });
 
-  test('blog post page renders test-post', async ({ page }) => {
-    await page.goto(`${BASE}/blog/test-post`);
-    // h1 appears once React fetches and renders the post
-    await expect(page.locator('h1')).toContainText('Test Post', { timeout: 20000 });
-    // Body content should be present
-    await expect(page.locator('body')).toContainText('first post for testing', { timeout: 5000 });
+  test('a post page renders its title', async ({ page }) => {
+    const title = await openFirstPost(page);
+    expect(title.length).toBeGreaterThan(0);
   });
 
   test('back-to-blog link exists on post page', async ({ page }) => {
-    await page.goto(`${BASE}/blog/test-post`);
-    await expect(page.locator('h1')).toContainText('Test Post', { timeout: 20000 });
-    // Back nav — text or arrow link
-    const backLink = page.locator('a[href="/blog"], a:has-text("All posts"), a:has-text("Back")');
+    await openFirstPost(page);
+    const backLink = page.locator('a[href="/blog"]');
     await expect(backLink.first()).toBeVisible({ timeout: 5000 });
   });
 
-  test('post tags are displayed', async ({ page }) => {
-    await page.goto(`${BASE}/blog/test-post`);
-    await expect(page.locator('h1')).toContainText('Test Post', { timeout: 20000 });
-    await expect(page.locator('body')).toContainText('c++', { timeout: 5000 });
+  // Regression: the sanitized body used to be injected from an effect keyed on
+  // `post`. For a post that belongs to a series, `post` was set one commit
+  // before `loading` cleared, so the effect ran while the skeleton was still
+  // mounted, found a null ref, and the article rendered with an empty body.
+  test('post body is not empty', async ({ page }) => {
+    await openFirstPost(page);
+    const body = page.locator('.post__body');
+    await expect(body).toBeVisible({ timeout: 20000 });
+    await expect
+      .poll(async () => (await body.innerText()).trim().length, { timeout: 10000 })
+      .toBeGreaterThan(0);
+  });
+
+  test('post tags link back to a filtered index', async ({ page }) => {
+    await openFirstPost(page);
+    const tag = page.locator('.post__tags .tag').first();
+    if (await tag.count() === 0) test.skip(true, 'first post carries no tags');
+    const label = (await tag.innerText()).trim();
+    await tag.click();
+    await expect(page).toHaveURL(new RegExp(`tag=${encodeURIComponent(label).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
   });
 
   test('blog index search input is present', async ({ page }) => {
     await page.goto(`${BASE}/blog`);
-    await expect(page.locator('.post-row, [class*="post-row"], article, .post-card').first()).toBeVisible({ timeout: 20000 });
-    // Search input might be present in new design
-    const searchInput = page.locator('input[type="search"], input[type="text"][placeholder*="earch"], input[placeholder*="earch"]');
-    const hasSearch = await searchInput.count() > 0;
-    if (hasSearch) {
-      // If search exists, typing a non-matching query should reduce visible posts
-      await searchInput.first().fill('xyznonexistent123');
-      await page.waitForTimeout(400); // wait for debounce
-      const remaining = await page.locator('.post-row, [class*="post-row"], article[class*="post"]').count();
-      expect(remaining).toBe(0);
-    }
-    // If no search yet, test passes (future feature)
+    await expect(page.locator('.post-row').first()).toBeVisible({ timeout: 20000 });
+    const searchInput = page.locator('input[type="search"]');
+    await expect(searchInput).toBeVisible();
+    await searchInput.fill('xyznonexistent123');
+    // Search is debounced by 300ms; poll rather than sleep a fixed amount.
+    await expect.poll(async () => page.locator('.post-row').count(), { timeout: 5000 }).toBe(0);
+    await expect(page.locator('.blog__empty-title')).toBeVisible();
   });
 });
 

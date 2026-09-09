@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 /**
  * Fades + lifts its children into view once, when scrolled near the viewport.
  * Hidden state lives behind a prefers-reduced-motion: no-preference media query
- * (in index.css), so reduced-motion users see content immediately — no JS gate needed.
+ * (in index.css), so reduced-motion users see content immediately, no JS gate needed.
  */
 export default function Reveal({ children }) {
   const ref = useRef(null);
