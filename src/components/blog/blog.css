@@ -1,11 +1,10 @@
+@import './code.css';
+
 /* ============================================================================
    Blog. Editorial layer over the same tokens as the portfolio.
-   The --blog-* alias layer is gone: it remapped ~15 variables one-to-one onto
-   --md-sys-color-* tokens and then declared the identical map a second time
-   under [data-theme="dark"], which did nothing because the tokens it pointed
-   at already invert.
-   Dials here are 6 / 4 / 3: quieter than the portfolio, because the job is
-   reading.
+   Dials 7 / 5 / 4 on the index, 5 / 5 / 3 on the post. The previous pass ran
+   6 / 4 / 3 and the restraint tipped into flatness: six posts at identical
+   weight, no reading times, no syntax colour, and a sidebar holding one line.
    ========================================================================= */
 
 .blog,
@@ -24,11 +23,12 @@
   white-space: nowrap;
 }
 
-/* ── Index header ───────────────────────────────────────────────────────── */
+/* ── Index masthead ─────────────────────────────────────────────────────── */
 
 .blog__head {
+  background: var(--md-sys-color-surface-container-low);
   border-bottom: 1px solid var(--md-sys-color-outline-variant);
-  padding-block: 72px 40px;
+  padding-block: 80px 48px;
 }
 
 .blog__head-inner,
@@ -39,30 +39,38 @@
 }
 
 .blog__title {
-  font-size: var(--md-sys-typescale-display-medium-size);
-  line-height: var(--md-sys-typescale-display-medium-line);
-  letter-spacing: var(--md-sys-typescale-display-medium-tracking);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
   font-weight: 600;
   color: var(--md-sys-color-on-surface);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
-.blog__lead {
+.blog__lead-text {
   font-size: var(--md-sys-typescale-body-large-size);
   line-height: var(--md-sys-typescale-body-large-line);
   color: var(--md-sys-color-on-surface-variant);
-  max-width: 52ch;
+  max-width: 54ch;
+}
+
+.blog__count {
+  margin-top: 20px;
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: var(--md-sys-typescale-label-small-size);
+  color: var(--md-sys-color-on-surface-variant);
+  font-variant-numeric: tabular-nums;
 }
 
 .blog__body {
   display: grid;
   gap: 56px;
-  padding-top: 40px;
+  padding-top: 44px;
   align-items: start;
 }
 
-@media (min-width: 900px) {
-  .blog__body { grid-template-columns: minmax(0, 1fr) 220px; gap: 64px; }
+@media (min-width: 960px) {
+  .blog__body { grid-template-columns: minmax(0, 1fr) 258px; gap: 72px; }
 }
 
 /* ── Controls ───────────────────────────────────────────────────────────── */
@@ -72,7 +80,7 @@
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .blog__search { flex: 1; min-width: 200px; position: relative; }
@@ -104,7 +112,6 @@
 }
 
 .blog__search-input { padding-left: 36px; }
-
 .blog__search-input::placeholder { color: var(--md-sys-color-on-surface-variant); }
 
 .blog__search-input:focus,
@@ -123,13 +130,15 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .tag {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   padding: 5px 12px;
+  min-height: 26px;
   border-radius: var(--md-sys-shape-corner-full);
   border: 1px solid var(--md-sys-color-outline-variant);
   background: transparent;
@@ -150,30 +159,110 @@
 
 .tag:focus-visible { outline: 2px solid var(--md-sys-color-primary); outline-offset: 2px; }
 
+/* Count carries how much is behind a tag, so the filter row is information
+   rather than eight identical pills. */
+.tag__count {
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: 0.625rem;
+  color: var(--md-sys-color-outline);
+  font-variant-numeric: tabular-nums;
+}
+
 .tag--active {
   background: var(--md-sys-color-primary);
   border-color: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
 }
 
+.tag--active .tag__count { color: color-mix(in srgb, var(--md-sys-color-on-primary) 70%, transparent); }
+
 .tag--clear { color: var(--md-sys-color-primary); border-style: dashed; }
 
-/* ── Post rows ──────────────────────────────────────────────────────────── */
+.blog__result-count {
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: var(--md-sys-typescale-label-small-size);
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 20px;
+}
+
+/* ── Lead post ──────────────────────────────────────────────────────────── */
 
 .blog__list { border-top: 1px solid var(--md-sys-color-outline-variant); }
 
-/* Rows, not cards. Each used to be an elevated tonal card that lifted and
-   scaled 2% on hover, so a list of posts read as a grid of tiles. */
-.post-row {
+.lead {
   position: relative;
-  padding-block: 28px;
+  padding-block: 36px 40px;
   border-bottom: 1px solid var(--md-sys-color-outline-variant);
 }
 
-.post-row__meta {
+/* A short accent rule marks the lead without turning it into a card. */
+.lead::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 64px;
+  height: 2px;
+  background: var(--md-sys-color-primary);
+}
+
+.lead__title {
+  font-size: clamp(1.75rem, 3.4vw, 2.375rem);
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface);
+  margin-bottom: 14px;
+  max-width: 20ch;
+  text-wrap: balance;
+}
+
+.lead__link { color: inherit; }
+.lead__link::after { content: ''; position: absolute; inset: 0; }
+.lead__link:focus-visible { outline: 2px solid var(--md-sys-color-primary); outline-offset: 6px; }
+
+.lead__summary {
+  font-size: var(--md-sys-typescale-body-large-size);
+  line-height: 1.6;
+  color: var(--md-sys-color-on-surface-variant);
+  max-width: 60ch;
+  margin-bottom: 20px;
+}
+
+.lead__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--md-sys-typescale-label-large-size);
+  font-weight: 500;
+  color: var(--md-sys-color-primary);
+}
+
+.lead__cta svg {
+  transition: transform var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized);
+}
+
+@media (hover: hover) {
+  .lead:hover .lead__title { color: var(--md-sys-color-primary); }
+  .lead:hover .lead__cta svg { transform: translateX(4px); }
+}
+
+.lead--skeleton { pointer-events: none; }
+.lead--skeleton::before { display: none; }
+
+/* ── Post rows ──────────────────────────────────────────────────────────── */
+
+.post-row {
+  position: relative;
+  padding-block: 26px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.post-row__meta,
+.lead .post-row__meta {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   flex-wrap: wrap;
   margin-bottom: 8px;
   font-family: var(--md-sys-typescale-font-mono);
@@ -184,16 +273,16 @@
 .post-row__series { color: var(--md-sys-color-primary); }
 
 .post-row__title {
-  font-size: 1.375rem;
+  font-size: 1.3125rem;
   line-height: 1.3;
   letter-spacing: -0.02em;
   font-weight: 600;
   color: var(--md-sys-color-on-surface);
-  margin-bottom: 8px;
+  margin-bottom: 7px;
+  max-width: 42ch;
+  text-wrap: balance;
 }
 
-/* Stretched link keeps the whole row clickable while the tag buttons below
-   stay independently focusable (they sit above it on z-index). */
 .post-row__link { color: inherit; }
 .post-row__link::after { content: ''; position: absolute; inset: 0; }
 .post-row__link:hover { color: var(--md-sys-color-primary); }
@@ -203,13 +292,8 @@
   font-size: var(--md-sys-typescale-body-medium-size);
   line-height: 1.6;
   color: var(--md-sys-color-on-surface-variant);
-  max-width: var(--md-sys-spacing-measure);
-  margin-bottom: 12px;
+  max-width: 66ch;
 }
-
-.post-row__tags { display: flex; gap: 6px; flex-wrap: wrap; position: relative; z-index: 1; }
-
-.post-row--skeleton { pointer-events: none; }
 
 /* ── Skeleton ───────────────────────────────────────────────────────────── */
 
@@ -270,34 +354,50 @@
   font-weight: 500;
 }
 
-/* ── Sidebar ────────────────────────────────────────────────────────────── */
+/* ── Series aside ───────────────────────────────────────────────────────── */
 
 .blog__aside-title {
   font-size: var(--md-sys-typescale-title-small-size);
   font-weight: 600;
   color: var(--md-sys-color-on-surface);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .blog__series { list-style: none; margin: 0; padding: 0; }
 
+/* Each series carries its description now. The old sidebar was a title and a
+   count, which on a two-series blog was 40 characters holding a whole column. */
 .blog__series-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 0;
+  display: grid;
+  gap: 4px;
+  padding: 14px 0;
   border-top: 1px solid var(--md-sys-color-outline-variant);
-  font-size: var(--md-sys-typescale-body-medium-size);
-  color: var(--md-sys-color-on-surface-variant);
   transition: color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 
-.blog__series-link:hover { color: var(--md-sys-color-primary); }
+.blog__series-name {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: var(--md-sys-typescale-body-medium-size);
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface);
+}
+
+.blog__series-link:hover .blog__series-name { color: var(--md-sys-color-primary); }
 
 .blog__series-count {
   font-family: var(--md-sys-typescale-font-mono);
   font-size: var(--md-sys-typescale-label-small-size);
+  font-weight: 400;
+  color: var(--md-sys-color-outline);
+  font-variant-numeric: tabular-nums;
+}
+
+.blog__series-desc {
+  font-size: var(--md-sys-typescale-body-small-size);
+  line-height: 1.5;
   color: var(--md-sys-color-on-surface-variant);
 }
 
@@ -305,10 +405,10 @@
    POST
    ========================================================================= */
 
-/* Reading progress, no JS. animation-timeline: scroll() advances the scaleX
-   from the document scroll position on the compositor. Browsers without
-   scroll-driven animation support simply never scale it up, and the bar
-   stays invisible, which is why it is aria-hidden and purely decorative. */
+/* Reading progress, no JS. animation-timeline: scroll() advances scaleX from
+   the document scroll position on the compositor. Browsers without
+   scroll-driven animation never scale it up, so the bar stays invisible, which
+   is why it is decorative and aria-hidden. */
 .post__progress {
   position: fixed;
   top: 60px;
@@ -338,7 +438,7 @@
 }
 
 .post__container {
-  max-width: 680px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 56px var(--md-sys-spacing-container-inline) 0;
 }
@@ -352,6 +452,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: 24px;
   font-family: var(--md-sys-typescale-font);
   font-size: var(--md-sys-typescale-label-large-size);
   color: var(--md-sys-color-on-surface-variant);
@@ -359,33 +460,45 @@
   transition: color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 
-.post__back { margin-bottom: 40px; }
+.post__back { margin-bottom: 44px; }
 .post__back:hover,
 .post__action:hover { color: var(--md-sys-color-primary); }
 
 .post__series-link {
   display: inline-block;
   font-size: var(--md-sys-typescale-label-large-size);
+  font-weight: 500;
   color: var(--md-sys-color-primary);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .post__title {
-  font-size: clamp(1.875rem, 4.5vw, 2.75rem);
-  line-height: 1.12;
-  letter-spacing: -0.03em;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.033em;
   font-weight: 600;
   color: var(--md-sys-color-on-surface);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   text-wrap: balance;
+}
+
+/* The summary already exists on every post and was only ever used on the index
+   and in meta tags. On the article it does the job a standfirst does in print:
+   tells you what you are about to read before you commit. */
+.post__standfirst {
+  font-size: 1.1875rem;
+  line-height: 1.55;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 22px;
+  max-width: 58ch;
 }
 
 .post__meta {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
   flex-wrap: wrap;
-  padding-bottom: 32px;
+  padding-bottom: 30px;
   border-bottom: 1px solid var(--md-sys-color-outline-variant);
   font-family: var(--md-sys-typescale-font-mono);
   font-size: var(--md-sys-typescale-label-small-size);
@@ -445,18 +558,8 @@
   color: var(--md-sys-color-on-surface-variant);
 }
 
-.post__body pre {
-  background: var(--md-sys-color-surface-container);
-  border: 1px solid var(--md-sys-color-outline-variant);
-  border-radius: var(--md-sys-shape-corner-md);
-  padding: 18px 20px;
-  overflow-x: auto;
-  font-family: var(--md-sys-typescale-font-mono);
-  font-size: 0.875rem;
-  line-height: 1.6;
-  margin: 1.8em 0;
-}
-
+/* Inline code only. Fenced blocks are restyled by code.css once
+   highlightCodeBlocks has wrapped them. */
 .post__body code {
   font-family: var(--md-sys-typescale-font-mono);
   font-size: 0.875em;
@@ -515,55 +618,133 @@
 
 .post__tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
 
-.post__actions {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-}
+.post__actions { display: flex; gap: 24px; flex-wrap: wrap; }
 
-.post__series-nav {
+/* ── Series playlist (on a post) ─────────────────────────────────────────── */
+
+.series-panel {
   margin-top: 48px;
-  padding-top: 28px;
-  border-top: 1px solid var(--md-sys-color-outline-variant);
-}
-
-.post__series-heading {
-  font-size: var(--md-sys-typescale-body-small-size);
-  color: var(--md-sys-color-on-surface-variant);
-  margin-bottom: 14px;
-}
-
-.post__series-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-@media (max-width: 520px) { .post__series-grid { grid-template-columns: 1fr; } }
-
-.post__series-card {
-  display: block;
-  padding: 16px 18px;
   border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--md-sys-shape-corner-md);
-  transition: border-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+  overflow: hidden;
 }
 
-.post__series-card:hover { border-color: var(--md-sys-color-primary); }
-.post__series-card--next { text-align: right; }
-
-.post__series-dir {
-  display: block;
-  font-size: var(--md-sys-typescale-label-small-size);
-  color: var(--md-sys-color-on-surface-variant);
-  margin-bottom: 4px;
+.series-panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  background: var(--md-sys-color-surface-container-low);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
 }
 
-.post__series-title {
+.series-panel__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   font-size: var(--md-sys-typescale-body-medium-size);
   font-weight: 600;
   color: var(--md-sys-color-on-surface);
-  line-height: 1.35;
+}
+
+.series-panel__title a { color: inherit; }
+.series-panel__title a:hover { color: var(--md-sys-color-primary); }
+
+.series-panel__pos {
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: var(--md-sys-typescale-label-small-size);
+  color: var(--md-sys-color-on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+
+.series-panel__list { list-style: none; margin: 0; padding: 0; }
+
+.series-panel__row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  font-size: var(--md-sys-typescale-body-medium-size);
+  color: var(--md-sys-color-on-surface);
+  transition: background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+}
+
+.series-panel__list li:last-child .series-panel__row { border-bottom: none; }
+
+a.series-panel__row:hover {
+  background: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-primary);
+}
+
+/* The current part is marked, not linked: a link to the page you are on is a
+   dead control. */
+.series-panel__row--current {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  font-weight: 600;
+}
+
+.series-panel__num {
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: var(--md-sys-typescale-label-small-size);
+  color: var(--md-sys-color-outline);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.series-panel__row--current .series-panel__num { color: inherit; }
+
+.series-panel__label { flex: 1; min-width: 0; }
+
+.series-panel__time,
+.series-panel__here {
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: var(--md-sys-typescale-label-small-size);
+  color: var(--md-sys-color-on-surface-variant);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.series-panel__here { color: inherit; opacity: 0.75; }
+
+.series-panel__next {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 16px;
+  padding: 16px 18px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container-low);
+  transition: background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+}
+
+.series-panel__next:hover { background: var(--md-sys-color-surface-container); }
+
+.series-panel__next-label {
+  grid-column: 1;
+  font-size: var(--md-sys-typescale-label-small-size);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.series-panel__next-title {
+  grid-column: 1;
+  font-size: var(--md-sys-typescale-body-medium-size);
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface);
+}
+
+.series-panel__next-arrow {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  color: var(--md-sys-color-primary);
+  transition: transform var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized);
+}
+
+@media (hover: hover) {
+  .series-panel__next:hover .series-panel__next-arrow { transform: translateX(4px); }
 }
 
 .post__error {
@@ -574,58 +755,116 @@
 
 /* ── Series page ────────────────────────────────────────────────────────── */
 
-.series__desc {
-  font-size: var(--md-sys-typescale-body-large-size);
-  line-height: 1.65;
-  color: var(--md-sys-color-on-surface-variant);
-  margin-bottom: 40px;
-  max-width: 56ch;
+.series-head { margin-bottom: 8px; }
+
+.series-head__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--md-sys-typescale-label-large-size);
+  font-weight: 500;
+  color: var(--md-sys-color-primary);
+  margin-bottom: 14px;
 }
 
-.series__list {
+.series-head__start {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 26px;
+  padding: 10px 18px;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  font-size: var(--md-sys-typescale-label-large-size);
+  font-weight: 500;
+}
+
+.series-head__start svg {
+  transition: transform var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized);
+}
+
+@media (hover: hover) {
+  .series-head__start:hover svg { transform: translateX(4px); }
+}
+
+.parts {
   list-style: none;
-  margin: 0;
+  margin: 44px 0 0;
   padding: 0;
   border-top: 1px solid var(--md-sys-color-outline-variant);
-  counter-reset: series;
 }
 
-.series__row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 16px 0;
+.parts__link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 18px;
+  padding: 22px 0;
   border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  transition:
+    padding var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-standard),
+    background-color var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-standard);
+}
+
+@media (hover: hover) {
+  .parts__link:hover {
+    background: var(--md-sys-color-surface-container-low);
+    padding-inline: 16px;
+  }
+  .parts__link:hover .parts__title { color: var(--md-sys-color-primary); }
+  .parts__link:hover .parts__arrow { transform: translateX(3px); }
+}
+
+.parts__num {
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: var(--md-sys-typescale-label-medium-size);
+  color: var(--md-sys-color-outline);
+  padding-top: 3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.parts__body { display: grid; gap: 6px; min-width: 0; }
+
+.parts__title {
+  font-size: 1.1875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
   color: var(--md-sys-color-on-surface);
   transition: color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
 }
 
-.series__row:hover { color: var(--md-sys-color-primary); }
-
-/* The step number comes from CSS counters on the ordered list rather than
-   a padStart'd span in the markup. */
-.series__row-title { font-weight: 600; }
-.series__row-title::before {
-  counter-increment: series;
-  content: counter(series, decimal-leading-zero);
-  font-family: var(--md-sys-typescale-font-mono);
-  font-size: var(--md-sys-typescale-label-small-size);
-  font-weight: 400;
-  color: var(--md-sys-color-outline);
-  margin-right: 14px;
+.parts__summary {
+  font-size: var(--md-sys-typescale-body-medium-size);
+  line-height: 1.55;
+  color: var(--md-sys-color-on-surface-variant);
 }
 
-.series__row-date {
+.parts__meta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 2px;
   font-family: var(--md-sys-typescale-font-mono);
   font-size: var(--md-sys-typescale-label-small-size);
   color: var(--md-sys-color-on-surface-variant);
-  white-space: nowrap;
+}
+
+.parts__arrow {
+  color: var(--md-sys-color-outline);
+  align-self: center;
+  flex-shrink: 0;
+  transition: transform var(--md-sys-motion-duration-medium1) var(--md-sys-motion-easing-emphasized);
 }
 
 @media (max-width: 600px) {
-  .blog__head { padding-block: 48px 32px; }
+  .blog__head { padding-block: 52px 34px; }
   .blog__head-inner,
   .blog__body { padding-inline: var(--md-sys-spacing-container-inline-sm); }
   .blog__body { gap: 40px; }
+  .lead { padding-block: 28px 32px; }
+  .lead__title { max-width: 100%; }
+  .post-row__title { max-width: 100%; }
+  .series-nav__card--next { text-align: left; }
 }

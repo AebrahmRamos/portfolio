@@ -1,0 +1,172 @@
+/* ============================================================================
+   Code blocks and syntax highlighting.
+
+   The editor writes highlight.js class names (via CodeBlockLowlight) and
+   highlight.js re-applies them at render time, but there was never a stylesheet
+   for them. Every code block on the blog rendered as flat monochrome text,
+   which on a systems blog is most of the page.
+
+   Shared by the published post and the editor so what you type matches what
+   ships.
+
+   On multiple hues: the one-accent rule governs UI chrome. Syntax colour is
+   semantic, it tells you a string from a keyword, so it gets its own scale.
+   Every token below is measured against the surface it sits on:
+     light  4.5:1 min (lowest 5.08)   dark  4.5:1 min (lowest 5.08)
+   ========================================================================= */
+
+:root {
+  --code-bg: var(--md-sys-color-surface-container);
+  --code-base: #0f1729;
+  --code-comment: #5f6875;
+  --code-keyword: #a02f6e;
+  --code-string: #1d6b3f;
+  --code-number: #8a5308;
+  --code-function: #1552cc;
+  --code-type: #7038ad;
+  --code-attr: #0f5f73;
+  --code-meta: #5f6875;
+  --code-deleted: #9a2620;
+  --code-inserted: #1d6b3f;
+}
+
+:root[data-theme="dark"] {
+  --code-base: #e8ecf2;
+  --code-comment: #828e9c;
+  --code-keyword: #f093c0;
+  --code-string: #8fd6a4;
+  --code-number: #e8b478;
+  --code-function: #7db0ff;
+  --code-type: #c9aef2;
+  --code-attr: #82cfe0;
+  --code-meta: #98a2b0;
+  --code-deleted: #ff9d95;
+  --code-inserted: #8fd6a4;
+}
+
+/* ── Block shell ─────────────────────────────────────────────────────────── */
+
+.codeblock {
+  margin: 1.9em 0;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-md);
+  background: var(--code-bg);
+  overflow: hidden;
+}
+
+.codeblock__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 10px 7px 14px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container-high);
+}
+
+.codeblock__lang {
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: var(--md-sys-typescale-label-small-size);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.codeblock__copy {
+  font-family: var(--md-sys-typescale-font);
+  font-size: var(--md-sys-typescale-label-small-size);
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface-variant);
+  background: none;
+  border-radius: var(--md-sys-shape-corner-xs);
+  padding: 4px 8px;
+  min-height: 24px;
+  transition:
+    color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
+    background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+}
+
+.codeblock__copy:hover {
+  color: var(--md-sys-color-on-surface);
+  background: var(--md-sys-color-surface-container-highest);
+}
+
+.codeblock__copy.is-copied { color: var(--md-sys-color-primary); }
+.codeblock__copy:focus-visible { outline: 2px solid var(--md-sys-color-primary); outline-offset: 1px; }
+
+/* The <pre> inside a .codeblock drops its own frame: the wrapper owns it. */
+.codeblock > pre {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 16px 18px;
+  overflow-x: auto;
+  font-family: var(--md-sys-typescale-font-mono);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--code-base);
+  /* Tabs at 8 columns make Makefiles and Go unreadable in a narrow column. */
+  tab-size: 2;
+}
+
+.codeblock > pre > code {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* ── highlight.js token scale ────────────────────────────────────────────── */
+
+.hljs-comment,
+.hljs-quote { color: var(--code-comment); font-style: italic; }
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-doctag,
+.hljs-name,
+.hljs-strong { color: var(--code-keyword); }
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string { color: var(--code-string); }
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo { color: var(--code-number); }
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-function .hljs-title,
+.hljs-subst { color: var(--code-function); }
+
+.hljs-type,
+.hljs-title.class_,
+.hljs-class .hljs-title,
+.hljs-built_in,
+.hljs-selector-class { color: var(--code-type); }
+
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-property,
+.hljs-params,
+.hljs-selector-id { color: var(--code-attr); }
+
+.hljs-meta,
+.hljs-meta .hljs-keyword,
+.hljs-comment .hljs-doctag { color: var(--code-meta); }
+
+.hljs-deletion { color: var(--code-deleted); }
+.hljs-addition { color: var(--code-inserted); }
+
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 600; }

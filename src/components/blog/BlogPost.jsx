@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { PiArrowLeftBold, PiLinkSimpleBold, PiCheckBold } from 'react-icons/pi';
+import { PiArrowLeftBold, PiArrowRightBold, PiLinkSimpleBold, PiCheckBold, PiStackSimpleBold } from 'react-icons/pi';
 import DOMPurify from 'dompurify';
 import { formatPostDate } from './format';
+import { highlightCodeBlocks } from './highlight';
 import './blog.css';
 
 // DOMPurify is configured to allow <iframe> for embeds, so constrain them to a
@@ -38,10 +39,11 @@ function calcReadingTime(html) {
 function SkeletonPost() {
   return (
     <div className="post__container" aria-hidden="true">
-      <div className="skeleton" style={{ width: 72, height: 13, marginBottom: 40 }} />
-      <div className="skeleton" style={{ width: '85%', height: 40, marginBottom: 12 }} />
-      <div className="skeleton" style={{ width: '55%', height: 40, marginBottom: 28 }} />
-      <div className="skeleton" style={{ width: 200, height: 13, marginBottom: 40 }} />
+      <div className="skeleton" style={{ width: 72, height: 13, marginBottom: 44 }} />
+      <div className="skeleton" style={{ width: 110, height: 12, marginBottom: 18 }} />
+      <div className="skeleton" style={{ width: '90%', height: 42, marginBottom: 12 }} />
+      <div className="skeleton" style={{ width: '58%', height: 42, marginBottom: 26 }} />
+      <div className="skeleton" style={{ width: 220, height: 12, marginBottom: 48 }} />
       {[100, 97, 93, 100, 88, 100, 95, 72].map((w, i) => (
         <div key={i} className="skeleton" style={{ width: `${w}%`, height: 16, marginBottom: 14 }} />
       ))}
@@ -71,33 +73,58 @@ function CopyLinkButton() {
   );
 }
 
-function SeriesNav({ seriesPosts, currentSlug, seriesTitle }) {
+function SeriesNav({ seriesPosts, currentSlug, seriesTitle, seriesSlug }) {
   const currentIdx = seriesPosts.findIndex((p) => p.slug === currentSlug);
-  const prev = currentIdx > 0 ? seriesPosts[currentIdx - 1] : null;
   const next = currentIdx < seriesPosts.length - 1 ? seriesPosts[currentIdx + 1] : null;
 
-  if (!prev && !next) return null;
+  if (seriesPosts.length < 2) return null;
 
+  // A playlist, not just prev/next. A reader who lands mid-series can see the
+  // whole run, where they are in it, and jump to any part. The old version
+  // exposed only the two neighbours, so parts 1 and 4 were unreachable from
+  // part 2 without going back to the index.
   return (
-    <nav className="post__series-nav" aria-label="Series navigation">
-      <p className="post__series-heading">
-        Part {currentIdx + 1} of {seriesPosts.length} in {seriesTitle}
-      </p>
-      <div className="post__series-grid">
-        {prev ? (
-          <Link to={`/blog/${prev.slug}`} className="post__series-card">
-            <span className="post__series-dir">Previous</span>
-            <span className="post__series-title">{prev.title}</span>
-          </Link>
-        ) : <div />}
-
-        {next && (
-          <Link to={`/blog/${next.slug}`} className="post__series-card post__series-card--next">
-            <span className="post__series-dir">Next</span>
-            <span className="post__series-title">{next.title}</span>
-          </Link>
-        )}
+    <nav className="series-panel" aria-label={`Parts in ${seriesTitle}`}>
+      <div className="series-panel__head">
+        <p className="series-panel__title">
+          <PiStackSimpleBold size={14} aria-hidden="true" />
+          <Link to={`/blog/series/${seriesSlug}`}>{seriesTitle}</Link>
+        </p>
+        <p className="series-panel__pos">
+          Part {currentIdx + 1} of {seriesPosts.length}
+        </p>
       </div>
+
+      <ol className="series-panel__list">
+        {seriesPosts.map((p, i) => {
+          const isCurrent = p.slug === currentSlug;
+          return (
+            <li key={p.slug}>
+              {isCurrent ? (
+                <span className="series-panel__row series-panel__row--current" aria-current="true">
+                  <span className="series-panel__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="series-panel__label">{p.title}</span>
+                  <span className="series-panel__here">You are here</span>
+                </span>
+              ) : (
+                <Link to={`/blog/${p.slug}`} className="series-panel__row">
+                  <span className="series-panel__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="series-panel__label">{p.title}</span>
+                  {p.read_minutes && <span className="series-panel__time">{p.read_minutes} min</span>}
+                </Link>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+
+      {next && (
+        <Link to={`/blog/${next.slug}`} className="series-panel__next">
+          <span className="series-panel__next-label">Next in this series</span>
+          <span className="series-panel__next-title">{next.title}</span>
+          <PiArrowRightBold className="series-panel__next-arrow" size={16} aria-hidden="true" />
+        </Link>
+      )}
     </nav>
   );
 }
@@ -131,10 +158,7 @@ export default function BlogPost() {
         // post and loading are set together, in one commit. Previously the
         // series fetch was awaited between them, so `post` landed while
         // `loading` was still true: the component was rendering the skeleton,
-        // .post__body did not exist, and the effect below found a null ref and
-        // silently skipped. The article then rendered with an empty body.
-        // The series is supporting content, so it loads on its own and never
-        // gates the article.
+        // .post__body did not exist, and the ref callback never fired.
         setPost(data);
         setLoading(false);
 
@@ -165,6 +189,7 @@ export default function BlogPost() {
         ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder'],
       })
       : '';
+    highlightCodeBlocks(node);
   }, [post]);
 
   useEffect(() => {
@@ -224,6 +249,8 @@ export default function BlogPost() {
 
           <h1 className="post__title">{post.title}</h1>
 
+          {post.summary && <p className="post__standfirst">{post.summary}</p>}
+
           <div className="post__meta">
             {post.published_at && (
               <time dateTime={new Date(post.published_at * 1000).toISOString()}>
@@ -265,6 +292,7 @@ export default function BlogPost() {
               seriesPosts={seriesPosts}
               currentSlug={slug}
               seriesTitle={seriesTitle}
+              seriesSlug={post.series_slug}
             />
           )}
         </footer>

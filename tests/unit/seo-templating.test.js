@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { applyMeta, injectJsonLd, blogPostingJsonLd, breadcrumbJsonLd } from '../../src/worker.js';
+import { applyMeta, injectJsonLd, blogPostingJsonLd, breadcrumbJsonLd, readMinutes } from '../../src/worker.js';
 
 const SHELL = `<!DOCTYPE html><html><head>
 <title>Aebrahm Ramos - Portfolio</title>
@@ -85,4 +85,19 @@ test('applyMeta replaces an existing canonical rather than adding a second', () 
   const canonicals = out.match(/<link rel="canonical"/g) ?? [];
   assert.equal(canonicals.length, 1);
   assert.match(out, /<link rel="canonical" href="https:\/\/aebrahmramos\.dev\/blog\/x" \/>/);
+});
+
+test('readMinutes floors at one minute and returns null for empty bodies', () => {
+  assert.equal(readMinutes(0), null);
+  assert.equal(readMinutes(null), null);
+  assert.equal(readMinutes(undefined), null);
+  // Anything with content reads as at least a minute rather than "0 min read".
+  assert.equal(readMinutes(10), 1);
+  assert.equal(readMinutes(500), 1);
+});
+
+test('readMinutes scales with length at ~238wpm over 5.5 chars per word', () => {
+  // 5.5 * 238 = 1309 chars per minute.
+  assert.equal(readMinutes(1309 * 4), 4);
+  assert.equal(readMinutes(1309 * 10), 10);
 });

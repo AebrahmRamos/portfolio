@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
-import LinkExtension from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
 import DOMPurify from 'dompurify';
 import { defaultMarkdownSerializer } from 'prosemirror-markdown';
+import {
+  PiTextBBold, PiTextItalicBold, PiTextStrikethroughBold, PiCodeBold,
+  PiTextHOneBold, PiTextHTwoBold, PiTextHThreeBold,
+  PiListBulletsBold, PiListNumbersBold, PiQuotesBold, PiCodeBlockBold,
+  PiLinkBold, PiLinkBreakBold, PiImageBold, PiUploadSimpleBold,
+  PiArrowCounterClockwiseBold, PiArrowClockwiseBold,
+  PiArrowLeftBold, PiXBold, PiWarningCircleBold, PiCheckCircleBold, PiPlusBold,
+} from 'react-icons/pi';
 import './admin.css';
 
 const lowlight = createLowlight(common);
@@ -17,7 +24,6 @@ function deriveSlug(title) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-// Serialize Tiptap doc to markdown using prosemirror-markdown
 function toMarkdown(editor) {
   try {
     return defaultMarkdownSerializer.serialize(editor.state.doc);
@@ -26,72 +32,179 @@ function toMarkdown(editor) {
   }
 }
 
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 // ─── Toolbar ──────────────────────────────────────────────────────────────────
 
-function Toolbar({ editor }) {
-  if (!editor) return null;
-
-  const btn = (label, action, active, title) => (
+function ToolButton({ icon, label, onClick, active, disabled }) {
+  return (
     <button
       type="button"
-      className={`tiptap-toolbar__btn${active ? ' tiptap-toolbar__btn--active' : ''}`}
-      onClick={action}
-      title={title || label}
-      aria-label={title || label}
+      className={`tb__btn${active ? ' tb__btn--active' : ''}`}
+      onClick={onClick}
+      disabled={disabled}
+      title={label}
+      aria-label={label}
+      aria-pressed={active === undefined ? undefined : active}
     >
-      {label}
+      {icon}
     </button>
   );
+}
 
-  const addImage = () => {
-    // Offer both URL and file upload
-    const choice = confirm('Upload a file? Click OK for file picker, Cancel to enter URL.');
-    if (choice) {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.onchange = async () => {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          editor.chain().focus().setImage({ src: reader.result }).run();
-        };
-        reader.readAsDataURL(file);
-      };
-      input.click();
-    } else {
-      const url = prompt('Image URL:');
-      if (url) editor.chain().focus().setImage({ src: url }).run();
-    }
+/**
+ * The toolbar used to render letterforms and emoji as its icons ("B", "I",
+ * "S̶", "`", "```", a paperclip emoji, arrows). Those are not icons, they are
+ * text pretending to be icons, and they inherited none of the sizing or
+ * alignment a real glyph set gives you.
+ *
+ * Link and image insertion used window.prompt(), and picking between upload and
+ * URL used window.confirm() with "OK for file picker, Cancel to enter URL",
+ * which is the kind of prompt you write for yourself and then never fix. Both
+ * now use an inline bar inside the editor chrome.
+ */
+function Toolbar({ editor }) {
+  const [bar, setBar] = useState(null); // null | 'link' | 'image'
+  const [value, setValue] = useState('');
+  const inputRef = useRef(null);
+  const fileRef = useRef(null);
+
+  useEffect(() => {
+    if (bar) inputRef.current?.focus();
+  }, [bar]);
+
+  if (!editor) return null;
+
+  const openLink = () => {
+    setValue(editor.getAttributes('link').href ?? '');
+    setBar('link');
   };
 
-  const addLink = () => {
-    const url = prompt('URL:');
-    if (url) editor.chain().focus().setLink({ href: url }).run();
+  const openImage = () => {
+    setValue('');
+    setBar('image');
+  };
+
+  const close = () => { setBar(null); setValue(''); editor.chain().focus().run(); };
+
+  const apply = (e) => {
+    e.preventDefault();
+    const url = value.trim();
+    if (!url) return;
+    if (bar === 'link') editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    else editor.chain().focus().setImage({ src: url }).run();
+    close();
+  };
+
+  const removeLink = () => {
+    editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    close();
+  };
+
+  const pickFile = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const dataUrl = await fileToBase64(file);
+    editor.chain().focus().setImage({ src: dataUrl }).run();
+    close();
   };
 
   return (
-    <div className="tiptap-toolbar" role="toolbar" aria-label="Formatting">
-      {btn('B', () => editor.chain().focus().toggleBold().run(), editor.isActive('bold'), 'Bold')}
-      {btn('I', () => editor.chain().focus().toggleItalic().run(), editor.isActive('italic'), 'Italic')}
-      {btn('S̶', () => editor.chain().focus().toggleStrike().run(), editor.isActive('strike'), 'Strike')}
-      {btn('`', () => editor.chain().focus().toggleCode().run(), editor.isActive('code'), 'Inline code')}
-      <div className="tiptap-toolbar__sep" />
-      {btn('H1', () => editor.chain().focus().toggleHeading({ level: 1 }).run(), editor.isActive('heading', { level: 1 }), 'Heading 1')}
-      {btn('H2', () => editor.chain().focus().toggleHeading({ level: 2 }).run(), editor.isActive('heading', { level: 2 }), 'Heading 2')}
-      {btn('H3', () => editor.chain().focus().toggleHeading({ level: 3 }).run(), editor.isActive('heading', { level: 3 }), 'Heading 3')}
-      <div className="tiptap-toolbar__sep" />
-      {btn('• ', () => editor.chain().focus().toggleBulletList().run(), editor.isActive('bulletList'), 'Bullet list')}
-      {btn('1. ', () => editor.chain().focus().toggleOrderedList().run(), editor.isActive('orderedList'), 'Numbered list')}
-      {btn('" "', () => editor.chain().focus().toggleBlockquote().run(), editor.isActive('blockquote'), 'Blockquote')}
-      {btn('```', () => editor.chain().focus().toggleCodeBlock().run(), editor.isActive('codeBlock'), 'Code block')}
-      <div className="tiptap-toolbar__sep" />
-      <button type="button" className="tiptap-toolbar__btn" onClick={addLink} title="Add link">🔗</button>
-      <button type="button" className="tiptap-toolbar__btn" onClick={addImage} title="Insert image">🖼</button>
-      <div className="tiptap-toolbar__sep" />
-      {btn('↩', () => editor.chain().focus().undo().run(), false, 'Undo')}
-      {btn('↪', () => editor.chain().focus().redo().run(), false, 'Redo')}
+    <div className="tb">
+      <div className="tb__row" role="toolbar" aria-label="Formatting">
+        <div className="tb__group">
+          <ToolButton icon={<PiTextBBold size={16} />} label="Bold" active={editor.isActive('bold')}
+            onClick={() => editor.chain().focus().toggleBold().run()} />
+          <ToolButton icon={<PiTextItalicBold size={16} />} label="Italic" active={editor.isActive('italic')}
+            onClick={() => editor.chain().focus().toggleItalic().run()} />
+          <ToolButton icon={<PiTextStrikethroughBold size={16} />} label="Strikethrough" active={editor.isActive('strike')}
+            onClick={() => editor.chain().focus().toggleStrike().run()} />
+          <ToolButton icon={<PiCodeBold size={16} />} label="Inline code" active={editor.isActive('code')}
+            onClick={() => editor.chain().focus().toggleCode().run()} />
+        </div>
+
+        <div className="tb__group">
+          <ToolButton icon={<PiTextHOneBold size={16} />} label="Heading 1" active={editor.isActive('heading', { level: 1 })}
+            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} />
+          <ToolButton icon={<PiTextHTwoBold size={16} />} label="Heading 2" active={editor.isActive('heading', { level: 2 })}
+            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} />
+          <ToolButton icon={<PiTextHThreeBold size={16} />} label="Heading 3" active={editor.isActive('heading', { level: 3 })}
+            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} />
+        </div>
+
+        <div className="tb__group">
+          <ToolButton icon={<PiListBulletsBold size={16} />} label="Bullet list" active={editor.isActive('bulletList')}
+            onClick={() => editor.chain().focus().toggleBulletList().run()} />
+          <ToolButton icon={<PiListNumbersBold size={16} />} label="Numbered list" active={editor.isActive('orderedList')}
+            onClick={() => editor.chain().focus().toggleOrderedList().run()} />
+          <ToolButton icon={<PiQuotesBold size={16} />} label="Quote" active={editor.isActive('blockquote')}
+            onClick={() => editor.chain().focus().toggleBlockquote().run()} />
+          <ToolButton icon={<PiCodeBlockBold size={16} />} label="Code block" active={editor.isActive('codeBlock')}
+            onClick={() => editor.chain().focus().toggleCodeBlock().run()} />
+        </div>
+
+        <div className="tb__group">
+          <ToolButton icon={<PiLinkBold size={16} />} label="Link" active={editor.isActive('link')} onClick={openLink} />
+          <ToolButton icon={<PiImageBold size={16} />} label="Image" onClick={openImage} />
+        </div>
+
+        <div className="tb__group tb__group--end">
+          <ToolButton icon={<PiArrowCounterClockwiseBold size={16} />} label="Undo"
+            disabled={!editor.can().undo()}
+            onClick={() => editor.chain().focus().undo().run()} />
+          <ToolButton icon={<PiArrowClockwiseBold size={16} />} label="Redo"
+            disabled={!editor.can().redo()}
+            onClick={() => editor.chain().focus().redo().run()} />
+        </div>
+      </div>
+
+      {bar && (
+        <form className="tb__bar" onSubmit={apply}>
+          <label className="tb__bar-label" htmlFor="tb-url">
+            {bar === 'link' ? 'Link URL' : 'Image URL'}
+          </label>
+          <input
+            id="tb-url"
+            ref={inputRef}
+            className="tb__bar-input"
+            type="url"
+            inputMode="url"
+            placeholder="https://"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Escape') close(); }}
+          />
+          <button type="submit" className="btn btn--sm btn--primary" disabled={!value.trim()}>
+            Apply
+          </button>
+          {bar === 'image' && (
+            <>
+              <button type="button" className="btn btn--sm btn--outlined" onClick={() => fileRef.current?.click()}>
+                <PiUploadSimpleBold size={14} />
+                Upload
+              </button>
+              <input ref={fileRef} type="file" accept="image/*" hidden onChange={pickFile} />
+            </>
+          )}
+          {bar === 'link' && editor.isActive('link') && (
+            <button type="button" className="btn btn--sm btn--outlined" onClick={removeLink}>
+              <PiLinkBreakBold size={14} />
+              Remove
+            </button>
+          )}
+          <button type="button" className="tb__bar-close" onClick={close} aria-label="Close">
+            <PiXBold size={14} />
+          </button>
+        </form>
+      )}
     </div>
   );
 }
@@ -113,39 +226,36 @@ export default function PostEditor({ token }) {
   const [allSeries, setAllSeries] = useState([]);
   const [saveState, setSaveState] = useState('idle'); // idle | saving | saved | error
   const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState('');
   const [loading, setLoading] = useState(isEdit);
-
-  // Convert a File/Blob to a base64 data URL for embedding images without R2
-  function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ codeBlock: false }),
+      // StarterKit ships the Link extension in Tiptap 3. Adding
+      // @tiptap/extension-link on top of it registered 'link' twice and Tiptap
+      // logged "Duplicate extension names found: ['link']" on every mount.
+      // Configure it through StarterKit instead of stacking a second copy.
+      StarterKit.configure({
+        codeBlock: false,
+        link: { openOnClick: false, autolink: true },
+      }),
       CodeBlockLowlight.configure({ lowlight }),
       Image.configure({ inline: false, allowBase64: true }),
-      LinkExtension.configure({ openOnClick: false }),
-      Placeholder.configure({ placeholder: 'Start writing…' }),
+      Placeholder.configure({ placeholder: 'Start writing' }),
     ],
     editorProps: {
       attributes: { 'aria-label': 'Post body', role: 'textbox' },
       // Handle image paste and drag-drop, convert to base64 and insert
       handlePaste(view, event) {
         const items = Array.from(event.clipboardData?.items ?? []);
-        const imageItem = items.find(item => item.type.startsWith('image/'));
-        if (!imageItem) return false; // let Tiptap handle non-image pastes normally
+        const imageItem = items.find((item) => item.type.startsWith('image/'));
+        if (!imageItem) return false;
 
         event.preventDefault();
         const file = imageItem.getAsFile();
         if (!file) return false;
 
-        fileToBase64(file).then(dataUrl => {
+        fileToBase64(file).then((dataUrl) => {
           view.dispatch(
             view.state.tr.replaceSelectionWith(
               view.state.schema.nodes.image.create({ src: dataUrl })
@@ -157,17 +267,16 @@ export default function PostEditor({ token }) {
       handleDrop(view, event, _slice, moved) {
         if (moved) return false;
         const files = Array.from(event.dataTransfer?.files ?? []);
-        const imageFile = files.find(f => f.type.startsWith('image/'));
+        const imageFile = files.find((f) => f.type.startsWith('image/'));
         if (!imageFile) return false;
 
         event.preventDefault();
         const coords = view.posAtCoords({ left: event.clientX, top: event.clientY });
         if (!coords) return false;
 
-        fileToBase64(imageFile).then(dataUrl => {
+        fileToBase64(imageFile).then((dataUrl) => {
           const node = view.state.schema.nodes.image.create({ src: dataUrl });
-          const transaction = view.state.tr.insert(coords.pos, node);
-          view.dispatch(transaction);
+          view.dispatch(view.state.tr.insert(coords.pos, node));
         }).catch(() => {});
         return true;
       },
@@ -176,10 +285,22 @@ export default function PostEditor({ token }) {
 
   // Load existing post for edit
   useEffect(() => {
-    if (!isEdit || !editor) return;
+    if (!isEdit || !editor) return undefined;
+
+    // React runs effects twice in development, and Tiptap destroys the editor
+    // instance in the cleanup between the two runs. The first fetch then
+    // resolved against a dead editor and `editor.commands` threw, which the
+    // old code swallowed into a blank form. Ignore results from a run that has
+    // already been cleaned up, and never touch a destroyed editor.
+    let cancelled = false;
+
     fetch(`/api/admin/posts/${id}`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json())
-      .then(post => {
+      .then((r) => {
+        if (!r.ok) throw new Error(r.status === 404 ? 'not_found' : 'fetch_error');
+        return r.json();
+      })
+      .then((post) => {
+        if (cancelled || editor.isDestroyed) return;
         setTitle(post.title ?? '');
         setSummary(post.summary ?? '');
         setSlug(post.slug ?? '');
@@ -190,62 +311,73 @@ export default function PostEditor({ token }) {
         if (post.body_json) {
           try {
             const doc = typeof post.body_json === 'string' ? JSON.parse(post.body_json) : post.body_json;
-            editor.commands.setContent(doc);
+            // An empty object is valid JSON but not a valid ProseMirror doc.
+            if (doc && doc.type) editor.commands.setContent(doc);
+            else editor.commands.setContent(post.body_html ?? '');
           } catch {
             editor.commands.setContent(post.body_html ?? '');
           }
         }
         setLoading(false);
       })
-      .catch(() => { setError('Failed to load post.'); setLoading(false); });
+      .catch((err) => {
+        if (cancelled) return;
+        if (import.meta.env.DEV) console.error('[PostEditor] load failed', err);
+        // A failed load used to leave a blank form with no message, which looks
+        // exactly like an empty post. Saving from that state would have
+        // overwritten the real one with nothing.
+        setLoadError(err.message === 'not_found'
+          ? 'That post does not exist. It may have been deleted.'
+          : 'Could not load this post. Refresh to try again.');
+        setLoading(false);
+      });
+
+    return () => { cancelled = true; };
   }, [isEdit, id, token, editor]);
 
-  // Load series list for sidebar
   useEffect(() => {
+    let cancelled = false;
     fetch('/api/admin/series', { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json())
-      .then(d => setAllSeries(d.series ?? []))
+      .then((r) => r.json())
+      .then((d) => { if (!cancelled) setAllSeries(d.series ?? []); })
       .catch(() => {});
+    return () => { cancelled = true; };
   }, [token]);
 
-  // Auto-derive slug from title
   useEffect(() => {
     if (!slugManual && title) setSlug(deriveSlug(title));
   }, [title, slugManual]);
 
-  async function save(targetStatus) {
+  const save = useCallback(async (targetStatus) => {
     if (!editor || !title) return;
     setSaveState('saving');
     setError('');
 
-    const body_json = editor.getJSON();
-    const body_html = DOMPurify.sanitize(editor.getHTML());
-    const body_md = toMarkdown(editor);
-    const tagsArr = tags.split(',').map(t => t.trim()).filter(Boolean);
-    const finalStatus = targetStatus ?? status;
-
     const payload = {
-      title, summary: summary || null, slug, body_json, body_html, body_md,
+      title,
+      summary: summary || null,
+      slug,
+      body_json: editor.getJSON(),
+      body_html: DOMPurify.sanitize(editor.getHTML()),
+      body_md: toMarkdown(editor),
       series_slug: seriesSlug || null,
-      tags: tagsArr, status: finalStatus,
+      tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+      status: targetStatus ?? status,
     };
 
     try {
-      const url = isEdit ? `/api/admin/posts/${id}` : '/api/admin/posts';
-      const method = isEdit ? 'PATCH' : 'POST';
-      const res = await fetch(url, {
-        method,
+      const res = await fetch(isEdit ? `/api/admin/posts/${id}` : '/api/admin/posts', {
+        method: isEdit ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload),
       });
 
       if (res.status === 409) {
         const d = await res.json();
-        setError(`Slug conflict. Try: ${d.suggested}`);
+        setError(`That slug is taken. Try "${d.suggested}".`);
         setSaveState('error');
         return;
       }
-
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         setError(d.error ?? 'Save failed.');
@@ -255,141 +387,172 @@ export default function PostEditor({ token }) {
 
       const d = await res.json();
       setSaveState('saved');
-      setStatus(finalStatus);
+      setStatus(payload.status);
       if (!isEdit) navigate(`/admin/edit/${d.id}`, { replace: true });
     } catch {
-      setError('Network error.');
+      setError('Network error. Your work is still in the editor.');
       setSaveState('error');
     }
-  }
+  }, [editor, title, summary, slug, seriesSlug, tags, status, isEdit, id, token, navigate]);
+
+  // Cmd/Ctrl+S saves a draft. Writers reach for it whether you wire it or not,
+  // and without this the browser's own save-page dialog opens over the editor.
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        save('draft');
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [save]);
+
+  // Clear the "Saved" pill once the author starts typing again.
+  useEffect(() => {
+    if (saveState === 'saved') setSaveState('idle');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [title, summary, slug, tags, seriesSlug]);
 
   if (loading) {
     return (
       <section className="admin">
         <div className="admin__container">
-          <p style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>Loading post…</p>
+          <div className="admin__loading">Loading post</div>
         </div>
       </section>
     );
   }
 
-  const saveStatusLabel = {
-    idle: null,
-    saving: 'Saving…',
-    saved: 'Saved',
-    error: `Error: ${error}`,
-  }[saveState];
+  if (loadError) {
+    return (
+      <section className="admin">
+        <div className="admin__container">
+          <Link to="/admin" className="btn btn--outlined btn--sm">
+            <PiArrowLeftBold size={14} />
+            Posts
+          </Link>
+          <div className="admin__notice admin__notice--error">
+            <PiWarningCircleBold size={18} />
+            <p>{loadError}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="admin">
-      <div className="admin__container">
-        <div className="admin__header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <Link to="/admin" className="btn btn--outlined btn--sm">← Posts</Link>
-            <h1 className="m3-headline-medium admin__title">
-              {isEdit ? 'Edit post' : 'New post'}
-            </h1>
+    <section className="admin admin--editor">
+      <header className="admin__bar">
+        <div className="admin__bar-inner">
+          <div className="admin__bar-left">
+            <Link to="/admin" className="admin__back" aria-label="Back to posts">
+              <PiArrowLeftBold size={15} />
+              Posts
+            </Link>
+            <span className="admin__bar-sep" aria-hidden="true" />
+            <span className="admin__bar-title">{isEdit ? title || 'Untitled post' : 'New post'}</span>
+            <span className={`admin__pill admin__pill--${status}`}>{status}</span>
           </div>
-          <div className="admin-actions">
-            {saveStatusLabel && (
-              <span className={`admin-status admin-status--${saveState}`}>{saveStatusLabel}</span>
+
+          <div className="admin__bar-right">
+            {saveState === 'saving' && <span className="admin__save">Saving</span>}
+            {saveState === 'saved' && (
+              <span className="admin__save admin__save--ok">
+                <PiCheckCircleBold size={14} />
+                Saved
+              </span>
             )}
-            <button type="button" className="btn btn--outlined" onClick={() => save('draft')}>
+            <button type="button" className="btn btn--outlined btn--sm" onClick={() => save('draft')}>
               Save draft
             </button>
-            <button
-              type="button"
-              className="btn btn--primary"
-              onClick={() => save('published')}
-            >
+            <button type="button" className="btn btn--primary btn--sm" onClick={() => save('published')}>
               {status === 'published' ? 'Update' : 'Publish'}
             </button>
           </div>
         </div>
+        {saveState === 'error' && (
+          <p className="admin__bar-error" role="alert">
+            <PiWarningCircleBold size={15} />
+            {error}
+          </p>
+        )}
+      </header>
 
+      <div className="admin__container">
         <div className="admin-editor">
-          {/* Main editing area */}
           <div className="admin-editor__main">
-            <div className="admin-field" style={{ marginBottom: 20 }}>
-              <input
-                type="text"
-                placeholder="Post title"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                style={{ fontSize: '1.5rem', fontWeight: 700, padding: '12px 16px', border: 'none', borderBottom: '2px solid var(--md-sys-color-outline-variant)', borderRadius: 0, background: 'transparent' }}
-              />
-            </div>
+            <input
+              className="admin-editor__title"
+              type="text"
+              placeholder="Post title"
+              aria-label="Post title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
 
             <Toolbar editor={editor} />
-            <div className="tiptap-editor-wrap">
+            <div className="admin-editor__canvas">
               <EditorContent editor={editor} />
             </div>
           </div>
 
-          {/* Sidebar */}
           <aside className="admin-editor__sidebar">
-            <div className="admin-editor__sidebar-card">
-              <p className="admin-editor__sidebar-card-title">Post details</p>
+            <section className="admin-card">
+              <h2 className="admin-card__title">Details</h2>
 
               <div className="admin-field">
-                <label>Slug</label>
+                <label htmlFor="f-slug">Slug</label>
                 <input
+                  id="f-slug"
                   type="text"
                   value={slug}
-                  onChange={e => { setSlug(e.target.value); setSlugManual(true); }}
+                  onChange={(e) => { setSlug(e.target.value); setSlugManual(true); }}
                   placeholder="post-slug"
                 />
+                <span className="admin-field__help">/blog/{slug || 'post-slug'}</span>
               </div>
 
               <div className="admin-field">
-                <label>Summary</label>
+                <label htmlFor="f-summary">Summary</label>
                 <textarea
+                  id="f-summary"
+                  rows={3}
                   value={summary}
-                  onChange={e => setSummary(e.target.value)}
-                  placeholder="One-sentence description for the post card and llms.txt"
+                  onChange={(e) => setSummary(e.target.value)}
+                  placeholder="One sentence. Shows on the index and in search results."
                 />
               </div>
 
               <div className="admin-field">
-                <label>Tags (comma-separated)</label>
+                <label htmlFor="f-tags">Tags</label>
                 <input
+                  id="f-tags"
                   type="text"
                   value={tags}
-                  onChange={e => setTags(e.target.value)}
-                  placeholder="systems, embedded, c++"
+                  onChange={(e) => setTags(e.target.value)}
+                  placeholder="systems, embedded, c"
                 />
+                <span className="admin-field__help">Comma separated.</span>
               </div>
-            </div>
+            </section>
 
-            <div className="admin-editor__sidebar-card">
-              <p className="admin-editor__sidebar-card-title">Series</p>
+            <section className="admin-card">
+              <h2 className="admin-card__title">Series</h2>
               <div className="admin-field">
-                <label>Series</label>
-                <select value={seriesSlug} onChange={e => setSeriesSlug(e.target.value)}>
+                <label htmlFor="f-series">Part of</label>
+                <select id="f-series" value={seriesSlug} onChange={(e) => setSeriesSlug(e.target.value)}>
                   <option value="">No series</option>
-                  {allSeries.map(s => (
+                  {allSeries.map((s) => (
                     <option key={s.slug} value={s.slug}>{s.title}</option>
                   ))}
                 </select>
               </div>
-              <CreateSeriesInline token={token} onCreated={s => { setAllSeries(prev => [...prev, s]); setSeriesSlug(s.slug); }} />
-            </div>
-
-            <div className="admin-editor__sidebar-card">
-              <p className="admin-editor__sidebar-card-title">Status</p>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {['draft', 'published'].map(s => (
-                  <button
-                    key={s}
-                    type="button"
-                    className={`btn btn--sm ${status === s ? 'btn--primary' : 'btn--outlined'}`}
-                    onClick={() => setStatus(s)}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
+              <CreateSeriesInline
+                token={token}
+                onCreated={(s) => { setAllSeries((prev) => [...prev, s]); setSeriesSlug(s.slug); }}
+              />
+            </section>
           </aside>
         </div>
       </div>
@@ -402,50 +565,71 @@ function CreateSeriesInline({ token, onCreated }) {
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
   const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState('');
 
   async function handleCreate(e) {
     e.preventDefault();
     setLoading(true);
-    const res = await fetch('/api/admin/series', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ title, description: desc }),
-    });
-    const d = await res.json();
-    if (res.ok) {
-      onCreated({ slug: d.slug, title, description: desc });
+    setErr('');
+    try {
+      const res = await fetch('/api/admin/series', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ title, description: desc }),
+      });
+      const d = await res.json();
+      if (!res.ok) {
+        setErr(d.error === 'slug_conflict' ? 'A series with that name exists.' : 'Could not create series.');
+        return;
+      }
+      onCreated({ slug: d.slug, title, description: desc, post_count: 0 });
       setTitle(''); setDesc(''); setShow(false);
+    } catch {
+      setErr('Network error.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
-  if (!show) return (
-    <button type="button" className="btn btn--sm btn--outlined" onClick={() => setShow(true)}>
-      + New series
-    </button>
-  );
+  if (!show) {
+    return (
+      <button type="button" className="btn btn--sm btn--outlined" onClick={() => setShow(true)}>
+        <PiPlusBold size={14} />
+        New series
+      </button>
+    );
+  }
 
   return (
-    <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
-      <input
-        className="admin-auth__input"
-        style={{ padding: '8px 12px', fontSize: '0.85rem' }}
-        placeholder="Series title"
-        value={title}
-        onChange={e => setTitle(e.target.value)}
-        required
-        autoFocus
-      />
-      <input
-        className="admin-auth__input"
-        style={{ padding: '8px 12px', fontSize: '0.85rem' }}
-        placeholder="Description (optional)"
-        value={desc}
-        onChange={e => setDesc(e.target.value)}
-      />
-      <div style={{ display: 'flex', gap: 8 }}>
-        <button type="submit" className="btn btn--sm btn--primary" disabled={loading}>Create</button>
-        <button type="button" className="btn btn--sm btn--outlined" onClick={() => setShow(false)}>Cancel</button>
+    <form className="admin-subform" onSubmit={handleCreate}>
+      <div className="admin-field">
+        <label htmlFor="f-series-title">Name</label>
+        <input
+          id="f-series-title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Bare Metal"
+          required
+          autoFocus
+        />
+      </div>
+      <div className="admin-field">
+        <label htmlFor="f-series-desc">Description</label>
+        <input
+          id="f-series-desc"
+          value={desc}
+          onChange={(e) => setDesc(e.target.value)}
+          placeholder="Optional"
+        />
+      </div>
+      {err && <p className="admin-field__error">{err}</p>}
+      <div className="admin-subform__actions">
+        <button type="submit" className="btn btn--sm btn--primary" disabled={loading || !title.trim()}>
+          {loading ? 'Creating' : 'Create'}
+        </button>
+        <button type="button" className="btn btn--sm btn--outlined" onClick={() => setShow(false)}>
+          Cancel
+        </button>
       </div>
     </form>
   );

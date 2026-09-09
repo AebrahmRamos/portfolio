@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
-import { Card } from '../m3';
+import {
+  PiPlusBold, PiEyeBold, PiPencilSimpleBold, PiTrashBold,
+  PiSignOutBold, PiWarningCircleBold,
+} from 'react-icons/pi';
 import PostEditor from './PostEditor';
 import './admin.css';
 
@@ -23,7 +26,7 @@ function AuthGate({ onAuth }) {
         sessionStorage.setItem('adminToken', token);
         onAuth(token);
       } else {
-        setError('Invalid token. Check your ADMIN_TOKEN.');
+        setError('That token was not accepted.');
       }
     } catch {
       setError('Network error. Try again.');
@@ -35,27 +38,34 @@ function AuthGate({ onAuth }) {
     <section className="admin">
       <div className="admin__container">
         <div className="admin-auth">
-          <Card variant="elevated" className="admin-auth__card">
-            <h1 className="m3-headline-medium admin-auth__title">Admin</h1>
-            <p className="m3-body-medium admin-auth__subtitle">
-              Enter your admin token to manage posts
-            </p>
+          <div className="admin-auth__card">
+            <h1 className="admin-auth__title">Admin</h1>
+            <p className="admin-auth__subtitle">Sign in to manage posts and series.</p>
             <form className="admin-auth__form" onSubmit={handleSubmit}>
-              <input
-                type="password"
-                className="admin-auth__input"
-                placeholder="Admin token"
-                value={token}
-                onChange={e => setToken(e.target.value)}
-                autoFocus
-                required
-              />
-              {error && <p className="admin-auth__error">{error}</p>}
+              <div className="admin-field">
+                <label htmlFor="admin-token">Admin token</label>
+                <input
+                  id="admin-token"
+                  type="password"
+                  className="admin-auth__input"
+                  value={token}
+                  onChange={(e) => setToken(e.target.value)}
+                  autoComplete="current-password"
+                  autoFocus
+                  required
+                />
+              </div>
+              {error && (
+                <p className="admin-auth__error" role="alert">
+                  <PiWarningCircleBold size={15} />
+                  {error}
+                </p>
+              )}
               <button type="submit" className="btn btn--primary" disabled={loading || !token}>
-                {loading ? 'Verifying…' : 'Sign in'}
+                {loading ? 'Checking' : 'Sign in'}
               </button>
             </form>
-          </Card>
+          </div>
         </div>
       </div>
     </section>
@@ -67,12 +77,16 @@ function AuthGate({ onAuth }) {
 function PostList({ token, onLogout }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const load = useCallback(() => {
     fetch('/api/admin/posts', { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json())
-      .then(d => { setPosts(d.posts ?? []); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then((r) => {
+        if (!r.ok) throw new Error('fetch_error');
+        return r.json();
+      })
+      .then((d) => { setPosts(d.posts ?? []); setLoading(false); })
+      .catch(() => { setError('Could not load posts.'); setLoading(false); });
   }, [token]);
 
   useEffect(() => { load(); }, [load]);
@@ -87,62 +101,88 @@ function PostList({ token, onLogout }) {
   }
 
   function formatDate(ts) {
-    if (!ts) return 'Draft';
-    return new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    if (!ts) return 'Not published';
+    return new Date(ts * 1000).toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric',
+    });
   }
 
-  if (loading) {
-    return (
-      <div className="admin">
-        <div className="admin__container">
-          <p style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>Loading…</p>
-        </div>
-      </div>
-    );
-  }
+  const drafts = posts.filter((p) => p.status === 'draft').length;
 
   return (
     <section className="admin">
       <div className="admin__container">
         <div className="admin__header">
-          <h1 className="m3-headline-large admin__title">Posts</h1>
+          <div>
+            <h1 className="admin__title">Posts</h1>
+            {!loading && !error && (
+              <p className="admin__subtitle">
+                {posts.length} total{drafts > 0 && `, ${drafts} draft${drafts === 1 ? '' : 's'}`}
+              </p>
+            )}
+          </div>
           <div className="admin-actions">
-            <Link to="/admin/new" className="btn btn--primary">+ New post</Link>
-            <Link to="/blog" className="btn btn--outlined">View blog</Link>
-            <button type="button" onClick={onLogout} className="btn btn--outlined">Sign out</button>
+            <Link to="/admin/new" className="btn btn--primary">
+              <PiPlusBold size={15} />
+              New post
+            </Link>
+            <Link to="/blog" className="btn btn--outlined">
+              <PiEyeBold size={15} />
+              View blog
+            </Link>
+            <button type="button" onClick={onLogout} className="btn btn--outlined">
+              <PiSignOutBold size={15} />
+              Sign out
+            </button>
           </div>
         </div>
 
-        {posts.length === 0 ? (
-          <Card variant="outlined" style={{ padding: 32, textAlign: 'center' }}>
-            <p className="m3-body-large" style={{ color: 'var(--md-sys-color-on-surface-variant)' }}>
-              No posts yet.{' '}
-              <Link to="/admin/new" style={{ color: 'var(--md-sys-color-primary)' }}>
-                Write your first post →
-              </Link>
-            </p>
-          </Card>
+        {loading ? (
+          <div className="admin__loading">Loading posts</div>
+        ) : error ? (
+          <div className="admin__notice admin__notice--error">
+            <PiWarningCircleBold size={18} />
+            <p>{error}</p>
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="admin__loading">
+            No posts yet. <Link to="/admin/new">Write the first one.</Link>
+          </div>
         ) : (
           <div className="admin-posts__list">
-            {posts.map(post => (
+            {posts.map((post) => (
               <div key={post.id} className="admin-post-item">
                 <div className="admin-post-item__info">
-                  <p className="m3-title-medium admin-post-item__title">{post.title}</p>
+                  <p className="admin-post-item__title">{post.title}</p>
                   <p className="admin-post-item__meta">
-                    {post.series_slug && <span>{post.series_slug} · </span>}
                     {formatDate(post.published_at)}
+                    {post.series_slug && ` in ${post.series_slug}`}
                   </p>
                 </div>
                 <span className={`admin-post-item__status admin-post-item__status--${post.status}`}>
                   {post.status}
                 </span>
                 <div className="admin-post-item__actions">
-                  <Link to={`/admin/edit/${post.id}`} className="btn btn--sm btn--secondary">Edit</Link>
-                  <a href={`/blog/${post.slug}`} target="_blank" rel="noreferrer" className="btn btn--sm btn--outlined">
+                  <Link to={`/admin/edit/${post.id}`} className="btn btn--sm btn--secondary">
+                    <PiPencilSimpleBold size={14} />
+                    Edit
+                  </Link>
+                  <a
+                    href={`/blog/${post.slug}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn--sm btn--outlined"
+                  >
+                    <PiEyeBold size={14} />
                     View
                   </a>
-                  <button onClick={() => handleDelete(post.id, post.title)} className="btn btn--sm btn--danger">
-                    Delete
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(post.id, post.title)}
+                    className="btn btn--sm btn--danger"
+                    aria-label={`Delete ${post.title}`}
+                  >
+                    <PiTrashBold size={14} />
                   </button>
                 </div>
               </div>

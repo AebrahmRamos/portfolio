@@ -151,6 +151,15 @@ function parseTags(raw) {
   try { return JSON.parse(raw ?? '[]'); } catch { return []; }
 }
 
+// Reading time from a character count. 5.5 chars per word is the standard
+// English estimate and 238 wpm is the Nielsen Norman median for adult screen
+// reading. Exported for the unit tests.
+export function readMinutes(charLength) {
+  const chars = Number(charLength) || 0;
+  if (chars === 0) return null;
+  return Math.max(1, Math.round(chars / 5.5 / 238));
+}
+
 // Pure: merge a PATCH body over the existing row into the next field set.
 // Exported for unit tests. Uses `'key' in body` so an explicit null/empty value
 // can CLEAR summary/tags/series_slug (the old `??`/truthy checks made them
@@ -191,8 +200,12 @@ async function handleGetPosts(request, env) {
   const offset = (page - 1) * limit;
 
   const [rowsResult, countResult] = await Promise.all([
+    // body_len, not body_md: the index needs a reading time but shipping the
+    // full markdown of 200 posts to render one number each is absurd. LENGTH()
+    // is computed in SQLite and costs a few bytes per row.
     env.DB.prepare(
-      `SELECT id, slug, title, summary, series_slug, tags, published_at, updated_at
+      `SELECT id, slug, title, summary, series_slug, tags, published_at, updated_at,
+              LENGTH(body_md) AS body_len
        FROM posts WHERE status = 'published'
        ORDER BY published_at DESC LIMIT ? OFFSET ?`
     ).bind(limit, offset).all(),
@@ -202,7 +215,11 @@ async function handleGetPosts(request, env) {
   const total = countResult?.total ?? 0;
   // Short TTL for the list. stale-while-revalidate keeps the CDN fast but fresh.
   return new Response(JSON.stringify({
-    posts: rowsResult.results.map(p => ({ ...p, tags: parseTags(p.tags) })),
+    posts: rowsResult.results.map(({ body_len, ...p }) => ({
+      ...p,
+      tags: parseTags(p.tags),
+      read_minutes: readMinutes(body_len),
+    })),
     total, page, limit,
     hasMore: offset + limit < total,
   }, null, 2), {
@@ -251,17 +268,46 @@ async function handleGetSeriesList(env) {
      LEFT JOIN posts p ON p.series_slug = s.slug AND p.status = 'published'
      GROUP BY s.id ORDER BY s.title`
   ).all();
-  return jsonResponse({ series: rows.results });
+  // Not jsonResponse: its `max-age=3600` is a *browser* cache, so creating a
+  // series or publishing into one left the blog sidebar an hour out of date
+  // for anyone who had already visited. Same short-TTL, CDN-cached shape as
+  // the post list instead.
+  return new Response(JSON.stringify({ series: rows.results }, null, 2), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, max-age=0, s-maxage=60, stale-while-revalidate=300',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  });
 }
 
 async function handleGetSeriesPosts(slug, env) {
   const series = await env.DB.prepare(`SELECT * FROM series WHERE slug = ?`).bind(slug).first();
   if (!series) return jsonResponse({ error: 'not_found' }, 404);
   const rows = await env.DB.prepare(
-    `SELECT id, slug, title, summary, tags, published_at FROM posts
+    `SELECT id, slug, title, summary, tags, published_at, LENGTH(body_md) AS body_len
+     FROM posts
      WHERE series_slug = ? AND status = 'published' ORDER BY published_at ASC`
   ).bind(slug).all();
-  return jsonResponse({ series, posts: rows.results.map(p => ({ ...p, tags: parseTags(p.tags) })) });
+  // Same reason as handleGetSeriesList: jsonResponse browser-caches for an
+  // hour, so publishing a new part left the series page and the in-post
+  // playlist stale for anyone who had already visited.
+  return new Response(JSON.stringify({
+    series,
+    // read_minutes so the series page can show a per-part and a total time,
+    // matching the post list. body_len is dropped rather than shipped.
+    posts: rows.results.map(({ body_len, ...p }) => ({
+      ...p,
+      tags: parseTags(p.tags),
+      read_minutes: readMinutes(body_len),
+    })),
+  }, null, 2), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, max-age=0, s-maxage=60, stale-while-revalidate=300',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  });
 }
 
 async function handleFeed(env) {
