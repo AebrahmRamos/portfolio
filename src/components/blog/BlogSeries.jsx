@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { PiArrowLeftBold, PiArrowRightBold, PiStackSimpleBold } from 'react-icons/pi';
+import { PiArrowLeftBold, PiArrowRightBold } from 'react-icons/pi';
 import { formatPostDate } from './format';
+import { useDocumentTitle } from '../../utils/useDocumentTitle';
 import './blog.css';
 
 // A series is a reading playlist: an ordered run of posts meant to be taken in
@@ -32,10 +33,7 @@ export default function BlogSeries() {
     return () => { cancelled = true; };
   }, [slug]);
 
-  useEffect(() => {
-    if (data?.series) document.title = `${data.series.title} | Aebrahm Ramos`;
-    return () => { document.title = 'Aebrahm Ramos'; };
-  }, [data]);
+  useDocumentTitle(data?.series?.title);
 
   if (loading) {
     return (
@@ -82,10 +80,6 @@ export default function BlogSeries() {
         </Link>
 
         <header className="series-head">
-          <p className="series-head__kicker">
-            <PiStackSimpleBold size={14} aria-hidden="true" />
-            Series
-          </p>
           <h1 className="post__title">{series.title}</h1>
           {series.description && <p className="post__standfirst">{series.description}</p>}
 

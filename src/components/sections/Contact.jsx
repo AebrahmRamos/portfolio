@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import {
   PiEnvelopeSimpleBold,
@@ -42,12 +42,43 @@ const Contact = () => {
   const [formData, setFormData] = useState(EMPTY);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
+  const [errors, setErrors] = useState({});
+  const formRef = useRef(null);
 
-  const handleChange = (e) =>
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  // The form used to disable its submit button until every required field was
+  // filled, with noValidate set and no per-field error state. Nothing told you
+  // which field was missing: the button was simply dead. It now stays enabled,
+  // and submitting names the problem on the field itself.
+  const validate = (data) => {
+    const next = {};
+    if (!data.firstName.trim()) next.firstName = 'Enter your first name.';
+    if (!data.lastName.trim()) next.lastName = 'Enter your last name.';
+    if (!data.email.trim()) next.email = 'Enter your email address.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) next.email = 'That email address does not look right.';
+    if (!data.message.trim()) next.message = 'Tell me what you are working on.';
+    return next;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear a field's error while it is being corrected, rather than leaving
+    // it flagged until the next submit.
+    setErrors((prev) => (prev[name] ? { ...prev, [name]: undefined } : prev));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const found = validate(formData);
+    if (Object.keys(found).length > 0) {
+      setErrors(found);
+      setSubmitStatus(null);
+      formRef.current?.querySelector(`[name="${Object.keys(found)[0]}"]`)?.focus();
+      return;
+    }
+
+    setErrors({});
     setIsSubmitting(true);
     setSubmitStatus(null);
 
@@ -72,15 +103,13 @@ const Contact = () => {
       );
       setSubmitStatus('success');
       setFormData(EMPTY);
+      setErrors({});
     } catch {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const isFormValid =
-    formData.firstName && formData.lastName && formData.email && formData.message;
 
   return (
     <section id="contact" className="contact">
@@ -94,7 +123,7 @@ const Contact = () => {
         </div>
 
         <div className="contact__grid">
-          <form className="contact__form" onSubmit={handleSubmit} noValidate>
+          <form className="contact__form" ref={formRef} onSubmit={handleSubmit} noValidate>
             <div role="status" aria-live="polite" aria-atomic="true">
               {submitStatus === 'success' && (
                 <Banner severity="success" className="contact__banner">
@@ -112,6 +141,7 @@ const Contact = () => {
               <TextField
                 label="First name"
                 name="firstName"
+                error={errors.firstName}
                 autoComplete="given-name"
                 required
                 value={formData.firstName}
@@ -120,6 +150,7 @@ const Contact = () => {
               <TextField
                 label="Last name"
                 name="lastName"
+                error={errors.lastName}
                 autoComplete="family-name"
                 required
                 value={formData.lastName}
@@ -130,6 +161,7 @@ const Contact = () => {
             <TextField
               label="Email"
               name="email"
+              error={errors.email}
               type="email"
               autoComplete="email"
               required
@@ -145,6 +177,7 @@ const Contact = () => {
             <TextField
               label="Message"
               name="message"
+              error={errors.message}
               multiline
               rows={6}
               required
@@ -157,7 +190,7 @@ const Contact = () => {
               type="submit"
               variant="filled"
               size="large"
-              disabled={!isFormValid || isSubmitting}
+              disabled={isSubmitting}
               startIcon={isSubmitting ? <Progress size={16} /> : <PiPaperPlaneTiltBold />}
             >
               {isSubmitting ? 'Sending' : 'Send message'}

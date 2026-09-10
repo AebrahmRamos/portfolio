@@ -53,7 +53,7 @@
 .work__index {
   font-family: var(--md-sys-typescale-font-mono);
   font-size: var(--md-sys-typescale-label-medium-size);
-  color: var(--md-sys-color-outline);
+  color: var(--md-sys-color-on-surface-muted);
   padding-top: 8px;
   font-variant-numeric: tabular-nums;
 }

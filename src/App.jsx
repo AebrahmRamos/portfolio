@@ -7,6 +7,7 @@ import Hero from './components/sections/Hero';
 import About from './components/sections/About';
 import Loading from './components/common/Loading';
 import Reveal from './components/common/Reveal';
+import { useDocumentTitle } from './utils/useDocumentTitle';
 
 // Lazy-load below-the-fold portfolio sections.
 const Experience = lazy(() => import('./components/sections/Experience'));
@@ -26,6 +27,10 @@ const AdminPanel = lazy(() => import('./components/admin/AdminPanel'));
 // The Resume section is gone as a standalone block; it is one row inside
 // Contact now, which still carries id="resume" so /#resume keeps working.
 function PortfolioPage() {
+  // Matches the <title> in index.html so a client-side return to / does not
+  // downgrade the tab to the bare site name.
+  useDocumentTitle('Aebrahm Ramos - Full-Stack Developer', { suffix: false });
+
   const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
   return (
     <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>

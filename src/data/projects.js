@@ -138,7 +138,7 @@ export const projects = [
       'Command-line OS simulator that models process scheduling, virtual memory, and multi-core CPU allocation.',
     fullDescription:
       'Developed a configurable OS simulator in C++ implementing FCFS and Round Robin schedulers (configurable quantum), virtual memory paging with LRU page replacement, and first-fit physical memory allocation. Includes a small instruction language (DECLARE, ADD, READ, WRITE, PRINT), automated process generation, real-time monitoring commands (vmstat, process-smi, screen), backing-store snapshots, and test harnesses for reproducible experiments and performance visualization.',
-    image: 'https://api.builder.io/api/v1/image/assets/TEMP/b2c10a7f62f84dd4920fc0a6c929f1b5d8d067e7?width=760',
+    image: null,
     features: [
       'FCFS and Round Robin schedulers with configurable quantum',
       'Virtual memory paging with LRU page replacement algorithm',
@@ -169,7 +169,7 @@ export const projects = [
       'Full-stack hospital management platform with patient records, pharmacy inventory, and real-time updates.',
     fullDescription:
       'Built a full-stack hospital management platform implementing patient records, pharmacy inventory with automatic stock adjustments, billing (HMO support), role-based access control, audit logging, cashier shift management, automated service-based transactions, real-time table/order updates via WebSockets, and department-specific dashboards and reports.',
-    image: 'https://api.builder.io/api/v1/image/assets/TEMP/c82a21e45ba64dd4920fc0a6c929f1b5d8d067e7?width=760',
+    image: null,
     features: [
       'Patient records management system',
       'Pharmacy inventory with automatic stock adjustments',
@@ -206,7 +206,7 @@ export const projects = [
       'Full-stack university student government platform for DLSU with admin dashboard and authentication.',
     fullDescription:
       'Developed a full-stack university student government platform for DLSU (Veritas USG) including an admin dashboard with Role-Based Access Control (RBAC) and permission-based roles, NextAuth.js authentication (credentials + Google OAuth, optional TOTP 2FA) with bcrypt password hashing, announcement and project management with rich-text editing and drag-and-drop image uploads (image optimization/WebP), API endpoints for public content, audit logging and rate limiting for security, middleware-based route protection (temporarily simplified during signin debugging), and deployment tooling using PM2 behind Nginx for production.',
-    image: 'https://api.builder.io/api/v1/image/assets/TEMP/d3a41c7d62f84dd4920fc0a6c929f1b5d8d067e7?width=760',
+    image: null,
     features: [
       'Admin dashboard with Role-Based Access Control (RBAC) and permission-based roles',
       'NextAuth.js authentication (credentials + Google OAuth)',
@@ -244,7 +244,7 @@ export const projects = [
       'Comprehensive website with e-commerce platform, AI receipt analysis, and member management.',
     fullDescription:
       'Developed a comprehensive website for the Google Developer Group on Campus at De La Salle University. This website includes a fully-fledged e-commerce platform with custom payment processing and AI receipt analysis, a member management system, and an organizational information portal to enhance engagement and efficiency.',
-    image: 'https://api.builder.io/api/v1/image/assets/TEMP/b2c10a7f62f84dd4920fc0a6c929f1b5d8d067e7?width=760',
+    image: null,
     features: [
       'Fully-fledged e-commerce platform',
       'Custom payment processing system',
@@ -274,7 +274,7 @@ export const projects = [
       'Internal tools hub with member directory, order processing, and administrative dashboards.',
     fullDescription:
       'Created an organizational management platform (internal tools hub) for Google Developer Groups on Campus, featuring member directory management, order processing with payment verification, and multi-departmental administrative dashboards to streamline internal operations and enhance organizational oversight.',
-    image: 'https://api.builder.io/api/v1/image/assets/TEMP/c82a21e45ba64dd4920fc0a6c929f1b5d8d067e7?width=760',
+    image: null,
     features: [
       'Member directory management with advanced filtering',
       'Order processing system',
@@ -304,7 +304,7 @@ export const projects = [
       'Organizational website with member management, event showcases, and learning resources portal.',
     fullDescription:
       'Designed and implemented an organizational website for the La Salle Debate Society (LSDS) of De La Salle University. This website includes member department management, event showcases with interactive galleries, and a learning resources portal to support the society\'s activities and outreach.',
-    image: 'https://api.builder.io/api/v1/image/assets/TEMP/b8a51c7d62f84dd4920fc0a6c929f1b5d8d067e7?width=760',
+    image: null,
     features: [
       'Member department management system',
       'Event showcases with interactive galleries',
@@ -331,7 +331,7 @@ export const projects = [
       'Recruitment and showcase website with dynamic content management and member onboarding.',
     fullDescription:
       'Built a recruitment and showcase website for Google Developer Student Club De La Salle University, featuring dynamic content management, interactive galleries, and a seamless member onboarding experience to attract and engage potential members.',
-    image: 'https://api.builder.io/api/v1/image/assets/TEMP/9161ca83a6dc467d83b197b651cc35ca93f109d1?width=760',
+    image: null,
     features: [
       'Dynamic content management system',
       'Interactive galleries',
@@ -346,7 +346,7 @@ export const projects = [
       'Mantine UI',
       'TailwindCSS',
     ],
-    liveDemo: '#demo',
+    liveDemo: null,
     github: null,
     featured: true,
     category: ['React', 'Firebase'],
@@ -359,7 +359,7 @@ export const projects = [
       'AI chatbot using Vertex AI and Gemini to assist university help desk with automated responses.',
     fullDescription:
       'Developed a RAG chatbot using Google Cloud Platform\'s Vertex AI and Gemini model. This is developed to assist the university\'s help desk by providing automated response to student inquiries only bound to the knowledge given to it and not hallucinating. This aims to improve the efficiency of concierge/help desk tickets and improve the response times.',
-    image: 'https://api.builder.io/api/v1/image/assets/TEMP/d3a41c7d62f84dd4920fc0a6c929f1b5d8d067e7?width=760',
+    image: null,
     features: [
       'Vertex AI and Gemini model integration',
       'Knowledge-bound automated responses (no hallucination)',
@@ -387,7 +387,7 @@ export const projects = [
       'Hardware EPROM programmer implementing the fast programming algorithm to interface a Motorola M68HC11 with a 2764 UVEPROM chip.',
     fullDescription:
       'Implemented a read and write programming protocol for the Motorola M68HC11 microcontroller to be externally interfaced with a 2764 UVEPROM. The programming protocol follows the fast programming algorithm specified in the 2764 UVEPROM\'s datasheet. The project encompasses a Python bootloader for host-side communication, M68HC11 assembly code for the microcontroller firmware, hardware connection design and interfacing, and custom PCB fabrication.',
-    image: 'https://api.builder.io/api/v1/image/assets/TEMP/b2c10a7f62f84dd4920fc0a6c929f1b5d8d067e7?width=760',
+    image: null,
     features: [
       'Read and write programming protocol for 2764 UVEPROM',
       'Fast programming algorithm per datasheet specification',
@@ -414,7 +414,7 @@ export const projects = [
       'RGB to Grayscale converter linking C and Assembly with optimized conversion function.',
     fullDescription:
       'A standard RGB to Grayscale converter linking C and Assembly together where the primary function to convert is implemented in Assembly.',
-    image: 'https://api.builder.io/api/v1/image/assets/TEMP/b2c10a7f62f84dd4920fc0a6c929f1b5d8d067e7?width=760',
+    image: null,
     features: [
       'C and x86 Assembly integration',
       'Image processing algorithm',

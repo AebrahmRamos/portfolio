@@ -4,6 +4,7 @@ import { PiArrowLeftBold, PiArrowRightBold, PiLinkSimpleBold, PiCheckBold, PiSta
 import DOMPurify from 'dompurify';
 import { formatPostDate } from './format';
 import { highlightCodeBlocks } from './highlight';
+import { useDocumentTitle } from '../../utils/useDocumentTitle';
 import './blog.css';
 
 // DOMPurify is configured to allow <iframe> for embeds, so constrain them to a
@@ -192,10 +193,7 @@ export default function BlogPost() {
     highlightCodeBlocks(node);
   }, [post]);
 
-  useEffect(() => {
-    if (post) document.title = `${post.title} | Aebrahm Ramos`;
-    return () => { document.title = 'Aebrahm Ramos'; };
-  }, [post]);
+  useDocumentTitle(post?.title);
 
   if (loading) {
     return (

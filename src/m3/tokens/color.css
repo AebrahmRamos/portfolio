@@ -66,6 +66,15 @@
   --md-sys-color-outline: #787f8f;
   --md-sys-color-outline-variant: #dde1e9;
 
+  /* Small muted text: counts, index numbers, placeholders.
+     These used --md-sys-color-outline, which is tuned to the 3:1 bar for
+     borders and control edges. At 12-13px it measured 4.01:1 and failed AA,
+     which is what Lighthouse flagged on the post page. This token is the same
+     role visually but clears 4.5:1 on every light surface in the ramp
+     (5.50 / 5.22 / 4.95 / 4.65). Keep using `outline` for borders and icons,
+     where 3:1 is the correct bar. */
+  --md-sys-color-on-surface-muted: #61697c;
+
   --md-sys-color-inverse-surface: #1b2434;
   --md-sys-color-inverse-on-surface: #f1f3f7;
   --md-sys-color-inverse-primary: #a8c6ff;
@@ -121,6 +130,11 @@
 
   --md-sys-color-outline: #798492;
   --md-sys-color-outline-variant: #2c333b;
+
+  /* Dark counterpart. The outline value only reached 3.71:1 on
+     surface-container-highest; this clears 4.5:1 on all five dark surfaces
+     (6.19 / 5.87 / 5.58 / 5.15 / 4.65). */
+  --md-sys-color-on-surface-muted: #8b95a3;
 
   --md-sys-color-inverse-surface: #e8ecf2;
   --md-sys-color-inverse-on-surface: #191d22;

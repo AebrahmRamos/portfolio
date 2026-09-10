@@ -7,7 +7,7 @@ import './Loading.css';
 const Loading = () => (
   <div className="loading" role="status" aria-live="polite">
     <span className="loading__bar" aria-hidden="true" />
-    <span className="loading__sr">Loading</span>
+    <span className="sr-only">Loading</span>
   </div>
 );
 

@@ -480,6 +480,8 @@ export default function PostEditor({ token }) {
       </header>
 
       <div className="admin__container">
+        <h1 className="sr-only">{isEdit ? `Edit post: ${title || 'Untitled'}` : 'New post'}</h1>
+
         <div className="admin-editor">
           <div className="admin-editor__main">
             <input

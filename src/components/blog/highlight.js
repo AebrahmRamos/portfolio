@@ -73,6 +73,13 @@ export function highlightCodeBlocks(root) {
 
     const detected = lang ?? tree?.data?.language ?? null;
 
+    // The block scrolls horizontally rather than wrapping code, so it has to
+    // be reachable by keyboard: a scroll container that only responds to a
+    // pointer strands keyboard users on the visible portion of a long line
+    // (WCAG 2.1.1, axe scrollable-region-focusable). code.css gives it a
+    // focus ring so the stop is visible when it lands.
+    pre.setAttribute('tabindex', '0');
+
     const wrap = doc.createElement('div');
     wrap.className = 'codeblock';
     pre.replaceWith(wrap);

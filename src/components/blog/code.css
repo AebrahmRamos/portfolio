@@ -108,6 +108,14 @@
   tab-size: 2;
 }
 
+/* highlight.js gives the scroll container tabindex="0" so it can be scrolled
+   from the keyboard; that tab stop needs to be visible when it lands. Inset,
+   because the wrapper clips overflow and an outset ring would be cut off. */
+.codeblock > pre:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -2px;
+}
+
 .codeblock > pre > code {
   font-family: inherit;
   font-size: inherit;

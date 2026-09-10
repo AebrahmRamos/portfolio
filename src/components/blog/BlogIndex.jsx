@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom';
 import { PiMagnifyingGlassBold, PiArrowRightBold, PiXBold } from 'react-icons/pi';
 import { formatPostDate } from './format';
+import { useDocumentTitle } from '../../utils/useDocumentTitle';
 import './blog.css';
 
 function Meta({ post, seriesTitle }) {
@@ -68,6 +69,8 @@ function SkeletonRows() {
 }
 
 export default function BlogIndex() {
+  useDocumentTitle('Writing');
+
   const [allPosts, setAllPosts] = useState([]);
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -202,7 +205,7 @@ export default function BlogIndex() {
               />
             </div>
             <label className="blog__sort-wrap">
-              <span className="blog__sr">Sort posts</span>
+              <span className="sr-only">Sort posts</span>
               <select
                 className="blog__sort"
                 value={sort}
